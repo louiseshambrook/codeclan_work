@@ -1,0 +1,271 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+```
+```{r}
+tidyverse_logo()
+```
+
+```{r}
+tidyverse::tidyverse_logo()
+```
+
+```{r}
+library(tidyverse)
+```
+```{r}
+devtools::install_github("codeclan/CodeClanData")
+```
+
+```{r}
+library(CodeClanData)
+```
+
+```{r}
+students
+```
+## Working with dplyr
+```{r}
+all_deaths
+```
+## Checking our data 
+```{r}
+# number of rows
+
+nrow(all_deaths)
+```
+
+```{r}
+# number of columns
+
+ncol(all_deaths)
+```
+```{r}
+# overall dimensions
+
+dim(all_deaths)
+```
+
+```{r}
+# variable names
+names(all_deaths)
+```
+```{r}
+# check first ten rows
+head(all_deaths, 10)
+```
+```{r}
+# check last ten rows
+tail(all_deaths, 10)
+```
+
+```{r}
+# get an overview of data
+glimpse(all_deaths)
+```
+```{r}
+# view data frame
+
+view(all_deaths)
+```
+
+```{r}
+# view a short representation of the data
+
+str(all_deaths)
+```
+```{r}
+# print data to the console
+all_deaths
+```
+```{r}
+# selecting a few variables to keep
+
+select(all_deaths, name, allegiances, gender, nobility, year_of_death)
+```
+```{r}
+select(all_deaths, -name)
+```
+
+```{r}
+got_deaths_no_names <- select(all_deaths, -name)
+
+```
+```{r}
+# select all columns relating to a book
+
+got_deaths_books <- select(all_deaths, -name, -allegiances, -year_of_death, -gender, -nobility)
+head(got_deaths_books)
+```
+
+```{r}
+# select all columns related to a death
+
+got_deaths_columns <- select(all_deaths, year_of_death, book_of_death, death_chapter)
+head(got_deaths_columns)
+```
+
+```{r}
+# filter 
+filter(all_deaths, allegiances == "Lannister" | allegiances == "House Lannister")
+
+```
+```{r}
+# using logical operators
+filter(all_deaths, allegiances != "Lannister")
+```
+
+
+```{r}
+filter(all_deaths, allegiances %in% c("House Lannister", "Lannister"))
+```
+
+```{r}
+filter(all_deaths, year_of_death > 299)
+```
+
+```{r}
+filter(all_deaths, allegiances == "None")
+```
+
+```{r}
+filter(all_deaths, book_intro_chapter >= 5 & book_intro_chapter <= 10)
+```
+
+```{r}
+# task 1 - Find where the year_of_death is less than or equal to 299.
+
+filter(all_deaths, year_of_death <= 299)
+
+```
+```{r}
+#task 2 - Find the females (gender is 0) who are not Lannisters
+filter(all_deaths, gender == 0 & (allegiances != "Lannister" & allegiances != "House Lannister"))
+
+```
+```{r}
+# task 3 - Find just the data for the characters “Jon Snow”, “Daenerys Targaryen” and “Samwell Tarly”.
+
+filter(all_deaths, name == "Jon Snow" | name == "Daenerys Targaryen" | name == "Samwell Tarly")
+
+```
+```{r}
+# arrange
+
+arrange(all_deaths, )
+```
+```{r}
+arrange(all_deaths, desc(gender))
+```
+```{r}
+arrange(all_deaths, book_of_death, death_chapter)
+```
+```{r}
+# arrange by allegiances
+arrange(all_deaths, allegiances)
+```
+```{r}
+# arrange by allegiances and book_intro_chapter
+arrange(all_deaths, allegiances, book_intro_chapter)
+```
+```{r}
+# Arrange all_deaths by descending year_of_death
+arrange(all_deaths, year_of_death)
+```
+```{r}
+# mutate
+
+mutate(all_deaths, years_survived = year_of_death - 298)
+```
+```{r}
+# changing an existing column
+
+mutate(all_deaths, book_of_death = book_of_death * 5)
+```
+```{r}
+mutate(all_deaths, year_of_death  = is.na(year_of_death))
+```
+```{r}
+mutate(all_deaths, book_of_death = as.character(book_of_death))
+
+```
+```{r}
+mutate(all_deaths, name = as.numeric(name))
+```
+```{r}
+mutate(all_deaths, year_of_death = sum(year_of_death, na.rm = TRUE))
+```
+```{r}
+mutate(all_deaths, year_of_death = mean(year_of_death, na.rm = TRUE))
+```
+```{r}
+# summarise
+
+summarise(all_deaths, n_males = sum(gender))
+```
+```{r}
+# group by and summarise
+
+deaths_grouped <-  group_by(all_deaths, allegiances)
+summarise(deaths_grouped, character_count = n())
+```
+```{r}
+# group by several variables
+
+deaths_grouped <- group_by(all_deaths, nobility, gender)
+summarise(deaths_grouped, character_count = n())
+```
+```{r}
+# magrittr pipes
+
+have_died <- filter(all_deaths, !is.na(book_of_death))
+
+died_grouped <- group_by(have_died, allegiances)
+
+died_counts <- summarise(died_grouped, count = n())
+
+arrange(died_counts, desc(count))
+
+```
+
+```{r}
+deaths_by_allegiance <- all_deaths %>%
+  filter(!is.na(book_of_death)) %>% 
+  group_by(allegiances) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count)) 
+
+```
+```{r}
+# pull function 
+
+av_year_of_death <- all_deaths %>%
+  summarise(av_value = mean(year_of_death,
+                            na.rm = TRUE))
+av_year_of_death
+```
+```{r}
+all_deaths %>% 
+  mutate(death_later_than_av = year_of_death > av_year_of_death)
+```
+```{r}
+all_deaths %>% 
+  mutate(death_later_than_av = year_of_death > 299.1574)
+```
+```{r}
+av_year_of_death <- all_deaths %>%
+  summarise(av_value = mean(year_of_death,
+                            na.rm = TRUE)) %>%
+  pull()
+av_year_of_death
+```
+
+```{r}
+all_deaths %>% 
+  mutate(death_later_than_av = year_of_death > av_year_of_death)
+```
+

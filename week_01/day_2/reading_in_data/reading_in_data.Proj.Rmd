@@ -1,0 +1,67 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+
+```
+
+```{r}
+read_csv("data/dog_bites.csv")
+
+```
+
+```{r}
+dog_bites <- read_csv("data/dog_bites.csv")
+
+```
+
+# Reading in excel files
+
+```{r}
+library(readxl)
+```
+
+```{r}
+seedmix <- read_excel("data/edinburgh_seedmix.xlsx")
+seedmix
+
+```
+```{r}
+seedmix_north <- read_excel("data/edinburgh_seedmix.xlsx", sheet = 3)
+seedmix_north
+```
+```{r}
+seedmix_north <- read_excel("data/edinburgh_seedmix.xlsx",
+                            sheet = "North Neighbourhood")
+seedmix_north
+```
+
+```{r}
+seedmix_south_one <- read_excel("data/edinburgh_seedmix.xlsx", sheet = 4)
+seedmix_south_one
+```
+
+```{r}
+seedmix_south_two <- read_excel("data/edinburgh_seedmix.xlsx",
+                            sheet = "South Neighbourhood")
+seedmix_south_two
+```
+
+```{r}
+write_csv(seedmix_south_one, "seedmix_south")
+
+```
+
+```{r}
+write_csv(seedmix_south_two, "clean_data/seedmix_cleaned.csv")
+```
+
+```{r}
+library(tidyverse)
+```
+
+
+

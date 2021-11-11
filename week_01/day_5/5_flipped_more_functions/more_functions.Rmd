@@ -1,0 +1,117 @@
+---
+title: "Some More Functions"
+output: html_notebook
+editor_options: 
+  chunk_output_type: inline
+---
+
+# Examples of functions
+
+Here's some examples of functions we've seen before and their inputs and outputs.
+
+| Function | Input | Output | What it does |
+|---|---|---|---|
+| `sum()`       | A `numeric` vector | A single number | Sums the elements of a vector |
+| `rev()`       | A vector         | A vector        | Reverses the elements of a vector |
+| `seq()`       | Several numbers  | A vector        | Generates a sequence of numbers |
+| `as.factor()` | A vector         | A vector        | Encodes a vector as `factor` type |
+
+For example for `sum()`, if our input is
+
+```{r}
+c(3, 6, 2)
+```
+
+Our output will be the number 11.
+
+```{r}
+sum(c(3, 6, 2))
+```
+
+
+## Some more functions
+
+This is a good chance to learn about some functions we haven't covered yet. If you want to know more about any of these functions, you can look up their help files.
+
+**`abs()`**
+
+Finds the absolute value of a number, i.e. find the distance of a number from zero (makes negative numbers positive)
+
+```{r}
+abs(-5)
+abs(3.1)
+```
+
+**`round()`**
+
+Rounds to the nearest whole number by default (the behaviour of this function when rounding off a 5 is a subtle, see the docs). If the `digits` parameter is a positive number, it will round to that number of decimal places; set to a negative number to round to powers of 10.
+
+```{r}
+round(5.233)
+round(5.233, digits = 2)
+round(3423.23, digits = -2)
+# subtle behaviour rounding a 5 - goes to even number
+round(3.5, digits = 0)
+round(2.5, digits = 0)
+```
+
+**`floor()`**
+
+Rounds, but always goes to the lowest number.
+
+```{r}
+floor(4.87)
+```
+
+**`ceiling()`**
+
+Similar to `floor()` but always goes to the highest number.
+
+```{r}
+ceiling(3.23)
+```
+
+**`paste()`**
+
+Joins character strings together, using whatever character separator (`sep`) you specify. Joins with a space by default.
+
+```{r}
+paste("Hello", "Goodbye")
+```
+
+```{r}
+paste("Hello", "Goodbye", sep = "")
+```
+
+If you have a vector of character strings, you can join them together by specifying the `collapse` argument.
+
+```{r}
+letters = c("h", "e", "l", "l", "o")
+paste(letters, collapse = "-")
+```
+
+A shortcut if you want to joining with no separator, i.e. `sep = ""`, is to use `paste0()`:
+
+```{r}
+paste0("Hello", "Goodbye")
+```
+
+**`sort()`**
+
+Returns elements of your vector in order. This is ascending order for numbers and alphabetical order for characters, although we can change this behaviour via the `decreasing` parameter
+ 
+```{r}
+sort(c(4, 2, 5, 1))
+```
+
+```{r}
+sort(c("banana", "apple", "carrot"))
+```
+
+**`nchar()`**
+
+Finds the number of characters in a string.
+
+```{r}
+nchar("hello")
+```

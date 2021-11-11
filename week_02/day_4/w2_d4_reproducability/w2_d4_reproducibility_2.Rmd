@@ -1,0 +1,94 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+# reproducibility
+
+# how to achieve this
+
+```
+```{r}
+# key to be organised, and keep a good folder structure
+```
+
+```{r}
+student <- c("Abigail", "Bjorn", "Caitlin", "Dave", "Elly", "Francis")
+question_1 <- c(10, 3, 1, 5, 5, 8)
+question_2 <- c(2, 5, 5, 4, 5, 6)
+question_3 <- c(4, 5, 9, 7, 6, 8)
+exam_results <- data.frame(student, question_1, question_2, question_3)
+```
+
+```{r}
+# This is NOT reproducible 
+
+exam_results[, 1]
+```
+
+```{r}
+exam_results <- exam_results %>%
+  select(question_2, student)
+# 
+# a more robust/reproducible way is by naming the data, i.e. the column 
+exam_results[, "student"]
+```
+
+```{r}
+# organising your code so that it is easy to read - one way of doing this
+# is by creating functions, or modulising it
+
+```
+
+```{r}
+# source function - looks in the working directory for various files
+# source() 
+# grabs the functon from e.g. an R script, and places in the global env, so it can be run
+
+e.g. 
+source("01_multiply_function.R") # this would be a separate script
+source("02_add_function.R") # this would be a separate script
+
+a <- multiply_by_n(2, 4)
+b <- add_two(a)
+b
+```
+
+```{r}
+# in an R script, you can add headers / tails
+
+# shift + cmd + r
+
+# on r script, you can select the little lines menu on top right which automatically indexes
+
+```
+
+```{r}
+# documentation
+
+# main points (comments)
+# purpose and objective - WHY
+# instruct how to follow the code
+
+# key things to note and include:
+#date (e.g. if packages or similar are or become out of date)
+#sources
+# evidence
+# decision making process
+# assume the reader has no prior knowledge
+```
+
+```{r}
+#restart and run all chunks, is safest way to avoid creating objects etc outside
+# of the active / required environment/notebook
+
+# if you do want to do this, sourcing is a good way to do this
+
+# if scripts are very long / take long to run, you can save scripts to a specfic workspace
+
+saveRDS(object, file = "name")
+
+# but comment it out after saving it the first time
+```
+

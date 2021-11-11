@@ -1,0 +1,86 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+```{r}
+library(tidyverse)
+```
+
+```{r}
+#load data
+comms_data <- read_csv("data/telecom_data.csv")
+```
+
+```{r}
+#checking for na's
+comms_data %>%
+  filter(is.na(monthly_charges))
+```
+
+```{r}
+#counting na's
+comms_data %>%
+  summarise(count = sum(is.na(monthly_charges)))
+```
+
+```{r}
+# dropping na's
+comms_data %>%
+  drop_na()
+```
+
+```{r}
+#replace with median
+#initially is blank in NA fields because NA's = 0 so will pull it down
+#then na.rm is added to overwrite NA's with the median
+comms_data %>%
+  mutate(monthly_charges = coalesce(
+    monthly_charges,
+    median(monthly_charges,
+    na.rm = TRUE)
+  )
+)
+```
+
+```{r}
+# task - look at total charges, find different type of missing value identifier and how many
+
+#charges_missing_values <- comms_data %>%
+#  filter(is.na(total_charges))
+#charges_missing_values
+
+#answer
+
+charges_missing_values <- comms_data %>%
+  mutate(
+    total_charges = na_if(total_charges, "na"), 
+    total_charges = na_if(total_charges, "N/A")
+  )
+
+```
+```{r}
+# getting output/result and changing to numeric
+
+charges_missing_values %>%
+  mutate(total_charges = as.numeric(total_charges)) %>%
+  filter(is.na(total_charges))
+```
+
+```{r}
+# task  - payment_method, find types of missing values and how many,
+# replace with NA and check if you have right amount
+
+payment_method_replaced <- charges_missing_values %>%
+  mutate(
+    payment_method = na_if(payment_method, "NA"),
+    payment_method = na_if(payment_method, "--"),
+  )
+
+```
+```{r}
+payment_new_category <- payment_method_replaced %>%
+  mutate(payment_method = coalesce(payment_method, "unavilable"))
+
+```
+
+

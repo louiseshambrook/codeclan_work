@@ -1,0 +1,52 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+
+```
+
+```{r}
+#loading data and removing lines
+video_games <- read_csv("data/steam-200k-sample.csv",
+                        skip = 4,
+                        col_types = cols("bought online" = col_logical())
+)
+```
+
+```{r}
+#variable names
+video_games %>%
+  names()
+```
+
+```{r}
+library(janitor)
+```
+
+```{r}
+# cleaning variables names 
+video_games_clean_names <- video_games %>%
+  clean_names()
+```
+
+```{r}
+#renaming columns
+video_games_rename <- video_games_clean_names %>%
+  rename("game_title" = "game_name",
+         "activity" = "what",
+         "playing_hours" = "value",
+         )
+
+```
+
+```{r}
+#dealing with missing values
+
+
+```
+
+
+

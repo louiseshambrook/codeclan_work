@@ -1,0 +1,123 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+
+new_coders <- read_csv("data/new_coders.csv")
+```
+
+```{r}
+new_coders %>%
+  group_by(reasons_to_code) %>%
+  summarise(avg_expected_earn = mean(expected_earn))
+```
+```{r}
+# doing group by and mutate - basically what I was trying to do yesterday on the starbucks data
+
+new_coders %>%
+  group_by(reasons_to_code) %>%
+  mutate(avg_expected_earn = mean(expected_earn),
+         diff_from_avg = expected_earn - avg_expected_earn
+         ) %>%
+  select(reasons_to_code, avg_expected_earn, diff_from_avg, everything()) %>%
+  arrange(expected_earn)
+```
+
+```{r}
+# task - add new column - avg age of gender
+
+new_coders %>%
+  group_by(gender, age) %>%
+  mutate(age = mean(age),
+         avg_age_gender
+  )
+#why the error?
+
+#Correct answer
+new_coders %>% 
+  select(age, gender) %>% 
+  group_by(gender) %>% 
+  mutate(
+    average_age_for_gender = mean(age)
+  )
+
+# mixed up the order for mutate
+
+```
+
+```{r}
+library(CodeClanData)
+
+chinesemeal
+```
+
+```{r}
+# lag function - can allow you to calculate the difference between a value and the following (like on a bank statement), 
+# lead does the opposite but backwards
+
+chinesemeal %>%
+  group_by(FoodType) %>%
+  mutate(
+    last_year_cal = lag(CaloriesPerDay),
+    cal_change = CaloriesPerDay - last_year_cal
+  )
+```
+
+```{r}
+#summarise and mutate across multiple columns
+
+deaths <- read_csv("data/character-deaths.csv")
+deaths
+
+```
+
+```{r}
+
+
+deaths %>%
+  mutate(across(book1_GoT:book5_DwD, as.logical))
+
+
+```
+
+```{r}
+#how many from each book die, grouped by alliance
+
+deaths %>%
+  group_by(allegiances) %>%
+  summarise(across(book1_GoT:book5_DwD, sum))
+
+```
+
+```{r}
+deaths %>%
+  summarise(across(everything(), ~sum(is.na(.))))
+```
+```{r}
+# methods of grabbing columns; A:B, everything(), and now - where
+
+deaths %>%
+  group_by(allegiances) %>%
+  summarise(across(where(is.numeric), mean))
+
+```
+
+```{r}
+#task - change all character columns in new_coders into factors. use across
+
+new_coders %>%
+  mutate(across
+         (where
+           (is.character),
+           as.factor)
+  )
+  
+```
+
+```{r}
+
+```
+

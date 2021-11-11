@@ -1,0 +1,122 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+the_name_of_my_variable <- c(3, 4, 5)
+
+the_name_of_my_variable == 4
+## Error in eval(expr, envir, enclos): object 'the_name_of_my_varaible' not found
+
+# R tells you where the error occurs
+```
+```{r}
+library(fcuk)
+```
+
+```{r}
+the_name_of_my_variable <- c(3, 4, 5)
+
+filter(the_name_of_my_variable, variable == 4)
+```
+
+```{r}
+dim(the_name_of_my_variable)
+length(the_name_of_my_variable)
+class(the_name_of_my_variable)
+```
+
+```{r}
+#to filter, you need a dataframe
+# to do it on this variable, code
+
+the_name_of_my_variable == 4
+
+```
+
+```{r}
+library(dplyr)
+```
+
+```{r}
+library(MASS)
+```
+
+```{r}
+select(mtcars, mpg)
+
+# error is that it's trying to run the select function from MASS
+```
+
+```{r}
+conflicts()
+```
+
+```{r}
+# Task - 2 minute
+#Let’s retry the example above but trying dplyr::select() to specify which package we want to use.
+
+dplyr::select(mtcars, mpg)
+
+# use the select function from the dplyr package
+
+```
+
+```{r}
+the_name_of_my_variable <- c(3, 4, 5)
+the_name_of_your_variable <- c(6, 7, 8)
+
+#both_variables <- tibble(the_name_of_my_variable the_name_of_your_variable)
+
+# error is no comma
+```
+
+```{r}
+#some_characters <- c("Steph", "Del", "Mhairi, "Aileen")"
+# missing end quotation mark
+```
+
+```{r}
+#task
+
+#the_name_of_my_variable <- c(3, 4, 5)
+#the_name_of_your_variable <- c(6, 7, 8)
+
+# both_variables <- tibble(the_name_of_my_variable, the_name_of_your_variable)
+
+# typo
+# These errors mean that the R code you are trying to run or source is not syntactically correct. That is, you have a typo.
+# 
+# To fix the problem, read the error message carefully. The code provided in the error message shows where R thinks that the problem is. Find that line in your original code, and look for the typo.
+
+```
+
+```{r}
+library(errorist)
+```
+
+```{r}
+library(errorist)
+
+the_name_of_my_variable <- c(3, 4, 5)
+the_name_of_your_variable <- c(6, 7, 8)
+
+#both_variables <- data.frame(the_name_of_my_variable the_name_of_your_variable)
+```
+
+```{r}
+#error - vector recycling 
+the_name_of_my_variable <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+subset_variable <- c(2, 3, 4)
+the_name_of_my_variable == subset_variable
+
+
+#correct way
+
+the_name_of_my_variable <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+subset_variable <- c(2, 3, 4)
+the_name_of_my_variable %in% subset_variable
+
+```
+

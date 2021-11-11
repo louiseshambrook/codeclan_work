@@ -1,0 +1,170 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+# Reproducibility
+
+#Unit testing
+
+#creating code to test out code that you have created previously
+
+
+```
+
+```{r}
+#creating test function
+
+is_leap_year <- function(year) {
+  if (year %% 100 == 0){
+    if (year %% 400 == 0) {
+      return(TRUE)
+    } else {
+      return(FALSE)
+      }
+  }  
+  
+  if (year %% 4 == 0 ) {
+    return(TRUE)
+  } else {
+    return(FALSE)
+  }
+}
+```
+```{r}
+is_leap_year(2013)
+```
+
+```{r}
+# to unit test, install package thatthat
+```
+```{r}
+library(testthat)
+```
+
+```{r}
+expect_equal()
+expect_error()
+```
+
+```{r}
+a <- 10
+```
+```{r}
+expect_equal(a, 11) # gives an error
+```
+
+```{r}
+test_that("real leap year return true", {
+  expect_equal(is_leap_year(2012), TRUE)
+  expect_equal(is_leap_year(2001), TRUE)
+})
+
+#test function, with lines included
+```
+
+```{r}
+test.dir("")
+#can test code in a rscript or similar, requires a directory path
+```
+```{r}
+#task
+
+# second test : one expectation
+test_that("Character input returns an error", {
+  expect_error(is_leap_year("year"))
+})
+
+# what is the test name
+# what is the expectation
+# what are you expecting the test to do
+```
+
+```{r}
+test_that("Character input returns an error", {
+  expect_error(is_leap_year("year"))
+  expect_error(is_leap_year(TRUE))
+})
+
+# true and false don't work within this operation as they translate to 0 and 1
+```
+
+```{r}
+#amending the test function
+
+is_leap_year <- function(year) {
+  if (!is.numeric(year)){
+    stop("non-numeric-input :( ")
+  }
+  if (year %% 100 == 0){
+    if (year %% 400 == 0) {
+      return(TRUE)
+    } else {
+      return(FALSE)
+      }
+  }  
+  if (year %% 4 == 0 ) {
+    return(TRUE)
+  } else {
+    return(FALSE)
+  }
+}
+
+```
+
+```{r}
+is_leap_year(TRUE)
+```
+
+
+```{r}
+# write test for 2017 and 1990 are correctly identified as not being leap years by our function
+
+test_that("real leap year return true", {
+  expect_equal(is_leap_year(2017), FALSE)
+  expect_equal(is_leap_year(1900), FALSE)
+})
+
+```
+
+```{r}
+#different types of expect functions
+
+num1 <- 5
+num2 <- (sqrt(5))^2
+
+expect_equal(num1, num2)
+
+#these values are equal, but not identical
+
+expect_identical(num1, num2)
+
+expect_gt(3, 3)
+
+expect_gte(2, 3)
+#greater than or equal to
+
+```
+
+```{r}
+#functions for strings
+
+string <- "is there a match?"
+
+expect_match(string, "there a") - 
+  #can take argument ignore.case = TRUE
+#happy with that, because there is a match
+
+```
+
+```{r}
+# when do you build tests?
+# when there are bigger, more advanced functions which can give more errors
+ 
+```
+
+```{r}
+
+```
+

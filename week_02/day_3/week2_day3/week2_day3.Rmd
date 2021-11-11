@@ -1,0 +1,205 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+# Matrices and lists
+
+# Data structures
+
+# vectors
+num <- 1:5
+strings <- c("This is a string", "hello")
+boolean <- c(TRUE, FALSE)
+
+# atomic vector - hold one type of data
+# versus list vector, aka list
+
+class(nums)
+```
+```{r}
+list("text", TRUE, c(1, 2, 3), list("meep", 4))
+```
+
+```{r}
+# as.list() - is the other way of making lists
+```
+
+```{r}
+# indexing and accessing a list - subsetting lists
+
+x <- list(1, "a", TRUE, c(1, 2, 3))
+
+x[[2]]
+
+# [] will always return the same data structure that you were trying to access
+```
+
+```{r}
+# can also be accessed by naming lists
+
+# $ denotes that a is a name in the list
+
+named_list <- list(a = "I love R", b = 1:10)
+
+named_list$a
+```
+
+```{r}
+# access through []
+
+named_list[["a"]]
+```
+
+```{r}
+# Nested lists
+
+# you can lists within a list inside another list
+
+student_info <- list(
+                "Agnes" = list(height = 1.8, shoe_size = 8L),
+                "Bobby" = list(height = 2.1, gender = "Male"),
+                "Charlie" = list(gender = "Female", likes_beets = TRUE)
+)
+
+student_info
+
+# extract the data/lists
+
+student_info$Bobby$height
+#gives bobby's height
+
+student_info[["Agnes"]][["shoe_size"]]
+```
+
+```{r}
+#Task
+
+# Task - 5 minutes
+# 
+# Make a named list that contains a numeric vector and a character vector.
+# 
+# Access the second element of your list using double square brackets [[]]. What is it's class?
+# 
+# Access the second element of your list using single square brackets []. What is it's class?
+# 
+# Access the second element of your list by name. What is it's class?
+```
+
+```{r}
+task_list <- list(a = c(4, 5, 6), b = c("meep", "hello", "here"))
+
+task_list[[2]]
+
+class(task_list[[2]])
+  
+task_list[2]
+
+class(task_list[2])
+
+task_list$b
+class(task_list$b)
+
+```
+
+```{r}
+# Matrices
+
+# a data structure that holds rectangular data
+
+matrix(1:4, nrow = 2, ncol = 2)
+
+# if we want it populated rowwise (default is by column)
+
+matrix(1:4, nrow = 2, ncol = 2, byrow = TRUE)
+```
+
+```{r}
+m <- matrix(1:6, nrow = 2, ncol = 3)
+
+class(m)
+
+# key distinction between matrices and DF's - matrices they MUST be the same type
+```
+
+```{r}
+# selecting elemnts from the matrix
+m[1,3]
+
+# select entire row
+m[1,]
+
+#select entire column
+m[,3]
+
+
+```
+```{r}
+# you can select multiple rows or columns by passing a vector
+
+m[, c(1,3)]
+#returns all rows for 1st and 3rd column
+```
+
+```{r}
+# advantage of matrix, is to be able to perform calculations on entire matrix
+
+m * 5
+```
+
+```{r}
+library(dplyr)
+library(magrittr)
+
+numers <- iris %>% select(-Species)
+
+# if it's all the same data type
+numers * 3
+
+# access the first row of a df
+numers[1, ]
+```
+
+```{r}
+# Working with rows and columns
+
+# want to get the mean average of a column
+
+#colMeans()
+
+colMeans(m)
+```
+
+```{r}
+# Other convenience functions
+
+`rowSums`
+
+`colSums`
+
+`rowMeans`
+
+rowSums(m)
+colSums(m)
+
+```
+```{r}
+# Task
+# Make a matrix with 3 rows and 4 columns. Each column should contain the numbers 1 to 3.
+# Find the element in the 2nd row, 3rd column.
+# Check that all the columns are identical by checking that their sums are the same.
+```
+
+```{r}
+#Make a matrix
+
+my_matrix <- matrix(1:3, nrow = 3, ncol = 4)
+
+my_matrix[2,3]
+
+colSums(my_matrix)
+
+
+```
+

@@ -1,0 +1,175 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(CodeClanData)
+```
+
+```{r}
+# mutating with ifelse statement
+
+students_big %>%
+  select(ageyears) %>%
+  mutate(
+    older_than_12 = if_else(ageyears > 12, "Older than 12", "12 or younger")
+  )
+
+```
+```{r}
+# adapting variables
+#select gender
+# change gender, if gender is M to Male, otherwise to Female
+
+students_big %>%
+  select(gender) %>%
+  mutate(
+    gender = if_else(gender == "M", "Male", "Female")
+  )
+```
+```{r}
+#Task  - change column "handed" to Right and Left instead of R and L
+students_big %>%
+  select(handed) %>%
+  mutate(
+    handed = if_else(handed == "R", "Right", "Left")
+  )
+
+```
+
+```{r}
+#task in fave activity, change football soccer to football, leave all others
+
+#changes the one for which the argument is true, leaves all others, passing in the column as the argument
+
+students_big %>%
+  select(favourite_physical_activity) %>%
+  mutate(
+    favourite_physical_activity = if_else(
+    favourite_physical_activity == "Football/Soccer", "Football", favourite_physical_activity)
+  )
+```
+
+```{r}
+# using recode - to change upper to lowercase
+
+students_big %>%
+  select(travel_to_school) %>%
+  mutate(
+    travel_to_school = recode(
+      travel_to_school,
+      "Bus" = "bus",
+      "Car" = "car",
+      "Walk" = "walk",
+      .default = "other",
+      # .missing = in case there are missing values
+    )
+  ) %>%
+  group_by(travel_to_school) %>%
+  summarise(n())
+```
+
+```{r}
+#recoding a numeric column
+#note - the variable passed into ageyears has to be in "", even when not a string
+
+students_big %>%
+  select(ageyears) %>%
+  mutate(ageyears = recode(
+    ageyears,
+    "12" = 120,
+    .default = 0
+  )
+  )
+```
+
+```{r}
+#task  - recode subject
+#task - recode sex
+#task - compl
+
+data <- read.table(header = TRUE, text="
+ subject sex control cond1 cond2 compl
+       1   M     7.9  12.3  10.7  T
+       2   F     6.3  10.6  11.1  T
+       3   F     9.5  13.1  13.8  N
+       4   M    11.5  13.4  12.9  F
+")
+```
+
+```{r}
+data %>%
+  select(subject) %>%
+  mutate(
+    subject = recode(
+      subject, 
+      "1" = "001",
+      "2" = "002",
+      "3" = "003",
+      "4" = "004"
+    )
+  )
+```
+
+```{r}
+data %>%
+  select(sex) %>%
+  mutate(
+    sex = recode (
+      sex,
+      "M" = "Male",
+      "F" = "Female"
+    )
+  )
+```
+
+```{r}
+#amended from "NA" to "NA_character_"
+
+data %>%
+  select(compl) %>%
+  mutate(
+    compl = recode (
+      compl,
+      "T" = "True",
+      "F" = "False",
+      .default = NA_character_
+    )
+  )
+```
+
+```{r}
+# recoding numerical values / adding a column
+
+students_big %>%
+  select(ageyears) %>%
+  mutate (
+    age_divisble = case_when(
+      ageyears %% 2 == 0 ~ "Even",
+      ageyears %% 3 == 0 ~ "Divisible by 3",
+      ageyears %% 5 == 0 ~ "Divisible by 5",
+      TRUE ~ as.character(ageyears)
+    )
+  )
+
+```
+
+
+```{r}
+# Task
+
+students_big %>%
+  select(region, travel_to_school) %>%
+  mutate(
+    estimated_travel_time = case_when(
+      region == "London" ~ 60,
+      travel_to_school == "Walk" ~ 10,
+      travel_to_school == "Car" ~ 20,
+      TRUE ~ 30
+  )
+)
+```
+
+

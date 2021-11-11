@@ -1,0 +1,38 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+# relative file path
+
+# difference between relative file path and absolute file path
+
+# relative file path is relative to your working directory, i.e. you do not need
+# to input the entire filepath
+```
+
+```{r}
+#absolute file path
+
+library(tidyverse)
+read_csv("/Users/louiseshambrook/GitHub/codeclan_work/codeclan_work/week_02/day_4/w2_d4_reproducability/no_project_example/")
+# trying to read in data, but unable to locate it / your files have not been set up correctly
+# 
+# by using ~, it brings you to the top of your directory
+
+# This is NOT reproducible, as their file structure may differ (and likely will)
+```
+
+```{r}
+read_csv("no_project_example/data/students.csv")
+```
+
+
+```{r}
+# if the data file is not accessible on the same level (e.g. if the data is not
+# contained within the same folder as the rproj, then the library(data) with the 
+#function data can correct this)
+# e.g. read_csv(here("data/students")
+```
+

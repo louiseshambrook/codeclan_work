@@ -1,0 +1,558 @@
+---
+title: "Tidy Data and `tidyr`"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+    css: ../../../styles.css
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.align = 'center')
+library(tidyverse)
+library(CodeClanData)
+```
+
+**Lesson Duration: 1 hour 15 minutes**
+
+# Learning Objectives<br>
+1. Understand the concept of tidy data
+2. Be able to describe why datasets are not tidy
+3. Know why tidy data is important for analytics
+
+
+# What is tidy data?
+
+<center>
+<br>
+<div class='emphasis'>
+“Tidy datasets are all alike, but every messy dataset is messy in its own way.” –– Hadley Wickham
+</div>
+</center>
+<br>
+
+Up until now, the data you've worked with has more or less been in a reasonable format: rows and columns have been organised in a sensible way, and variables have been separated out. However, more often than not, the data you work with will not be formatted in the most efficient way possible. You'll have columns representing the same thing, oddly named rows and column headers, and sometimes more than one data entry per cell. This type of data is known (in the tidyverse world) as messy data. What we need is the opposite - tidy data!
+
+<br>
+
+```{r, fig.width = 0.3, fig.height= 0.3, echo = FALSE}
+library(knitr)
+# Small fig.width
+include_graphics("images/real_world_data.jpg")
+```
+
+<br>
+
+
+## Tidy data has structure 
+
+There are three fundamental rules defining Tidy Data:
+
+1. Each variable must have its own column. 
+2. Each observation must have its own row.
+3. Each value must have its own cell (i.e. no grouping two variables together, e.g. a person's name and age should not be in one cell 'Joe Blogs, 28' ).
+
+This figure from [statseducation.com](http://statseducation.com/Introduction-to-R/img/tidy-1.png) shows this a bit more clearly: 
+<br><center>
+![](http://statseducation.com/Introduction-to-R/img/tidy-1.png)  
+</center>
+<br>
+
+Arranging your data in this way makes it easier to work with because you have a consistent way of referring to variables (as column names) and observations (as row indices). When using tidy data and tidy tools, you spend less time worrying about how to feed the output from one function into the input of another, and more time answering your questions about the data. 
+
+
+## Tidy data contains relationships 
+
+Tidy data also works on a premise that data contains values which have relationships between one another, and it displays these in the dataset as consistently as it does the values. For example, in a tidy dataset you might have relationships such as:  
+
+1. A name associated with a bank account number   
+2. A customer associated with an order  
+3. A patient ID associated with a test result  
+
+
+Basally, tidy datasets provide a standardized way to link the structure of a dataset (its physical layout) with its semantics (its meaning).  
+
+<br>
+
+## Tidy data has a format 
+
+Before you can start tidying data we need to introduce some more terminology.
+
+**Long format** is where every row represents an observation belonging to a particular category.
+
+
+| Product | Attribute | Value     | 
+|---------|-----------|-----------| 
+| A       | Height    | 10        | 
+| A       | Width     | 5         | 
+| A       | Weight    | 2         | 
+| B       | Height    | 20        | 
+| B       | Width     | 10        | 
+
+<br>
+
+| country     | year    | avg_temp |
+|-------------|---------|----------|
+| Sweden      | 1994    |   11     |
+| Denmark     | 1994    |    5     |
+| Norway      | 1994    |    9     |
+| Sweden      | 1995    |    8     |
+| Denmark     | 1995    |    7     |
+| Norway      | 1995    |    8     |
+| Sweden      | 1996    |    9     |
+| Denmark     | 1996    |   10     |
+| Norway      | 1996    |   11     |
+
+
+<br>
+
+**Wide format** is when each observation is spread across multiple columns.
+
+| Product | Height | Width | Weight   | 
+|---------|--------|-------|----------|   
+| A       | 10     | 5     | 2        | 
+| B       | 20     | 10    | NA       | 
+
+<br>
+
+| country     | avg_temp_1994 | avg_temp_1995 | avg_temp_1996 |
+|-------------|---------------|---------------|---------------|
+| Sweden      |       11      |       8       |       9       |
+| Denmark     |       5       |       7       |      10       |
+| Norway      |       9       |       8       |      11       |
+
+<br>
+
+
+
+### Which is the better format?
+
+Out of the two formats above, which do you prefer? 
+
+Tidy data is generally long format data. Long format works best for data-wrangling for three main reasons: 
+
+1. If you have a lot of variables, wide format can be tricky. Imagine if we had 50 years worth of average temperatures, for each month. In wide format, you'd end up with 600 columns (50*12 months). In the long dataset, you might only have 12 variable columns - one for each month.   
+
+2. Long format structures the data in key-value pairs and therefore aids clarity. For example, it is relatively quick to see that in the long dataset above, the temperature belongs to a country-year pair.  
+
+3. Certain packages (such as ggplot) and many in built R statistics functions require data to be in long format. Therefore, it's easier to organise your data in this format to start with. 
+
+
+## An example
+
+<br>
+Take a look at the image below: 
+
+![](https://d33wubrfki0l68.cloudfront.net/f6fca537e77896868fedcd85d9d01031930d76c9/637d9/images/tidy-17.png)  
+
+<blockquote class='task'>
+**Task - 5 mins** 
+
+On the left, you have data that isn't classed as 'tidy'. Why is this?
+
+
+<details>
+<summary>**Answer**</summary>
+This data isn't tidy because you have more than one observation per cell. On the right, this dataset has been 'tidied', and the cases and population have been separated, making it easier to analyse. 
+</details>
+</blockquote>
+
+
+# Tidyr package
+
+So, we've talked about what tidy data is, and why we need it. Now we can actually practice manipulating data into the correct form for analysis. The R package `tidyr`, provides functions to help you organize (or reshape) your data set into tidy format. `tidyr` provides four main functions for tidying messy data: `pivot_longer()`, `pivot_wider()`, `separate()` and `unite()`.
+
+<br>
+<center>
+![](https://tidyr.tidyverse.org/logo.png){ width=20% }
+</center>
+<br>
+
+What do these functions do? 
+
+* `pivot_longer()`: gathers columns into rows
+* `pivot_wider()`: spreads rows into columns
+* `separate()` : separates one column into two 
+* `unite()` : unites several columns into one 
+
+
+## `pivot_longer()`
+
+This function takes in the following arguments:   
+
+* `data` : the data you want to pivot  
+* `cols` : the columns you want to pivot
+* `names_to` : the name of your new column where your old column names (the ones you are pivoting) will go.
+* `values_to` : the name of your new column where your data will go (that was in your old columns)
+<br>
+
+
+
+## `pivot_wider()`
+
+Takes in the following arguments:   
+
+* `data` : the data you want to pivot  
+* `id_cols` : your columns you want to pivot
+* `names_from`: the column where you will get your new column names from   
+* `values_from` : the data you're going to move into your new columns 
+<br>
+
+
+In general, the `pivot` functions work by allowing you to change the columns and rows around so you can switch between wide and long format data. 
+<br>
+<center>
+![](https://www.fromthebottomoftheheap.net/assets/img/posts/tidyr-longer-wider.gif)
+</center>
+<br>
+
+
+<div class='emphasis'>
+<center>
+**Note: the `pivot_longer()` function has replaced the `gather()` function, and `pivot_wider()` has replaced the `spread()` function. The cheatsheets online haven't been updated yet though!** 
+
+<br>
+<center>
+![](http://ohi-science.org/data-science-training/img/rstudio-cheatsheet-spread-gather-sep-unite.png)
+</center>
+<br>
+
+## `separate()`
+
+The `separate` function takes in the following arguments:   
+
+* `data` : the data you want to reshape    
+* `col`: the column you want to split  
+* `into` : the new variables you're going to create
+* `sep` : the separator you're looking for to define your split. Can either be a number i.e. the position in the string that will separate at or a sequence that looking to match (which is written in 'regular expression', which we will learn more about tomorrow). 
+<br>
+
+
+## `unite()`
+* `data` : the data you want to reshape    
+* `col`: the columns you want to unite
+* `sep` : the separator you're looking for to define your split. 
+
+
+# Examples of using `tidyr`
+
+## Heart Rates
+
+Now let's look at an example. Pretend you're working at a drug testing unit, and you've got some data from three subjects, and you've recorded their heart rate twice a day. 
+
+<br>
+```{r}
+# create subject info tibble
+subject_hr <- tibble( name = c("SUBJ01","SUBJ02","SUBJ03"), 
+  hr_am = c(68,72,68), 
+  hr_pm = c(58,89,52))
+
+subject_hr
+```
+
+<blockquote class='task'>
+**Task - 5 mins**   
+
+The data above isn't tidy. Why?
+
+<details>
+<summary>**Answers**</summary>
+
+* There are 2 heart rate columns, when we really, should only have one (rule 1: a variable must have its own column). 
+* Because heart rate is spread out into two columns, it means that rows don't contain one unique observation (rule 2). If you look, row one contains two different heart rate options for one particular subject. 
+
+What we really need is for our data to look like this: 
+
+
+| SUBJID  | TIME    | HEART RATE  | 
+|---------|---------|-------------| 
+| SUBJ01  | hr_am   | 68          | 
+| SUBJ01  | hr_pm   | 58          | 
+| SUBJ02  | hr_am   | 72          |  
+| SUBJ02  | hr_pm   | 89          | 
+| SUBJ03  | hr_am   | 68          | 
+| SUBJ03  | hr_pm   | 52          | 
+
+In this, each observation has its own row, and each variable is only repeated once. 
+
+</details>
+</blockquote>
+<br>
+
+Now we've figured out what we want to do, let's use `tidyr` to tidy this data.
+
+```{r}
+library(tidyr)
+
+subject_hr %>%
+  pivot_longer(cols = c("hr_am", "hr_pm"), 
+               names_to = "measurement_time", 
+               values_to = "heartrate") 
+```
+
+## Income
+
+<blockquote class='task'>
+**Task - 5 minutes**
+
+Look at the data below.  
+<br> 
+```{r}
+income <- tibble(religion = c("Agnostic","Atheist","Buddhist", "Catholic"), 
+  X10k = c(12,25,3,75), 
+  X10k_to_20k = c(34,14,6,60),
+  X20k_to_30k = c(45,22,10,110))
+
+income
+```
+
+* What makes the table untidy?
+* How could you tidy it? (You don't need to know how to write the code, you just need to have an idea of you would tidy them up)
+
+
+<details>
+<summary>**Answers**</summary>
+What makes this table untidy?
+This one is a bit harder. 
+
+* First, variables (religion and income amount) form both the column and row headings. 
+* Second, the column headings are values, not variable names. 
+
+To tidy this data we would want to have an income column, with the different income amounts as categories. We would then have a count column, which shows how many people of each religion earn that income.   
+</details>
+</blockquote>
+
+<br>
+
+```{r}
+# tidy the income data
+tidy_income <- income %>%
+  pivot_longer(-religion, names_to = "income", values_to = "count")
+ 
+tidy_income
+```
+
+As you can see, we have used the `pivot_longer` function to go into the dataset `income`, and create two new columns called `income` and `count`. In this case, we have defined the columns to gather by excluding the `religion` column by using the `-` operator. We don;t want this one to change,only the income and the count ones.
+
+This dataset is now tidy because each column represents a variable, and each row represents an observation. 
+
+
+## Orders
+
+Look at the data below.  
+
+```{r}
+# print out the data
+messy_orders <- tibble( name = c("Joe Bloggs","Jane Smith","Penny Jones"), 
+  order_info = c("XY7282/29-06-19","LO0182/15-03-19","AS6812/04-06-19"), 
+  order_amount = c(58.00,125.00,75.25))
+
+messy_orders
+```
+
+<blockquote class='task'>
+**Task - 5 minutes**
+
+* What makes the table untidy?
+* How could you tidy it? (You don't need to know how to write the code, you just need to have an idea of you would tidy them up)
+
+
+<details>
+<summary>**Answers**</summary>
+What makes this table untidy?
+
+* The `order_info` column contains both order information and order dates. 
+
+To tidy the data we would:
+
+* Split these columns into two. 
+
+</details>
+<br>
+</blockquote>
+<br>
+
+To tidy the data, we need to separate out the `order_info` column into two separate ones using the `separate` function.  
+
+```{r}
+# split columns
+tidy_orders <- messy_orders %>% 
+  separate(order_info, c("order_number","date"), sep ="/")
+
+tidy_orders
+```
+
+
+# Using tidyr on real data 
+
+Now, let's look at using them on a real, messy dataset. 
+
+Read in the `hospitals93to98.csv` file. This particular dataset stores the reasons people were admitted to hospital between 1993 and 1998.   
+<br>
+
+```{r, message = FALSE}
+# load in the hospital stays data 
+hospital_visits <- read_csv("data/hospitals93to98.csv")
+
+head(hospital_visits)
+```
+
+<br>
+<blockquote class='task'>
+**Task - 5 mins** 
+
+Take a look at the data. What about it isn't tidy? What could be done to tidy it?
+
+<details>
+<summary>**Hint**</summary>
+
+* Take a look at the column headings - do they all represent the same type of measurement? e.g. are they all measuring a year value?  
+* Are there unique values in all the rows?  
+
+</details>
+<details>
+<summary>**Answer**</summary>
+
+* The columns all represent years, which could be merged into one column, with rows representing different years. 
+* The bed days and separations are all merged within one variable (`Field`)
+
+</details>
+
+</blockquote>
+
+
+
+## `pivot_longer()` : move columns into rows
+
+In the above task, you identified that one reason the data wasn't tidy because we had many columns representing the years. Ideally, we want all the years to be in one column, with their values within another. In order to do this, we need to use the `pivot_longer()` function, which changes columns into rows. 
+
+<blockquote class='task'>
+**Task - 5 mins** 
+
+Before we use the function, get in groups and discuss what you think the data needs to look like. Draw a schematic of how you think the tidy table will look. 
+
+</blockquote>
+
+
+Now you have your schematic, let's use `pivot_longer()` function to check if you were right.   
+
+```{r}
+# tidy the hospital data
+hospital_visits_long <- hospital_visits %>%
+  pivot_longer(cols = starts_with("FY"), 
+               names_to = "year", 
+               values_to = "visit_numbers")
+
+# view the data 
+head(hospital_visits_long)
+
+```
+<br>
+The code above gathers the data from all the different years in `hospital_visits`, creates a new naming variable column called `year`, a new result column called `visit_numbers` and within that puts all the data. 
+
+<br>
+
+
+## `pivot_wider()` : move rows into columns 
+
+In the above task, you identified that another reason the data wasn't tidy because we had both `Separations` and `PatientDays` within the same column, and these are different variables. To make the data tidy, these ideally need to be changed into two different ones. 
+
+<blockquote class='task'>
+**Task - 5 mins** 
+
+Before we use the `pivot_wider()` function, get in groups and discuss what you think the data needs to look like. Draw a schematic of how you think the tidy table will look. 
+
+</blockquote>
+
+Now you have your schematic, let's check if you were right.   
+
+
+```{r}
+# use the pivot_wider() function
+hospital_visits_wide <- hospital_visits_long %>%
+  pivot_wider(names_from = Field, 
+              values_from = visit_numbers)
+
+# view the data
+head(hospital_visits_wide)
+```
+<br>
+
+The code above uses our new long format data `hospital_visits_long`, spreads the `Field` into new columns (it will create new columns to match however many unique values in the Field column), and into these new columns it puts whatever is in the `visit_numbers` column. 
+  
+Finally, our data is starting to look better!   
+
+<br>
+
+## `separate()`: splitting a single variable into two 
+
+Sometimes, you might have values within a column that you want to split out. For example, in the `IcdChapter` column, we have a coding variable (e.g. 0), and a description of that value (e.g. 0 = Not Reported). If we want to separate characters within a variable string, we can use the `separate()` function which turns a single character column into multiple columns.
+
+
+<blockquote class='task'>
+**Task - 5 mins** 
+
+Before we use the `separate` function, discuss what you think the data will look like after we do it. Draw a schematic of how you think the tidy table will look. 
+
+</blockquote>
+
+
+Let's check if you were right:
+
+```{r}
+# split the codes and descriptions column 
+hospital_visits_coded <- hospital_visits_wide %>%
+  separate(IcdChapter, c("code", "description"), sep = "\\." )
+
+head(hospital_visits_coded)
+```
+
+<br>
+The code above separates the data in the `IcdChapter` variable into two new columns called `code` and `description`. Within these, it puts whatever is before the separating value we have defined (in this case, a full stop) in the first, and whatever is after the separating value in the second.   
+
+You may notice something a bit unusual about our `sep` argument. We know we want to split by a full stop '.' but in regular expression '.' has special behaviours and actually means *any character*. But that's not what we want! We want it to match a literal full stop ('.'). So to do this you need to use an 'escape' to tell the regular expression you want to match it exactly - we do this by using the string '\\.'. We will go into regular expression properly tomorrow (this is all you need to know for now!) 
+
+<br> 
+
+## `unite()`: merging two variables into one 
+
+Finally, there may be a time where you want to combine two variables into one. For the sake of demonstration, let's unite the variables we just split above. This time, let's change the separator to a colon instead of a period. 
+
+```{r}
+# unite the codes and descriptions back together 
+hospital_visits_unite <- hospital_visits_coded %>%
+  unite(disease, c("code", "description"), sep =":")
+
+head(hospital_visits_unite)
+```
+<br>
+The code above unites the data in the `code` and `description` variables into a new column called `disease`. Within this, it separates the two columns by a colon operator. 
+
+And voila! We have a nice tidy, reshaped dataset. 
+
+# Why is tidy data important?
+
+Right now, you might be sitting thinking that tidy data is such a good (and almost, obvious) idea, that most datasets you come into contact with in the wild will be in this format? Wrong. In practice, raw data you're given is rarely perfectly tidy.
+
+<br>
+<center>
+<div class='emphasis'>
+"The development of tidy data has been driven by my experience working with real-world datasets. With few, if any, constraints on their organisation, such datasets are often constructed in bizarre ways. I have spent countless hours struggling to get such datasets organised in a way that makes data analysis possible, let alone easy."
+- Hadley Wickham
+</div>
+</center>
+<br>
+
+
+The main reason tidy data is important is because it makes it easy for a data analyst or scientist to extract the necessary data because it has a standardised way of structuring the data. Messy data requires different strategies and often times unique programming solutions in order to extract data in the same way. This slows analysis, invites errors, and makes the analysis pipeline less robust and reproducible. 
+
+Secondly, good ordering and structure of the data makes it easier to scan and eyeball the raw data. This is an important and very necessary part to understanding and working with your data.
+
+Third, it's important to have tidy data in R is because of the type of programming language R is. R is a vectorized programming language, meaning that all data structures, functions and operations are designed to work with vectors. Data frames (or tibbles) in R are just lists of vectors, arranged to look like tables. 
+
+Finally, tidy data arranges all values so that the relationships parallel the structure of data frames/tibbles in R. As a result, tidy datasets can easily use R's different functions (all of which are written to deal with vectors). This means you'll have an easier user experience: you can analyse data using functions that someone has already written for you! 
+
+

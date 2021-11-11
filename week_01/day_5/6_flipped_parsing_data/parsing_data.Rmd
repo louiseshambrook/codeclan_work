@@ -1,0 +1,229 @@
+---
+title: "Parsing data"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+    css: ../../../styles.css
+  pdf_document: default
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.align = 'center')
+```
+
+# Learning Objectives<br>
+
+* Understand the challenge of parsing different data types
+* Know about different encoding
+* Know about different locales and numeric formats
+
+**Duration - 30 minutes**<br>
+
+# Unicode
+
+Unicode is a system for encoding text data. At first you might think text data is simple: twenty-six letters, nine numbers and some punctuation symbols. How hard can that be? However, unicode isn't just for English text, unicode aims to faithfully represent all written communication in the world. Ambitious and noble aims! Currently over 1,100 languages are represented in unicode. All of these characters need to be compactly represented in a way that a computer can understand, and this can get complicated!
+
+## Code points
+
+Each character in unicode is called a 'code point'. Each code point is represented as a number up to 1,114,112, with a prefix `U`. When writing unicode code points, hexadecimal formatted numbers are normally used. The unicode [website](http://unicode.org) lists every code point that has been mapped to a character thus far. For example:
+
+* A is U+0041 - http://unicode.org/cldr/utility/character.jsp?a=A
+* θ is U+03B8 - http://unicode.org/cldr/utility/character.jsp?a=%CE%B8
+* 😀 is U+1F600 - https://unicode.org/cldr/utility/character.jsp?a=%F0%9F%98%80&B1=Show
+
+## Encodings
+
+So, every character you might want to use is stored in your computer as a number between 0 and 1,114,112. This seems like a simple enough system. However, there's a big problem with it. Storing a integer number in that range requires 32 bits, and this would make storing text documents take a lot of space on your computer - particularly when most text documents you write will only involve the basic English characters.
+
+The solution to this problem is *encodings*: these are ways of mapping between the large number that represents a code point, to a more compact number. Unfortunately, there are lots of ways of doing this encoding.
+
+The two most common ways that you will encounter are UTF-8 and UTF-16, these encode unicode characters in 8 bits and 16 bits respectively. 
+
+To read unicode data you need to know what encoding it is in. Most files you come across will use UTF-8., so this is what R defaults to. However, other encodings are used, and these won't display correctly by default. If this happens, you'll need to figure out the encoding and specify it when you read the file in. It can be difficult to figure out an encoding, and often the best and simplest thing to do is to try different encodings until one works! The most common encodings to try are:
+
+1. UTF-8
+2. UTF-16
+3. Latin-1
+4. cp1252
+4. GB2312 or GBK or GB 18030 - used for Chinese characters
+5. EUC-KR - for Korean characters,
+6. cp1251 or KOI8-R - used for Cyrillic 
+7. cp1256 or ISO-8859-6 - used for Arabic
+
+Note that while some of these encodings are commonly used for certain character sets, any unicode encoding should be able to represent any character in unicode. 
+
+## Changing encoding in R
+
+We can change the encoding of any file read in using the `readr` package via the `locale =` argument taken in by most of the `readr` functions. The `locale =` argument takes a `locale` object, which you create using the `locale()` function!
+
+Here's an example of a `locale` object, with all the default values.
+
+```{r}
+library(readr)
+locale()
+```
+
+Here is a `locale` in which the timezone is set to US Central
+
+```{r}
+locale(tz = "US/Central")
+```
+
+Now, as you can see, the default encoding in a `locale` is UTF-8. We can change this quite straightforwardly
+
+```{r}
+locale(encoding = 'Latin1')
+```
+
+For more information of changing encodings and other elements of the `locale`, see the help file for `locale()`, or the vignette you can access via `vignette('locales')` (Vignettes are for longer-form documentation that typically doesn't come in the standard R help file format). 
+
+<blockquote class='task'>
+**Task - 5 mins** 
+
+1. Use `read_file()` in `readr` to read in `pride_and_prejudice_utf_16.txt`.
+2. Now read the name file, but change the encoding to `utf-16`.
+
+<br>
+
+<details>
+<summary>**Answer**</summary>
+1.
+```{r}
+pride_and_prejudice <- read_file('data/pride_and_prejudice_utf_16.txt')
+pride_and_prejudice
+```
+
+2.
+```{r}
+pride_and_prejudice <- read_file('data/pride_and_prejudice_utf_16.txt',
+          locale = locale(encoding = 'utf-16'))
+pride_and_prejudice
+```
+
+</details>
+</blockquote>
+
+# Locales
+
+Unicode is essential for supporting data from around the word. However, data differs in more than just language and character sets. Throughout the world there are different standards that affect the kind of data you'll typically receive.
+
+## Decimal places
+
+You will be used to decimal numbers being indicated with a full-stop or point, e.g. '4.72'. However, this is the exception rather than the rule worldwide. Outside of the UK and North America, most countries use a comma, e.g. '4,72'.
+
+Accordingly, the symbol for separating digits in large numbers is often switched from a comma to a point. So while you might be used to seeing a large decimal number represented as '4,023,002.06', other places will write this as '4.023.002,06'.
+
+## Dates
+
+* In the UK we normally write dates starting with the day of the month, e.g. 15/6/2019 for the 15th of June 2019. 
+* The United States writes dates with the month first, e.g. 6/15/2019 for the same date
+* Other countries, including China and Japan, write dates with the year first, e.g. 2019/6/15
+* There is also variation between using four digits or two digits for the year, i.e. 19 v.s. 2019 *  * Finally, different countries use different separators between elements of dates: '\', '-', '.' and ' ' are all common. 
+
+For many dates, it can be impossible to disambiguate the meaning if you don't know which system the date is being written in.
+
+<br>
+<div class='emphasis'>
+If you have the choice, use the international date format `yyyy-mm-dd`, e.g. 2019-06-15
+</div>
+<br>
+
+## Names
+
+Don't assume that all names come in the form `<First-Name> <Last-Name>`. Many countries put family names first, don't have the concept of a family name, don't use last names, or use many last names. It's often easiest to work with a single string to hold a full name, as this makes no assumptions of format. 
+
+For more details on names see the advice [here](https://www.w3.org/International/questions/qa-personal-names), and, again, for more information on setting `locale` in `readr`, see `vignette("locales")`. 
+
+<blockquote class='task'>
+**Task - 5 mins** 
+
+1. Read the file `cake_european.csv`. The file uses a semi-colon separator, why do you think that is? Examine the read-in data closely: what type are the columns?
+2. Now, when reading the data, set `locale = locale(decimal_mark = ',')` in the function you use to read in the data. What do you notice about the data now?
+3. Next, when reading the data, set `locale = locale(decimal_mark = ',', date_format = '%d/%m/%Y')`. What do you notice about the data now?
+
+<br>
+<details>
+<summary>**Answer**</summary>
+1.
+```{r}
+cake <- read_delim(
+  'data/cake_european.csv', 
+  delim  = ';'
+)
+cake
+```
+Commas are used as decimal marks, and so can't be used to separate columns in the file. Semi-colons are used instead as column separators. Most of the columns are of type `character` even though they hold `numeric` data.
+
+2.
+```{r}
+cake <- read_delim(
+  'data/cake_european.csv',
+  delim  = ';',
+  locale = locale(
+    decimal_mark = ','
+  )
+)
+cake
+```
+
+Now the `numeric` columns are read in as type `double`, instead of `character`, this is more useful.
+
+3.
+```{r}
+cake <- read_delim(
+  'data/cake_european.csv',
+  delim  = ';',
+  locale = locale(
+    decimal_mark = ',',
+    date_format = '%d/%m/%Y'
+  )
+)
+cake
+```
+
+Now `date_made` is read as type `date` rather than `character`.
+
+</details>
+</blockquote>
+
+<hr>
+
+# Recap
+
+* What is Unicode?
+<details>
+<summary>**Answer**</summary>
+A system for storing text data that can handle a wide range of character sets.
+</details>
+
+<br>
+
+* What are the two most common unicode encodings?
+<details>
+<summary>**Answer**</summary>
+`utf-8` and `utf-16`
+</details>
+
+<br>
+
+* Name three ways, aside from language, in which data format can differ worldwide.
+<details>
+<summary>**Answer**</summary>
+
+* Decimal markers and digit separators
+* Date format
+* Name format
+
+</details>
+
+<hr>
+
+# Additional Resources
+
+[Date formats used around the world](https://docs.oracle.com/cd/E19455-01/806-0169/overview-9/index.html)
+
+[A very good blog post explaining unicode in more detail](http://reedbeta.com/blog/programmers-intro-to-unicode/)

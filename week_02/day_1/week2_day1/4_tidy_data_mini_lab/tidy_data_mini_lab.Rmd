@@ -1,0 +1,37 @@
+---
+title: "Tidy Data Mini-Lab"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+    css: ../../../styles.css
+  pdf_document: default
+---
+
+**Duration: 30 minutes** 
+
+Now it's your turn to practice the verbs on a new dataset. Complete the following task:
+
+# MVP
+
+**Task 1.**  
+Load in the `country_data.csv` file and take a look at it. What needs changed in this to make it tidy? Which columns need made into long format, and which need spread to rows?
+
+<br>
+
+**Task 2.**  
+Do the appropriate pivoting of your columns using R  
+
+<br>
+
+**Task 3.**  
+Separate the `country` variable so you have the name in one column and the number in another.   
+
+<br>
+
+**Task 4.**  
+Unite the `code_letter` and `code_numb` variables so that they are both in one column, with no spaces separating them.   
+
+

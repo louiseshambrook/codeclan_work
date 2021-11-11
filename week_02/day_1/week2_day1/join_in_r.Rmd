@@ -1,0 +1,164 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+# types of join
+
+# mutating joins
+# adds columns between one or other tables (i.e takes column from one and add to the other)
+
+# inner_join() - will be most commonly used
+# left_join()  - will be most commonly used
+# right_join()
+# full_join()
+
+# filtering joins
+
+# semi_join()
+# anti_join()
+
+# binding joins
+
+# bind_rows()
+# bind_cols()
+
+# basic syntax - 
+# <type of join>_join(x, y, by = NULL, suffix = c(".x,", ".y"))
+
+```
+
+```{r}
+# customer database
+
+customers <- tibble(
+  customer_ID = c(001, 002, 004, 005, 008, 010), 
+  name = c("John Smith", "Jane Adams", "Robert Landry", "Jane Tow", "Raul Tann", "Hilary Joyal"),
+  email_address = c("johnsmith@gmail.com", "janea@gmail.com", "rlabdry@hotmail.com", "janet89@aol.com", "paul.tann1@gmail.com", NA),
+  shipping_address = c("32 Station Road, Edinburgh", "42 Park Drive, Edinburgh", NA, "10 Gardiner Rd, Edinburgh", "12 Main St, Edinburgh", " 234 Queensferry Rd, Edinburgh,")
+)
+```
+
+```{r}
+# order database / information
+
+orders <- tibble(
+  customer_ID = c(001, 002, 005, 010, 012, 001), 
+  order_number = c("KU65781", "SU98201", "JS76821", "YR28212", "JS91221","YR21873"),
+  order_total = c("£32.50", "£56.00", "£100.02", "£20.25", "£39.50", "£45.00"),
+  product_code = c("XZY780", "XYZ123", "XYZ256", "XYZ262", "XYZ345", "XYZ127")
+)
+```
+
+```{r}
+# joining the two datasets 
+
+inner_join(customers, orders, by = "customer_ID")
+
+# some customers are missing, e.g. number 4
+# only returns records where there's an equivalent in both halves
+
+```
+
+```{r}
+#left join
+
+# so if you want a list of all your customers, and know when / which orders
+# they have made, use a left join
+
+left_join(customers, orders, by = "customer_ID")
+
+# more missing values, as there are two customers who had no orders,
+# but all the order variables are included
+
+```
+
+```{r}
+# right join
+# same idea, but you keep everything in your right hand table
+
+right_join(customers, orders, by = "customer_ID")
+```
+
+```{r}
+# using a full join
+# includes everything, but matches where possible 
+
+full_join(customers, orders, by = "customer_ID")
+```
+
+```{r}
+#changing column names
+
+customers_adj <- customers %>%
+  rename(this_is_an_id = customer_ID)
+```
+
+```{r}
+# joining by different column names
+
+inner_join(customers_adj, orders, by = c("this_is_an_id" = "customer_ID"))
+```
+
+```{r}
+# making another dataframe
+
+customers2 <- customers %>% 
+  mutate(payment_type = c("card", "cash", "cash", "card", "card", "card"))
+
+orders2 <- orders %>%
+  mutate(payment_type = c("card", "cash", "cash", "card", "card", "cash"))
+```
+
+```{r}
+# join by more than one column
+
+inner_join(customers2, orders2, by = c("customer_ID", "payment_type"))
+
+```
+
+```{r}
+# filtering joins, semi join
+
+semi_join(customers, orders, by = "customer_ID")
+```
+```{r}
+# anti join - is the opposite of the semi join
+
+anti_join(customers, orders, by = "customer_ID")
+```
+
+```{r}
+# bind_cols
+# append columns and rows
+# e.g. updated set for the next year, to add on to the end of the dataset
+
+statuses <- tibble(
+  status = c("active", "active", "inactive", "inactive", "active", "inactive")
+) 
+
+bind_cols(customers, statuses)
+
+```
+
+```{r}
+past_customers <- tibble(
+  customer_ID = c(020, 021), 
+  name = c("Dave Brown", "Jess Bishop"),
+  email_address = c("dbrown@hotmail.com", "jessb@gmail.com"),
+  shipping_address = c("57 Park View, Leith", "12 Reid Way, Broxburn")
+)
+```
+
+```{r}
+# bind rows
+
+bind_rows(customers, past_customers)
+```
+

@@ -10,23 +10,18 @@ state_income_data
 ```
 ```{r}
 library(tidyverse)
-
 ```
 
-```{r}
-glimpse(state_income_data)
-```
-```{r}
-head(state_income_data)
-
-```
 ```{r}
 #Load in the data, and have a look at it. How many variables does it have? How many observations? What are the variable names? What type of variables does it have?
+
+glimpse(state_income_data)
+head(state_income_data)
 
 # variables - 16
 # observations - 51
 # variable names 
-#types - chr and dbl
+# types - chr and dbl
 ```
 
 ```{r}
@@ -40,7 +35,6 @@ years_selected
 ```{r}
 # Rename the Index column to first_letter. Hint: look up the rename() function.
 rename(state_income_data, "first_letter" = "Index")
-
 
 ```
 

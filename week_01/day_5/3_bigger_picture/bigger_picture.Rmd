@@ -1,0 +1,230 @@
+---
+title: "The Bigger Picture"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    df_print: paged
+    css: ../../../styles.css
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+# What do I do next?
+
+
+Congratulations - you've finished your first week! Now is a good time to have a reflection on how it went for you, and to think about moving forward. 
+
+<br>
+<center>
+
+![](https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQrTnMLNIly5rpWbO-i5kchF5VGNXyChb_mPS2Ev3w4AbnLkmMg)
+
+</center>
+<br>
+
+
+Below we've compiled some tips for helping you consolidate your analysis skills and find your own path in the data world. 
+
+
+## Think of a niche
+
+When you first started out, you may or may not have had a niche in mind that you wanted to start out with. As you work through the course, start to pay attention to what topics you like and which you don't. Some questions to ask yourself as you go along:
+
+1. What part of the course do I find most interesting?  
+2. What kind of topics do I feel excited to work on?       
+3. What kind of data and questions am I interested in?   
+4. Which of the external speakers or workshops do I enjoy the most?
+5. What kind of projects am I interested in outside of coding? 
+
+If you can merge your interests with programming you are way ahead of the game!
+
+What is also really useful to reflect on is what parts of the course you don't like. Knowing what you don't like is often just as useful (and often times, easier) as knowing what you do like. For example, you might love visualisation but hate modelling: you'd probably focus your job search more on basic data analyst roles rather than data engineer roles. No job will involve everything we've covered, so it's useful to ask yourself:
+
+1. Which part of the course do I really not enjoy? 
+2. Do I prefer working with R, python, or SQL? 
+3. Do I like working with messy data, or would I prefer working somewhere that has more structure?
+4. Do I like working alone, or with a big team?
+
+Only you will be able to tell what is interesting to you and what isn't, and so a crucial step in your journey is to take some time to reflect on what might be the best job for you at the end, as you go along through the course. 
+
+<br>
+
+## Remember that learning isn't a linear process
+
+When you start learning something new, you're going to be exicted. You might learn some basics, and feel like you're making good progress. Then, things ramp up a bit: you encounter a more complex problem, or some messy data, and the solutions you need are more than a quick google search away. You might start to think you've failed already, and be tempted to move away from what you're learning. 
+
+But actually, this process is totally normal. Learning isn't linear. It requires you to practice and add to knowledge you have, and to go back and forth consolidating. Humans have a habit of thinking in a linear fashion. It’s not hard to know why we do this. Like a lot of human mental activity, it’s a short cut that saves us effort and energy: we like to think in terms of this leads to that, then that and so on. 
+
+<br>
+<center>
+![](https://pbs.twimg.com/media/CLA5mTzWEAAVapP.jpg)
+</center>
+<br>
+
+Having the expectation of this cycle going in is helpful. Just knowing that it will get harder and you will need to get past that point is a big first step. Being prepared for your new skill to get harder before it gets better will allow you to accept the challenging times and move forward. 
+
+
+<br> 
+
+
+## Do some tutorials and revisit your class notes
+
+Tutorials and class notes are a great way of learning concepts. They usually provide you step by step guides, and allow you to digest the information you need in your own time. Usually the aim of a tutorial or class isn't to teach you EVERYTHING you know about a topic, but rather to provide you a starting point and a way to learn a concept fully. The internet is a great place to find tutorials. Simply typing in "Tutorial in R on X" (insert whatever you want to learn) is usually a good way to find something decent. Alternatively, twitter and blogs are often good places to find people working on up to date walkthroughs. 
+
+<center>
+
+```{r fig.width=20, fig.height=10,echo=FALSE}
+library(png)
+library(grid)
+img <- readPNG("images/resource.png")
+ grid.raster(img)
+```
+
+[For example, here is a collection of resources on R that someone posted on twitter](https://twitter.com/paulvanderlaken/status/1158352201208799232?s=20)  
+</center>
+
+<br>
+
+<center>
+```{r fig.width=20, fig.height=10,echo=FALSE}
+img2 <- readPNG("images/resource2.png")
+grid.raster(img2)
+```
+
+[Here is a blog post with a link to a tutorial, developed by those at R studio](https://t.co/MYCARXrFJs?amp=1)
+</center>
+<br>
+
+Getting an online presence and interacting with data analysts online is a great way to get access to new information and tutorials. 
+
+
+## Then, move beyond tutorials 
+
+The most difficult part of programming is putting all the pieces together. Learning is so reliant on connecting
+concepts and linking what you’ve known for a while to new concepts.  Learning in isolation without linking to
+existing knowledge is very difficult. In my experience, the most difficult part of programming is transferring what you learn in tutorials and the lessons you've had here into a "plan" for new data. That is, the hardest part is knowing which types of code you need, what pieces together with what, and knowing where to start on new datasets.   
+
+Again, this is totally normal. When you're following tutorials or working through class material, you learn how to do the analysis in steps. When you're working with real data, you don't have that. Learning to put the pieces of the puzzle together and problem solve is a key skill to develop. So, how do we do this? Here’s some advice
+for moving out of that cycle.  
+
+<br>
+
+
+### How do we move beyond tutorials and notes?
+
+<br>
+
+#### Think of a project that interests you
+
+What is it you are interested in? Analysing data relevant to your own interests will make the whole process more rewarding.For example, when I first learnt ggplot, I struggled with the syntax. I was getting frustrated, and so decided I needed to think of something more fun to do. I came across an R package that links to an app I used to track my cycling. That let me get all my own cycling data for the past year. Then I spent some time learning ggplot using my own cycling data. The fact that I wanted to visualise my own data was very motivating for me, and helped me push through the frustrating coding errors I was getting.  
+
+<br>
+
+#### Read other people's code
+
+Throughout the course, you'll work with the open datasets from a website called kaggle. Kaggle is a wildy popular website that hosts loads of open datasets and hosts competitions where you try and solve different problems. The good thing is, you don't need to actually do the competition to have access to the problems or datasets. For example, if you go onto kaggle and click on datasets, you'll find thousands of open data you can use. 
+
+<br>
+<center>
+
+```{r fig.width=20, fig.height=10,echo=FALSE}
+img2 <- readPNG("images/kaggle1.png")
+grid.raster(img2)
+```
+
+</center>
+<br>
+If you click on an individual dataset, you'll then be able to read things called 'kernels', which are code notebooks that others have written which analyse those datasets.
+<br>
+<center>
+
+```{r fig.width=20, fig.height=10,echo=FALSE}
+img2 <- readPNG("images/kaggle2.png")
+grid.raster(img2)
+```
+
+</center>
+
+<br>
+
+Reading and working through other people's code is a great way to learn. Not only will you be able to get ideas of analysis that can be carried out for you to try yourself, you'll be able to read other people's code and get ideas of different ways to do things.   
+<br>
+
+
+#### Daily code challenges
+
+Another way to learn is to sign up or find daily coding challenges that you can implement in R. Websites such as [dailycodingproblem](https://www.dailycodingproblem.com/) provide different problems for you to solve, and you can implement solutions in any language you want. 
+
+Some less official and more random daily coding challenges come from websites like reddit, where other programmers release challenges you can try [Reddit daily coding challenges](https://www.reddit.com/r/dailyprogrammer/).   
+
+Finally, there is a good website called [Exercism](https://exercism.io/my/tracks/r), which allows you to sign up to different tracks to practice your coding. 
+
+Alternatively, you can set yourself some coding challenges. For example, if you feel you didn't do very well at the strings section of the course, you could make it that you'd attempt to do a homework question each day. There are lots of ways to keep up your skills, and daily practice is a great way.   
+
+<br>
+
+#### Pseudocode practice
+
+Some people will have a summary of the problem they're trying to solve with a dataset. Instead of reading through how they've solved the problem, start out with writing down in plain words what you think you need to do to solve the problem. This is known as pseudocoding: involves thinking about the logic of your code, and writing down a step-by-step outline of your code that you can gradually translate into the programming language. 
+
+For example, you might write something like this:
+<br>
+<center>
+![](https://ars.els-cdn.com/content/image/3-s2.0-B9780081008805000062-f06-05-9780081008805.jpg)
+</center>
+<br>
+
+Pseudocoding allows you to do several things:   
+
+1. It allows you to work through your problem in a logical way, without having to necessarily know how the code will look.  
+2. Let's you create a framework to follow. We've all been at the "staring at a blank page with no idea where to start" stage. Writing pseudocode can really help thinking through the problems and move on from a blank stuck stage. 
+3. Helps you structure your analysis. When you solve a problem, you don't need to tackle all of it at once. The same goes for code. Your analysis should build logically. Writing out small steps will be easier to manage, and you'll be better at noticing any gaps in your analysis pipeline. The bulk of your time should be spent on problem solving rather than writing the initial implementation code!  
+
+<br>
+
+#### Practice googling
+
+Googling for help is perfectly valid and will be something you do a lot as a data analyst. In fact, getting good at it is really important and something worth practicing. You've all been there where you google and get a sea of results, and you're expected to know which help to follow. 
+
+A big reason to use Google is that it is hard to remember all those minor details and nuances especially when you are programming in multiple languages and using dozens of frameworks. Aside from that, good programmers also know that they cannot be the first one to have encountered a problem. They use Google to research possible solutions, carefully evaluating the results and consciously separating the wheat from the chaff; they don’t blindly follow or copy-paste any solution they come across. 
+
+
+<center>
+![](https://images7.memedroid.com/images/UPLOADED642/5d51217c2e8cb.jpeg)
+
+</center>
+
+<br>
+
+
+#### Practice, practice, practice
+
+All things considered, the best thing you can do is practice a lot. As we've mentioned above, doing some online code competitions, blocking out some time to work through problems a bit more difficult than the previous week, or working on a project of your own that is slightly above your current comfort level. You'll expand your skill set by trying difficult things, and you'll become a better programmer by applying your knowledge. 
+
+
+
+## Don't lose sight of the big picture
+
+It's important that you remember that you can practice all you want, and you will most definitely improve your skills, but no one person can know everything. You'll constantly be improving and evolving, and even those you might think know everything don't. 
+
+If you want a good example of this, have a look at this tweet written by the the co-author of `ggplot2`.
+
+<center>
+
+```{r fig.width=6, fig.height=3,echo=FALSE}
+img2 <- readPNG("images/ggplot.png")
+grid.raster(img2)
+```
+
+</center>
+
+<br>
+
+You will get there! Happy coding! 
+

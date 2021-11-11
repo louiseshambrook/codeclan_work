@@ -1,0 +1,87 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+#functions
+
+#to see code of the functions, run without brackets
+
+library
+
+nchar()
+
+# there are many arguments that can be passed in, but we often skip many of them
+# by being explicit, you can move the arguments around, syntax doesn't matter
+# what is more common, is passing arguments by place, but when one is skipped, R throws errors
+
+
+
+```
+
+```{r}
+my_fun <- function(x, y, z) {
+      1+1
+}
+
+# good practice to not return on the last line
+```
+
+```{r}
+multiply_by_5 <- function(x) {
+  x * 5
+}
+
+multiply_by_5(5)
+```
+```{r}
+multiply_by <- function(x, y) {
+  x * y
+}
+
+multiply_by(1:3, 10)
+```
+
+```{r}
+beaver1
+```
+
+
+```{r}
+make_price <- function(x) {
+  paste("£", x)
+}
+make_price(4)
+
+# paste0 is what you need to remove the space
+
+# round() rounds to two decimal places
+
+```
+
+```{r}
+triangle_function <- function(x) {
+  (x*(x+1))/2
+}
+
+triangle_function(5)
+```
+
+```{r}
+#global assignment operator
+
+
+```
+```{r}
+# to debug functions
+
+#debug() is an option
+# but not great because you have to stop it
+#undebug()
+#debugonce() is better - goes through the code line by line
+
+
+
+```
+

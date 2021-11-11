@@ -1,0 +1,254 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+```{r}
+# https://style.tidyverse.org/
+
+```
+
+```{r}
+# Object names
+# Snake case is used (snake_case)
+
+# objects should be nouns and functions should be verbs
+
+# cannot use numbers in objects in the first character, e.g. 1_file
+
+```
+
+```{r}
+# always start with library calls
+
+#use empty space to split code into sections - by personal pref
+
+```
+
+```{r}
+# spacing and assignment
+
+# put spaces after commas, and after operations
+# no space after the start/end of brackets (e.g. (function, bleep) )
+# no space after calling a function, e.g mean(bleep)
+# space before and after assignment operators ( <- )
+
+```
+
+```{r}
+# Line length
+
+# Code should not be more than 80 char per line
+# Code can be split across multiple lines
+# should have function name and opening bracket on one line
+# args on the next line
+
+```
+
+```{r}
+# Quotation marks
+# Double and single quotation marks are equally valid as a string
+# Some strings may have an apostrophe, and then the string breaks
+# Convention is therefore to use double quotation marks
+```
+
+```{r}
+# Comments
+# Comments are powerful and important in understanding code
+# Comment above the code
+```
+
+```{r}
+# Cleaning up script for presenting / other people reading
+
+```
+
+```{r}
+# Task
+
+AmountSpent=c(9.1,8.55,14.32,14.17,14.34,7.97,9.79,11.47,12.44)
+Category=c('Lunch'
+              , 'Dinner'
+              , 'Lunch'
+              , 'Lunch'
+              , 'Cinema'
+              , 'Drinks'
+              , 'Lunch'
+              , 'Lunch'
+              , 'Dinner')
+my.week.of.spending=tibble(AmountSpent=AmountSpent, SpendingCategory=Category)
+str(my.week.of.spending)
+View(my.week.of.spending)
+my.week.of.spending
+summarise(my.week.of.spending,sum(AmountSpent))
+summarise(filter(my.week.of.spending,SpendingCategory=='Lunch'),sum(AmountSpent))
+
+```
+
+```{r}
+# Cleaned up
+
+amount_spent <- c(9.1, 8.55, 14.32, 14.17, 14.34, 7.97, 9.79, 11.47, 12.44)
+spending_category <- c("Lunch", "Dinner", "Cinema", "Drinks")
+
+my_week_of_spending <- tibble(amount_spent, spending_category)
+my_week_of_spending
+
+summarise(my_week_of_spending, sum(amount_spent))
+
+summarise(filter(my_week_of_spending, spending_category == "Lunch"),
+          sum(amount_spent))
+
+#should have added comments
+#shouldn't have deleted stuff in line 133
+
+
+```
+
+```{r}
+#styler - package
+```
+
+
+```{r}
+# Task / reviewing code from yesterday and rewriting
+```
+
+
+
+
+```{r}
+library(tidyverse)
+movie_data <- read_csv("data/movies.csv")
+```
+
+```{r}
+#Q1
+head(movie_data)
+summary(movie_data)
+glimpse(movie_data)
+names(movie_data)
+sum(is.na(movie_data))
+
+# Original title and title are similar
+# Missing data in tagline
+# Runtime is in a poor format
+# Revenue has missing data
+```
+
+```{r}
+#Q2
+#Selecting the titles, runtime and budget
+movies_selected <- movie_data %>%
+  select(original_title, runtime, budget)
+movies_selected
+```
+
+```{r}
+# Q3 - find the missing values
+movies_selected %>%
+  summarise(count = sum(is.na(original_title)))
+
+movies_selected %>%
+  summarise(count = sum(is.na(runtime)))
+
+movies_selected %>%
+  summarise(count = sum(is.na(budget)))
+```
+
+```{r}
+# Q4 - removing the NA's from movies_runtime
+movies_runtime <- movies_selected %>%
+  mutate(runtime = na_if(runtime, "0")
+  )
+
+# Checking again for NA's in runtime
+runtime_count_again <- movies_selected %>%
+  filter(runtime == 0) %>%
+  count() %>%s
+```
+
+```{r}
+#Q5 - impute missing values in runtime with median runtime
+
+movies_imputed <- movies_runtime %>%
+  mutate(runtime = coalesce(runtime,
+    median(runtime, na.rm = TRUE)
+  )
+)
+  
+# Checking again for NA's in runtime
+movies_imputed %>%
+  filter(runtime == 0) %>%
+  count() %>%
+```
+
+```{r}
+#Q6 - using slice_min and slice_max
+
+movies_imputed %>%
+  slice_min(runtime, n = 10)
+
+movies_imputed %>%
+  slice_max(runtime, n = 10)
+```
+
+```{r}
+#Q7 - Use if_else to impute budget below $100 and overwrite
+
+movies_imputed <- movies_imputed %>%
+  select(budget) %>%
+  mutate(budget = if_else(
+    budget == 0, median(budget, na.rm = TRUE), budget)
+  )
+
+```
+
+
+
+
+
+```{r}
+#Q1E - Using case_when, create a new column called budget_type and label budgets as follows:
+# 
+#     Budgets below 12 million as ‘Small budget’
+#     Budgets between 12 and 40 million as ‘Medium budget’
+#     Budgets 40 millions and above as ‘Big budget’
+# 
+# Save this into a new variable called movie_budgets.
+
+movies_selected %>%
+  select(budget) %>%
+  mutate(
+    budget_type = case_when(
+      budget < 12000000 ~ "Small budget",
+      budget <= 40000000 ~ "Medium budget", 
+      TRUE ~ as.character("Big budget")
+    )
+  )
+
+```
+
+```{r}
+#Q2E - Take the original dataset with all the variables. Using across and where, summarise the number of missing values, first across all columns of type character, and then across all columns of type numeric.
+
+movie_data %>%
+  summarise(across(where
+            (is.character), count(sum(is.na
+            ))))
+
+```
+```{r}
+#to compare the title / original title
+
+movie_data %>% 
+  mutate(same_title = if_else(original_title == title, "same", "not same")) %>% 
+  filter(same_title == "not same")
+```
+
+
+
+```{r}
+
+```
+
+

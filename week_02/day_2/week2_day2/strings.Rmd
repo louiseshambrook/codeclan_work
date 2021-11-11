@@ -1,0 +1,217 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+# defining strings
+
+string <- 'this is a string'
+#throws an error if you use an apostrophe
+
+double_quotes <- "this is also a string"
+
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+employees <- tibble(
+  first_name = c("Sally", "steven", "Mary", "John"),
+  last_name = c("Smith", "hasTings", "Milne", "Davidson"),
+  postcode = c("EH10 6GH", "EH3 7HL", "G1 7FR", NA), 
+  location = c(" ", "Edinburgh", "", "Stirling")
+)
+
+employees
+
+# Sally and Mary both don't have a location, but Sally does technically have a
+# location, which is a " " 
+# so ALWAYS check for empty spaces
+
+```
+
+```{r}
+# checking for empty spaces
+
+employees %>%
+  group_by(location) %>%
+  summarise(count = n())
+
+# better would be to go through and change to NA
+
+```
+
+```{r}
+# Manipulating strings
+
+str_c("this", "is", "a", "string")
+# concatenates the input
+
+```
+
+```{r}
+# function can be used to create a name (instead of first_name and last_name)
+
+employees %>%
+  mutate(full_name = str_c(first_name, last_name, sep = " "))
+```
+
+```{r}
+# fixing casing / casing
+# janitor / clean_names for column is one option
+
+pangram <- "the quick brown fox jumps over the lazy dog"
+
+#all in uppercase
+pangram %>%
+  str_to_upper()
+
+#all in lowercase
+pangram %>%
+  str_to_lower()
+
+#all words start with uppercase
+pangram %>%
+  str_to_title()
+
+# letters after full stop begin with capital
+pangram %>%
+  str_to_sentence()
+
+```
+
+```{r}
+#fixing the case of names
+
+employees <- employees %>%
+  mutate(first_name = str_to_title(first_name),
+         last_name = str_to_title(last_name),
+         full_name = str_c(first_name, last_name, sep = " ")
+  )
+
+```
+
+```{r}
+unbroken_string <- "we're going to split this string up"
+
+unbroken_string %>%
+  str_split(" ") %>%
+  flatten_chr()
+
+
+```
+
+```{r}
+employees %>%
+  mutate(postcode_new = str_split(postcode, " ")
+  ) %>%
+  unnest(postcode_new)
+
+# not very useful, but the separate function is more useful
+```
+
+```{r}
+employees %>%
+  separate(postcode, c("postcode_outer", "postcode_inner"),
+           sep = " ")
+```
+
+```{r}
+# Task - 10 mins
+# Concatenate the strings "Manipulating" "strings" "is" "fun!"
+# Capitalise the result and save it in a new variable
+# Split the formatted string into individual characters
+
+string_task <- str_c("Manipulating", "strings", "is", "fun!")
+# can add sep = " "
+
+capitalised_string_task <- str_to_upper(string_task)
+
+str_split(capitalised_string_task, "") %>%
+  flatten_chr()
+
+```
+
+```{r}
+# finding strings / substrings
+
+full_string <- "let's grab a substring from things"
+
+full_string %>%
+  str_sub(start = 1, end = 5)
+
+# counts from the start of the index of the string, to the end
+# 1 index language (not 0)
+# doesn't require an end argument, will count towards the end
+# end of the string is -1
+
+full_string %>%
+  str_sub(-5, -1)
+
+```
+
+```{r}
+employees %>%
+  mutate(postcode_inner = str_sub(postcode, -3))
+
+# starts 3 points from the end
+
+employees %>%
+  mutate(postcode_outer = str_sub(postcode, start = 1, end = -4))
+```
+
+```{r}
+#replace bits of string
+
+original_string <- "we're going to replace some words"
+
+# string_sub() is an option, but because it's hardcoding, it isn't great
+
+str_sub(original_string, 1, 22) <- "I've changed"
+
+```
+
+```{r}
+#numbers as strings
+
+number <- 123456.789
+
+number %>%
+  format(nsmall = 2)
+
+number %>%
+  format(nsmall = 2, big.mark = ",", decimal.mark = ".")
+
+#changed from numeric, to string, with 2 decimal places
+# can be used for graphing, for the sake of formatting
+```
+
+```{r}
+# Here are some more questions for you to practice with. Remember, the point of these questions is not to do something that makes sense for this dataset, but rather to allow you to practice using the techniques we’ve learnt today on a real dataset. When it comes to your projects, you will be in charge of deciding how to work with the strings in your dataset.
+# We are going to use some Spotify data for this task:
+# Uppercase the text in the playlist_name column. Overwrite the existing column to store the result.
+# Lowcase the text in the track_artist column. Store the result in a new column called track_artist_lowcase.
+# Take the first 5 characters of the playlist_id column, and save it in a new column called playlist_start.
+# Take the first 4 characters of the track_album_release_date column and save it in a new column called year.
+# What else can you do to this dataset to practice? Can you work with the numbers? This is open ended - have fun!
+
+```
+
+```{r}
+spotify_songs <- read_csv("data/spotify_sample.csv")
+```
+```{r}
+
+spotify_cleaned <- spotify_songs %>%
+  clean_names() %>%
+  mutate(playlist_name = str_to_upper(playlist_name)) %>%
+  mutate(track_artist_lowcase = str_to_lower(track_artist)) %>%
+  mutate(playlist_start = str_sub(playlist_id, start = 1, end = 5)) %>%
+  mutate(year = str_sub(track_album_release_date, start = 1, end = 4))
+
+```
+
+

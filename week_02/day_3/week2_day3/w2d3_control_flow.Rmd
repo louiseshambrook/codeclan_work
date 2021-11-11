@@ -1,0 +1,334 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+```{r}
+#Control Flow
+```
+
+```{r}
+# if statements
+
+# already explored, na.if
+
+if (condition) {
+  # code that runs if condition is met 
+}
+```
+
+```{r}
+# conditional operators
+
+# `==` equal to
+# `!=` not equal to
+# `<` less than
+# `>` greater than
+# `>=` greater than OR equal to
+# `%in%` is in the set
+```
+
+```{r}
+x <- 7
+y <- 8
+
+if (x <= y) (
+  print("it's less than or equal to y")
+)
+
+
+```
+
+```{r}
+# task
+# Write an if statement that prints 'Yes that divides by 2' if a number x is divisible by 2 (hint: use %% 2 == 0 as your expression), try it out for different values of x.
+
+x <- 9
+
+if (x %% 2 == 0) {
+  print("yes that divides by 2")
+}
+```
+
+```{r}
+# Nested if statements
+
+# we can write more complicated if statements
+
+if (10 != 5) {
+  if (2 > 0) {
+   print("the second condition was met") 
+  }
+  print("the first condition was met")
+}
+```
+
+```{r}
+#Task
+
+#check if various statements are met
+
+if (x > y) {
+  print("Start of outer if block")
+
+  if (x %% y == 0) {
+    print("Inner if block 1")
+  }
+
+  if (y %in% c(1:5)) {
+    print("Inner if block 2")
+  }
+
+  print("End of outer if block")
+}
+
+print("After if statement")
+```
+
+```{r}
+# if else statements
+
+# if (condition) {
+#   # do something
+# } else {
+#   # do something else
+# }
+```
+
+```{r}
+# if (rain) {
+#   wear_wellies()
+# } else {
+#   wear_trainers()
+# }
+```
+
+```{r}
+if (4 < 5) {
+  print("yes it's less")
+} else {
+  print("no it's not")
+}
+
+```
+
+```{r}
+if (4 < 5) {
+  print("yes it's less")
+} else if (6 > 8) {
+  print("no it's not")
+} else if (9 < 6) {
+  print("hello")
+} else {
+  print("meow")
+}
+```
+
+```{r}
+# Task
+# Edit your code from the first exercise so that it prints ‘Yes that divides’ when x is divisible by 2, and prints ‘No that does not divide’ otherwise.
+
+x <- 9
+
+if (x %% 2 == 0) {
+  print("yes that divides")
+} else {
+  print("not it doesn't divide")
+}
+```
+
+```{r}
+# for loops
+
+# basic syntax
+
+for (item in basket) {
+  hang_up(item)
+}
+```
+
+```{r}
+print("the day is Monday")
+print("the day is Tuesday")
+print("The day is Wednesday")
+print("The day is Thursday")
+print("The day is Friday")
+```
+
+```{r}
+weekdays <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
+
+for (day in weekdays) {
+  phrase <- paste("the day is", day, sep = " ")
+  print(phrase)
+}
+```
+
+```{r}
+# task
+# 
+# Task - 10 mins
+# 
+# Change the code below to use a for loop:
+
+print(1)
+print(2)
+print(3)
+print(4)
+print(5)
+
+numbers <- c("1", "2", "3", "4", "5")
+
+for (num in numbers) {
+  print(num)
+}
+```
+
+```{r}
+# while loops
+
+while (snowing) {
+  clear_drive()
+}
+```
+
+```{r}
+#R example
+
+# set beginning value, and stop value
+
+current_value <- 1
+stop_value <- 10
+
+while (current_value < stop_value){
+  print(current_value)
+  current_val <- current_val + 1
+}
+
+```
+
+```{r}
+# for loop indexing
+
+weekdays <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
+
+for (i in 1:length(weekdays)) {
+  print(i)
+  phrase <- paste("the day is", weekdays[i], sep = " ")
+  print(phrase)
+}
+
+```
+
+```{r}
+# nested loops
+# loops within loops
+
+my_matrix <- replicate(5, floor(rnorm(5) *100))
+my_matrix
+
+
+# printing all the rows and columns from a matrix
+
+for (row in 1:5) {
+  for (col in 1:5) {
+    print(my_matrix[row, col])
+  }
+}
+
+# if we don't know how many rows and columns
+n_rows <- nrow(my_matrix)
+n_cols <- ncol(my_matrix)
+
+for (row in 1:n_rows) {
+  for (col in 1:n_cols) {
+    print(my_matrix[row, col])
+  }
+}
+
+```
+
+```{r}
+product_matrix <- matrix(nrow = 5, ncol = 5)
+product_matrix
+
+new_matrix <- for (row in 1:1) {
+  for (col in 1:1) {
+    (product_matrix[[1,1]])
+  }
+}
+
+my_matrix[2,3]
+
+#answer
+
+for (x in 1:nrow) {
+  for (y in 1:ncol) {
+    product_matrix[x,y] <- x * y
+  }
+}
+
+
+```
+
+```{r}
+#creates a numeric vector
+my_vector <- c(1, 4, 6, 2, 4)
+
+#creates a temporary vector (length 5)
+temp_vector <- numeric(length(my_vector))
+
+for (i in 1:length(my_vector)) {
+  temp_vector[i] <- my_vector[i] + 1
+}
+
+# overwrite inital vector
+my_vector <- temp_vector
+
+my_vector
+
+```
+
+```{r}
+# apply family of functions
+
+apply()
+lapply()
+sapply()
+
+purrr:
+  map()
+
+# these allow you to take a function and apply it in a vectorised way
+
+```
+
+```{r}
+
+sapply(iris, class)
+
+# sapply() - will try to return the simplest data structure it can (vectors)
+
+# lapply() - will usually return a list
+ 
+
+
+```
+
+```{r}
+# Final Task from me (5 mins):
+# Using the starwars list from the CodeClanData package, do the following:
+# Print the name for every character in the list
+# You can use for loops or apply
+
+library(CodeClanData)
+
+starwars
+
+for (x in starwars) {
+    print(x$star_wars)
+}
+
+# not quite right
+
+```
+

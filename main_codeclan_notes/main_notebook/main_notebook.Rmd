@@ -2,25 +2,75 @@
 title: "Main Notebook"
 output: html_notebook
 ---
-### MISC NOTES TO TIDY
-as.numeric(name)
-na.rm = TRUE)
-n()
-as.logical)
-across()
-as.factor
-ungroup
 
-add wed and thur
+## Document starts here
+Louise Shambrook
 
-### Libraries
+Updated 11/11/2021
+
+## 0.0 Index
+
+0.1 - Libraries
+
+0.2 - Data sources
+
+0.3 - Class log
+
+1.1 - Summary functions
+
+1.2 - dplyr functions
+
+1.3 - Other important functions
+
+1.4 - str functions
+
+1.5 - joining functions
+
+1.5.1 - Pivot functions
+
+1.6 - base R functions
+
+1.6.1 - Useful mathematical operators
+
+1.6.2 - Conditional operators
+
+1.7 - Unit testing
+
+2.1 - If statements
+
+2.2 - For statements
+
+2.3 - Which statements
+
+2.4 - Functions
+
+3.1 - Styling and best practice
+
+3.2 - Reproducibility and file paths
+
+3.3 - Assertive programming
+
+4.1 - Tidy data
+
+5.1 - Regular expressions (regex)
+
+5.2 - Strings
+
+6.1 - Matricies and lists
+
+10.1 - Notes from weekend homework
+
+## 0.1 Libraries
 
 library(tidyverse)
 library(readxl)
 library(janitor)
 library(styler)
+library(fcuk)
+library(errorist)
+library(assertr)
 
-# Data Sources
+## 0.2 Data Sources
 
 library(CodeClanData)
 data/dog_bites.csv
@@ -29,18 +79,34 @@ data/new_coders.csv
 data/character-deaths.csv
 mdata/movies.csv
 
-To read in data:
-  read_csv()
+To read in data
 
-# Functions
+read_csv()
 
-summary / data exploration functions
+## 0.3 Class log
 
-dplyr functions
+W1 D1 
 
-Other functions
+W1 D2 - reading in excel files 
 
-# Summary / data exploration
+W1 D3 - 
+
+W1 D4 - Recoding, Styling and best practice, errors
+
+W1 D5 - 
+
+W2 D1 - Joins and Tidy data
+
+W2 D2 - Strings and Regular expressions
+
+W2 D3 - Matrices and Lists, control flow, and functions
+
+W2 D4 - Unit testing, assertive programming, reproducibility 
+
+W2 D5 - 
+
+## 1.1 Summary / data exploration
+
 `nrow()` - returns the number of rows
 
 `ncol()` - returns the number of columns
@@ -59,30 +125,27 @@ Other functions
 
 `view()` - view entire df
 
-`str()` - get structure of df
+`str()` - returns structure of df
 
 `sum(is.na)` - checking for na
 
+length
 
-# dplyr functions ------------------------------
 
-# select
+## 1.2 dplyr functions 
+
 `select()` - selecting variables; can be used with a negative (-x)
 
-# filter
 `filter()` - filter columns out
 
-# arrange
 `arrange()` - aranges rows
+
 `arrange(desc())` - arranges in descending order
 
-# mutate
 `mutate()` - overwrites / creates a new column - mutate(new_column = old_column + 5)
 
-# group by
 `group_by()` - creates a group
 
-# summarise
 `summarise()` - creates a summary
 
 can be used with:
@@ -92,28 +155,33 @@ can be used with:
 `n()` - 
 `everything()` 
 
-# group by and summarise
+group by and summarise
+
 data <- group_by(column_x, column_y)
 summarise(data, column_y = n())
 
-# is.na
 `is.na()` - checks a column for NA values
 
 Useful to use with:
 `filter(!is.na(column))` - removes na values from column
 
-# na.drop
 `na.drop` - drops NA rows
 
-# pull
-`pull()`
+`pull()` - 
 
-# coalesce
-`coalesce()`
+`coalesce()` - 
+
+across() - 
+
+ungroup() - 
+tibble() - 
+n() - 
+na.rm = TRUE; mutate(new_col = old_col = x(na.rm = TRUE)
+summarise(count = sum(is.na(col)))
 
 
 
-# Other important functions -------------------------------------
+## 1.3 Other important functions
 
 `slice_min()`
 
@@ -131,944 +199,532 @@ can recode from NA to NA_character
 e.g. mutate(compl = recode (compl, "T" = "True", "F" = "False", .default = NA_character_))
 
 
-# Day/Week history ------------
+as.numeric(name)
+as.logical)
+as.factor()
 
-# Week 1 Day 2 - reading in excel files 
+## 1.4 Str functions
 
-# Week 1 Day 3 - 
+`str_length()`
 
-# Week 1 Day 4 - Recoding; Styling and best practice
+`str_extract()`
+
+`str_extract_all()`
+
+`str_detect()`
+
+
+## 1.5 Joining functions
+
+basic syntax - <type of join>_join(x, y, by = NULL, suffix = c(".x,", ".y"))
+```{r}
+inner_join(customers, orders, by = "customer_ID")
+```
+
+`inner_join()` - only returns records where there's an equivalent in both halves
+
+`left_join()` - all variables from the left df will be included
+
+`right_join()` - opposite of left_join
+
+`full_join()` - includes everything, matching where possible
+
+`semi_join()` - filtering join
+
+`anti_join()` - filtering join
+
+`bind_rows()` - appends rows, e.g. for an updated dataset
+
+`bind_cols()` - appends columns, e.g. for an updated dataset
+
+## 1.5.1 Pivot functions
+
+`pivot_longer()` - takes names_to and values_to
+
+`pivot_wider()` -  takes names_from and values_from
+
+## 1.6 Base R functions
+
+`if_else()`
+
+`sample()`
+
+`all()`
+
+`any()`
+
+`conflicts()`
+
+
+## 1.6.1 Useful mathematical operators
+
+`%% ` - modulo operator, e.g. 50 %% == 0
+
+`%in%` - checks for if x is in y
+
+
+## 1.6.2 Conditional operators
+
+`==` - equal to
+
+`!=` - not equal to
+
+`<` - less than
+
+`>` - greater than
+
+`>=` - greater than OR equal to
+
+`%in%` - is in the set
+
+
+## 1.6.3 Vectorisation of R
+
+The apply family (apply(), lapply(), sapply()) of functions allow you to take a functions and apply it in a vectorised way.
+
+apply() - will try to return the simplest data structure it can (vectors)
+
+lapply() - will usually return a list
+
+
+
+## 1.7 Unit testing
+
+Unit testing is creating code to test code that has previously been written.
+
+Tests are generally a good idea for bigger, more advanced functions which are prone to throw more errors.
+
+To unit test in R, apply package testthat.
+
+`expect_equal()` - tests for if values are equal
+
+`expect_error()` - tests for if an error is expect, and will return true if it IS expected.
+
+
+## 2.1 If statements
+
+Basic syntax
+```{r}
+if (condition) {
+}
+```
+
+`if(){}` - if statement (code runs if condition is met)
+
+`if(){if(){}}` - nested if statement
+
+`if(){}else{}` - if else statement
+
+Example
+```{r}
+if (4 < 5) {
+  print("yes it's less")
+} else {
+  print("no it's not")
+}
+```
+
+`if(){}else if{}` - else if statement
+
+Example
+```{r}
+if (x > y) {
+  print("yes it's less")
+} else if (x < y){
+  print("y is greater")
+} else {
+  print("they're the same")
+}
+```
+
+
+## 2.2 For statements
+
+Basic syntax
+```{r}
+for (num in numbers) {
+}
+```
+
+`for(){}` - for statement. The () take two statements, a placeholder and an index
+`for(){for(){}}` - nested for loop
+
+Example of indexing
+```{r}
+for (i in 1:length(weekdays)) {
+  print(i)
+  print("the day is", weekdays[i], sep = " ")
+}
+```
+
+It is often important to add a counter, e.g.
+```{r}
+for (i in 1:length(my_vector)) {
+  temp_vector[i] <- my_vector[i] + 1
+}
+```
+
+
+## 2.3 Which statements
+###To be edited ALOT
+
+
+
+```{r}
+# while loops
+
+while (snowing) {
+  clear_drive()
+}
+```
+
+```{r}
+#R example
+
+# set beginning value, and stop value
+
+current_value <- 1
+stop_value <- 10
+
+while (current_value < stop_value){
+  print(current_value)
+  current_val <- current_val + 1
+}
+
+```
+
+
+
+## 2.4 Functions
+
+```{r}
+#functions
+
+#to see code of the functions, run without brackets
+
+library
+
+nchar()
+
+# there are many arguments that can be passed in, but we often skip many of them
+# by being explicit, you can move the arguments around, syntax doesn't matter
+# what is more common, is passing arguments by place, but when one is skipped, R throws errors
+
+
+
+```
+
+```{r}
+my_fun <- function(x, y, z) {
+      1+1
+}
+
+# good practice to not return on the last line
+```
+
+```{r}
+multiply_by_5 <- function(x) {
+  x * 5
+}
+
+multiply_by_5(5)
+```
+```{r}
+multiply_by <- function(x, y) {
+  x * y
+}
+
+multiply_by(1:3, 10)
+```
+
+```{r}
+beaver1
+```
+
+
+```{r}
+make_price <- function(x) {
+  paste("£", x)
+}
+make_price(4)
+
+# paste0 is what you need to remove the space
+
+# round() rounds to two decimal places
+
+```
+
+```{r}
+triangle_function <- function(x) {
+  (x*(x+1))/2
+}
+
+triangle_function(5)
+```
+
+```{r}
+#global assignment operator
+
+
+```
+```{r}
+# to debug functions
+
+#debug() is an option
+# but not great because you have to stop it
+#undebug()
+#debugonce() is better - goes through the code line by line
+
+
+
+```
 
 
 
 
-# Styling and Best Practice -----------------
+## 3.1 Styling and Best Practice
+###To be edited ALOT
 
 Snakecase is best practice
 Objects should be nouns and functions should be verbs
 Cannot use numbers in objects in the first character, e.g. 1_file
 Always start with library calls
 
-## Spacing and assignment
+Spacing and assignment
 Put spaces after commas, and after operations
 No space after the start/end of brackets (e.g. (function, bleep) )
 No space after calling a function, e.g mean(bleep)
 Space before and after assignment operators ( <- )
 
-## Line length
+Line length
 Code should not be more than 80 char per line
 Code can be split across multiple lines
 Should have function name and opening bracket on one line
 Args on the next line
 
-## Quotation marks
+Quotation marks
 Double and single quotation marks are equally valid as a string
 Some strings may have an apostrophe, and then the string breaks
 Convention is therefore to use double quotation marks
 
-## Comments
+Comments
 Comments are powerful and important in understanding code
 Comment above the code
 
 
-# EDIT FROM HERE DOWN -------------
+## 3.2 Reproducibility and file paths
+###To be edited ALOT
+
+How to Achieve reproducibility
+
+key to be organised, and keep a good folder structure
+
+exam_results[, 1] - This is NOT reproducible 
+a more robust/reproducible way is by naming the data, i.e. the column 
+exam_results[, "student"]
 
 
-BEST PRACTICE
+organising your code so that it is easy to read - one way of doing this
+is by creating functions, or modulising it
 
-```{r}
-library(tidyverse)
 
-```
+source function - looks in the working directory for various files
+source()
+grabs the functon from e.g. an R script, and places in the global env, so it can be run
 
-```{r}
-#Q1
-head(movie_data)
-summary(movie_data)
-glimpse(movie_data)
-names(movie_data)
-sum(is.na(movie_data))
+e.g. 
+source("01_multiply_function.R") # this would be a separate script
+source("02_add_function.R") # this would be a separate script
+a <- multiply_by_n(2, 4)
+b <- add_two(a)
+b
 
-# Original title and title are similar
-# Missing data in tagline
-# Runtime is in a poor format
-# Revenue has missing data
-```
 
-```{r}
-#Q2
-#Selecting the titles, runtime and budget
-movies_selected <- movie_data %>%
-  select(original_title, runtime, budget)
-movies_selected
-```
+in an R script, you can add headers / tails
+shift + cmd + r
+on r script, you can select the little lines menu on top right which automatically indexes
 
-```{r}
-# Q3 - find the missing values
-movies_selected %>%
-  summarise(count = sum(is.na(original_title)))
 
-movies_selected %>%
-  summarise(count = sum(is.na(runtime)))
 
-movies_selected %>%
-  summarise(count = sum(is.na(budget)))
-```
+documentation
 
-```{r}
-# Q4 - removing the NA's from movies_runtime
-movies_runtime <- movies_selected %>%
-  mutate(runtime = na_if(runtime, "0")
-  )
+main points (comments)
+purpose and objective - WHY
+instruct how to follow the code
 
-# Checking again for NA's in runtime
-runtime_count_again <- movies_selected %>%
-  filter(runtime == 0) %>%
-  count() %>%s
-```
+key things to note and include:
+date (e.g. if packages or similar are or become out of date)
+sources
+evidence
+decision making process
+assume the reader has no prior knowledge
 
-```{r}
-#Q5 - impute missing values in runtime with median runtime
+restart and run all chunks, is safest way to avoid creating objects etc outside
+of the active / required environment/notebook
+if you do want to do this, sourcing is a good way to do this
+if scripts are very long / take long to run, you can save scripts to a specfic workspace
+saveRDS(object, file = "name")
+but comment it out after saving it the first time
 
-movies_imputed <- movies_runtime %>%
-  mutate(runtime = coalesce(runtime,
-                            median(runtime, na.rm = TRUE)
-  )
-  )
 
-# Checking again for NA's in runtime
-movies_imputed %>%
-  filter(runtime == 0) %>%
-  count() %>%
-  ```
 
-```{r}
-#Q6 - using slice_min and slice_max
+relative file path
 
-movies_imputed %>%
-  slice_min(runtime, n = 10)
+difference between relative file path and absolute file path
+relative file path is relative to your working directory, i.e. you do not need
+to input the entire filepath
 
-movies_imputed %>%
-  slice_max(runtime, n = 10)
-```
+
+read_csv("/Users/louiseshambrook/GitHub/codeclan_work/codeclan_work/week_02/day_4/w2_d4_reproducability/no_project_example/")
+trying to read in data, but unable to locate it / your files have not been set up correctly
+by using ~, it brings you to the top of your directory
+This is NOT reproducible, as their file structure may differ (and likely will)
+
+if the data file is not accessible on the same level (e.g. if the data is not
+contained within the same folder as the rproj, then the library(data) with the 
+function data can correct this)
+e.g. read_csv(here("data/students")
+
+
+
+## 3.3 Assertive programming
+###To be edited ALOT
 
 ```{r}
-#Q7 - Use if_else to impute budget below $100 and overwrite
-
-movies_imputed <- movies_imputed %>%
-  select(budget) %>%
-  mutate(budget = if_else(
-    budget == 0, median(budget, na.rm = TRUE), budget)
-  )
-
+# assertive programming
+# checking / looking at the data going into your code
 ```
-
-```{r}
-#Q1E - Using case_when, create a new column called budget_type and label budgets as follows:
-# 
-#     Budgets below 12 million as ‘Small budget’
-#     Budgets between 12 and 40 million as ‘Medium budget’
-#     Budgets 40 millions and above as ‘Big budget’
-# 
-# Save this into a new variable called movie_budgets.
-
-movies_selected %>%
-  select(budget) %>%
-  mutate(
-    budget_type = case_when(
-      budget < 12000000 ~ "Small budget",
-      budget <= 40000000 ~ "Medium budget", 
-      TRUE ~ as.character("Big budget")
-    )
-  )
-
-```
-
-```{r}
-#Q2E - Take the original dataset with all the variables. Using across and where, summarise the number of missing values, first across all columns of type character, and then across all columns of type numeric.
-
-movie_data %>%
-  summarise(across(where
-                   (is.character), count(sum(is.na
-                   ))))
-
-```
-```{r}
-#to compare the title / original title
-
-movie_data %>% 
-  mutate(same_title = if_else(original_title == title, "same", "not same")) %>% 
-  filter(same_title == "not same")
-```
-
-
-
-```{r}
-
-```
-
-ERRORS LAB
-
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, error = T, message = F)
-```
-
-In this lab you will be presented with several code chunks that produce errors. Your task is to try and solve the errors and get the code chunk not only running without an error, but doing what it should be doing. For each chunk you will get a short description of what it is meant to be doing. 
-
-Remember to create a new notebook and copy over the contents of the .Rmd file and solve them in there, rather than changing the classnotes! You'll see the error messages when you try to run the chunks in your notebook - keep fixing them until you don't get an error (and it's accomplishing the goal).
-
-Use what you have learned in the errors lesson to solve these errors. Remember: problem solving and trying to interpret the error messages should be your first approach. Where this does not cut it there are several options: Google, StackOverflow, rubber ducking, specific function help files, checking data types and dimensions.
-
-**Note:** You may have to fix more than one thing per code chunk to escape the errors!
-
-# MVP
-<br>
-**Error 1.**  
-
-Create `some_letters` which is a character vector containing the following letters: "E", "R", "R", "O" and "R".
-```{r}
-some_letters <- c("E", "R", "R", "O", "R")
-
-```
-
-<br> 
-
-**Error 2.**  
-
-Create `message` which is a vector containing the following strings: "does", "this", "work" and "?", then convert the vector to uppercase using `toupper`.
-```{r}
-message <- c("does", "this", "work", "?")
-
-toupper(message)
-
-```
-
-
-<br> 
-
-
-**Error 3.**  
-
-Select columns `mpg`, `cyl`, and `disp` from `mtcars` and keep only rows where `mpg` is less than 20..
-```{r}
-
-mtcars %>% 
-  select(mpg, cyl, disp) %>%
-  filter(mpg < 20)
-
-```
-
-
-<br> 
-
-
-**Error 4.**
-*Select columns `Sepal.Length`, `Sepal.Width`, and `Species` and arrange by `Sepal Length`.*
-```{r}
-
-iris %>% 
-  select(Sepal.Width, Species, Sepal.Length) %>% 
-  arrange(Sepal.Length)
-
-```
-
-
-<br> 
-
-
-**Error 5.** 
-
-Find the average tooth length for where the supplement is vitamin C.
-
-```{r}
-ToothGrowth %>%
-  filter(supp == "VC") %>%
-  summarise(avg_len_vc = mean(len))
-
-```
-
-
-<br> 
-
-**Error 6.**
-Create a vector of animals (cat, dog, rabbit, horse), then use the `sample` function to get 10 random animals from those categories.
-
-```{r}
-animals <- c("cat", "dog", "rabbit", "horse")
-
-sample(animals, 10, 'replace' = TRUE)
-
-```
-
-
-<br> 
-
-**Error 7.**  
-Create dog_names and cat_names, then use `intersect` to check which common pet names are shared by both dogs and cats.
-
-```{r}
-dog_names <- c("Lucy", "Molly", "Charlie", "Luna", "Bella", "Cooper")
-
-cat_names <- c("Luna", "Lily", "Lucy", "Charlie", "Max", "Oliver")
-
-lubridate::intersect(dog_names, cat_names)
-
-#didn't need to load it in from a different package 
-#read further through on help pages, first answer isn't always right
-
-```
-
-
-<br> 
-  
-  **Error 8.**
-  Filter weights equal to or below 150 grams, then create a new column 'weight_kg' that contains the weight in kilograms.
-
-```{r}
-chickwts %>% 
-  filter(weight <= 150) %>% 
-  mutate(weight_kg = weight * 0.001)
-
-
-```
-
-
-<br> 
-  
-  **Error 9.**
-  Create a tibble with column `alphabet` which contains the English alphabet and column `numbers` which has a unique number for each letter. Then remove rows where the letter is A, B or C.
-
-```{r}
-tibble(alphabet = letters,
-       numbers = 1:26) %>% 
-  filter(alphabet != c("a", "b", "c"))
-
-
-```
-
-
-<br>
-  
-  **Error 10.** 
-  
-  **The chunk below creates the data for this error (don't change anything in it):**
-```{r}
-# Don't change anything in this code chunk
-# but you will need to include it in your notebooks
-
-set.seed(999)
-
-scent_ratings <- tibble(
-  iD = rep(1:10, each = 5),
-  SCENT = rep(c("New book", "Cut grass", "Rose oil", "Fresh linen", "Wet dog"), 10),
-  rating = sample(c(0:5, NA), 50, replace = TRUE),
-  PersonAge = rep(NA, 50)
-)
-```
-
-Clean the variable names and drop missing ratings from `scent_ratings` and calculate an average rating per scent.
-
-```{r}
-scent_ratings <- scent_ratings %>%
-  janitor::clean_names() %>%
-  select(-person_age) %>%
-  drop_na() %>%
-  group_by(scent) %>% 
-  summarise(mean_rating = (mean(rating)))
-
-```
-
-<br> 
-  
-  
-  
-  ERRORS
-
-```{r}
-the_name_of_my_variable <- c(3, 4, 5)
-
-the_name_of_my_variable == 4
-## Error in eval(expr, envir, enclos): object 'the_name_of_my_varaible' not found
-
-# R tells you where the error occurs
-```
-```{r}
-library(fcuk)
-```
-
-```{r}
-the_name_of_my_variable <- c(3, 4, 5)
-
-filter(the_name_of_my_variable, variable == 4)
-```
-
-```{r}
-dim(the_name_of_my_variable)
-length(the_name_of_my_variable)
-class(the_name_of_my_variable)
-```
-
-```{r}
-#to filter, you need a dataframe
-# to do it on this variable, code
-
-the_name_of_my_variable == 4
-
-```
-
-```{r}
-library(dplyr)
-```
-
-```{r}
-library(MASS)
-```
-
-```{r}
-select(mtcars, mpg)
-
-# error is that it's trying to run the select function from MASS
-```
-
-```{r}
-conflicts()
-```
-
-```{r}
-# Task - 2 minute
-#Let’s retry the example above but trying dplyr::select() to specify which package we want to use.
-
-dplyr::select(mtcars, mpg)
-
-# use the select function from the dplyr package
-
-```
-
-```{r}
-the_name_of_my_variable <- c(3, 4, 5)
-the_name_of_your_variable <- c(6, 7, 8)
-
-#both_variables <- tibble(the_name_of_my_variable the_name_of_your_variable)
-
-# error is no comma
-```
-
-```{r}
-#some_characters <- c("Steph", "Del", "Mhairi, "Aileen")"
-# missing end quotation mark
-```
-
-```{r}
-#task
-
-#the_name_of_my_variable <- c(3, 4, 5)
-#the_name_of_your_variable <- c(6, 7, 8)
-
-# both_variables <- tibble(the_name_of_my_variable, the_name_of_your_variable)
-
-# typo
-# These errors mean that the R code you are trying to run or source is not syntactically correct. That is, you have a typo.
-# 
-# To fix the problem, read the error message carefully. The code provided in the error message shows where R thinks that the problem is. Find that line in your original code, and look for the typo.
-
-```
-
-```{r}
-library(errorist)
-```
-
-```{r}
-library(errorist)
-
-the_name_of_my_variable <- c(3, 4, 5)
-the_name_of_your_variable <- c(6, 7, 8)
-
-#both_variables <- data.frame(the_name_of_my_variable the_name_of_your_variable)
-```
-
-```{r}
-#error - vector recycling 
-the_name_of_my_variable <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-subset_variable <- c(2, 3, 4)
-the_name_of_my_variable == subset_variable
-
-
-#correct way
-
-the_name_of_my_variable <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
-subset_variable <- c(2, 3, 4)
-the_name_of_my_variable %in% subset_variable
-
-```
-
-
-
-
-
-
-
-### WEEKEND HOMEWORK
-
-
-# My questions to explore
-
-#Q1 - What is the highest rated book from the original series in English by JK?
-#Q2 - Is the average of the original HP higher than the average of LotR?
-#Q3 - What are the ratings and titles of the top 5 french books
-# ranked by ratings count?
-#Q4 - What is the mean rating for books published by Puffin?
-#Q5 - Are short books (200 to 400 pages) rated lower or higher on average
-# than long books (600 to 800 pages)?
-
-
-
-```{r}
-# loading packages and data
-
-library(tidyverse)
-library(janitor)
-
-books <- read_csv("data/books.csv")
-```
-
-```{r}
-# Creating my main dataframe - removing row_ID, ISBN, ISBN13,
-# publication_date and text_reviews_count
-
-main_books_data <- books %>%
-  select(-rowid, -isbn, -isbn13, -text_reviews_count, -bookID)
-
-```
-
-```{r}
-#Q1 - What is the highest rated book from the original series in English by JK?
-
-highest_hp_rating <- main_books_data %>%
-  select(title, authors, average_rating) %>%
-  filter(str_detect(authors, "Rowling"),
-         str_detect(title, "Harry Potter and the"),
-         !str_detect(title, "Sorcerer's")) %>%
-  group_by(average_rating, title) %>%
-  distinct(title) %>%
-  ungroup() %>%
-  slice_max(1)
-
-# Answer is HBP with 4.57
-
-```
-
-```{r}
-#Q2 - Is the average of HP1-7 higher than the average of LotR?
-
-# Calculating the Harry Potter average
-hp_avg_rating <- main_books_data %>%
-  select(title, authors, average_rating) %>%
-  filter(str_detect(authors, "Rowling"),
-         str_detect(title, "Harry Potter and the"),
-         !str_detect(title, "Sorcerer's")) %>%
-  distinct(title, average_rating) %>%
-  summarise(avg_rating = mean(average_rating))
-hp_avg_rating
-# 4.511667
-
-# Calculating the LotR average
-lotr_avg_rating <- main_books_data %>%
-  select(title, authors, average_rating, publisher) %>%
-  filter(str_detect(title, "The Return of the King|The Fellowship of the Ring|The Two Towers"),
-         str_detect(publisher, "Houghton Mifflin|Mariner Books"), 
-         authors != "Jude Fisher/Viggo Mortensen",
-         publisher != "Houghton Mifflin Harcourt"
-  ) %>%
-  summarise(avg_rating = mean(average_rating))
-lotr_avg_rating
-
-#4.44333
-
-higher_hp_lotr_rating <- hp_avg_rating > lotr_avg_rating
-higher_hp_lotr_rating
-#TRUE - HP is higher than LOTR
-
-```
-
-```{r}
-#Q3 What are the ratings and titles of the top 5 rated french books
-#ranked by number of ratings (not rating)
-
-top_french_books <- main_books_data %>%
-  select(title, average_rating, ratings_count, language_code) %>%
-  filter(language_code == "fre") %>%
-  group_by(ratings_count, average_rating) %>%
-  arrange(desc(ratings_count))
-
-head(top_french_books, 5)
-
-#top_french_books gives the output
-
-```
-
-```{r}
-#Q4 - What is the mean rating for books published by Puffin?
-
-mean_puffin_rating <- main_books_data %>%
-  select(title, average_rating, publisher) %>%
-  summarise(puffin_avg_rating = (mean(average_rating)))
-
-# answer is 3.934075
-
-```
-
-```{r}
-#Q5 - Are shorter books, rated lower than longer books?
-
-# low book rating 
-short_book <- main_books_data %>%
-  select(title, average_rating, num_pages) %>%
-  mutate(length_of_book = case_when(
-    num_pages < 200 ~ "under 200",
-    num_pages > 200 & num_pages < 400 ~ "200 to 400",
-    TRUE ~ "above 2000")) %>%
-  filter(length_of_book == "200 to 400") %>%
-  summarise(low_book_avg_rating = mean(average_rating))
-
-long_book <- main_books_data %>%
-  select(title, average_rating, num_pages) %>%
-  mutate(length_of_book = case_when(
-    num_pages < 600 ~ "under 200",
-    num_pages > 600 & num_pages < 800 ~ "600 to 800",
-    TRUE ~ "above 2000")) %>%
-  filter(length_of_book == "600 to 800") %>%
-  summarise(high_book_avg_rating = mean(average_rating))
-
-highest_book_split_rating <- short_book < long_book
-highest_book_split_rating
-#TRUE
-
-book_summ <- books %>%
-  select(title, average_rating, num_pages) %>%
-  mutate(length_of_book = case_when(
-    num_pages < 200 ~ "0. under 200",
-    num_pages >= 200 & num_pages < 400 ~ "1. 200 to 400",
-    num_pages >= 400 & num_pages < 600 ~ "2. 400 to 600",
-    num_pages >= 600 & num_pages < 800 ~ "3. 600 to 800",
-    TRUE ~ "4. above 800")) %>%
-  # filter(length_of_book == "200 to 400") %>%
-  group_by(length_of_book) %>%
-  summarise(avg_rating = mean(average_rating))
-
-```
-
-WEEK 2
-
-str_length()
-str_exxtract
-str_extract_all
-str_detect
-
-
-WEEK 2 DAY ONE
-
-JOIN IN R
 
 
 ```{r}
 library(tidyverse)
 ```
 
-
 ```{r}
-# types of join
-
-# mutating joins
-# adds columns between one or other tables (i.e takes column from one and add to the other)
-
-# inner_join() - will be most commonly used
-# left_join()  - will be most commonly used
-# right_join()
-# full_join()
-
-# filtering joins
-
-# semi_join()
-# anti_join()
-
-# binding joins
-
-# bind_rows()
-# bind_cols()
-
-# basic syntax - 
-# <type of join>_join(x, y, by = NULL, suffix = c(".x,", ".y"))
-
+weather_one <- read_csv("data/delhi_weather_one.csv")
+weather_two <- read_csv("data/delhi_weather_two.csv")
 ```
 
 ```{r}
-# customer database
-
-customers <- tibble(
-  customer_ID = c(001, 002, 004, 005, 008, 010), 
-  name = c("John Smith", "Jane Adams", "Robert Landry", "Jane Tow", "Raul Tann", "Hilary Joyal"),
-  email_address = c("johnsmith@gmail.com", "janea@gmail.com", "rlabdry@hotmail.com", "janet89@aol.com", "paul.tann1@gmail.com", NA),
-  shipping_address = c("32 Station Road, Edinburgh", "42 Park Drive, Edinburgh", NA, "10 Gardiner Rd, Edinburgh", "12 Main St, Edinburgh", " 234 Queensferry Rd, Edinburgh,")
-)
-```
-
-```{r}
-# order database / information
-
-orders <- tibble(
-  customer_ID = c(001, 002, 005, 010, 012, 001), 
-  order_number = c("KU65781", "SU98201", "JS76821", "YR28212", "JS91221","YR21873"),
-  order_total = c("£32.50", "£56.00", "£100.02", "£20.25", "£39.50", "£45.00"),
-  product_code = c("XZY780", "XYZ123", "XYZ256", "XYZ262", "XYZ345", "XYZ127")
-)
-```
-
-```{r}
-# joining the two datasets 
-
-inner_join(customers, orders, by = "customer_ID")
-
-# some customers are missing, e.g. number 4
-# only returns records where there's an equivalent in both halves
-
-```
-
-```{r}
-#left join
-
-# so if you want a list of all your customers, and know when / which orders
-# they have made, use a left join
-
-left_join(customers, orders, by = "customer_ID")
-
-# more missing values, as there are two customers who had no orders,
-# but all the order variables are included
-
-```
-
-```{r}
-# right join
-# same idea, but you keep everything in your right hand table
-
-right_join(customers, orders, by = "customer_ID")
-```
-
-```{r}
-# using a full join
-# includes everything, but matches where possible 
-
-full_join(customers, orders, by = "customer_ID")
-```
-
-```{r}
-#changing column names
-
-customers_adj <- customers %>%
-  rename(this_is_an_id = customer_ID)
-```
-
-```{r}
-# joining by different column names
-
-inner_join(customers_adj, orders, by = c("this_is_an_id" = "customer_ID"))
-```
-
-```{r}
-# making another dataframe
-
-customers2 <- customers %>% 
-  mutate(payment_type = c("card", "cash", "cash", "card", "card", "card"))
-
-orders2 <- orders %>%
-  mutate(payment_type = c("card", "cash", "cash", "card", "card", "cash"))
-```
-
-```{r}
-# join by more than one column
-
-inner_join(customers2, orders2, by = c("customer_ID", "payment_type"))
-
-```
-
-```{r}
-# filtering joins, semi join
-
-semi_join(customers, orders, by = "customer_ID")
-```
-```{r}
-# anti join - is the opposite of the semi join
-
-anti_join(customers, orders, by = "customer_ID")
-```
-
-```{r}
-# bind_cols
-# append columns and rows
-# e.g. updated set for the next year, to add on to the end of the dataset
-
-statuses <- tibble(
-  status = c("active", "active", "inactive", "inactive", "active", "inactive")
-) 
-
-bind_cols(customers, statuses)
-
-```
-
-```{r}
-past_customers <- tibble(
-  customer_ID = c(020, 021), 
-  name = c("Dave Brown", "Jess Bishop"),
-  email_address = c("dbrown@hotmail.com", "jessb@gmail.com"),
-  shipping_address = c("57 Park View, Leith", "12 Reid Way, Broxburn")
-)
-```
-
-```{r}
-# bind rows
-
-bind_rows(customers, past_customers)
-```
-JOIN IN R LAB
-
-
-```{r}
-library(dplyr)
-actors <- read_csv("data/actors.csv")
-movies <- read_csv("data/movies.csv")
-roles <- read_csv("data/roles.csv")
-
-names(movies)
-```
-
-```{r}
-# Question 1.
-# Read the files “actors.csv”, “movies.csv” and “roles.csv” into R. You might get warnings here - don’t worry the data is okay for what we are trying to do.
-
-```
-
-```{r}
-# Question 2.
-# 
-#     What are the primary keys and the foreign keys for each data frame?
-#     What kind of relationship (one-to-one, one-to-many, many-to-many) is there between
-#         actors and roles   - one-to-many
-#         movies and roles   - one-to-many
-#         actors and movies  - many-to-many
-
-#actor - ID
-#movies - ID
-#roles - actor ID
-
-```
-
-```{r}
-# 2
-# Question 1.
-# From the movies table, find the id of the film The Little Mermaid. (In the data as “Little Mermaid, The”).
-
-movies %>%
-  select(name, id) %>%
-  filter(name == "Little Mermaid, The")
-
-```
-
-```{r}
-# Question 2.
-# Filter the roles data frame, so we just have roles from the Little Mermaid (hint: use the ID you found in the last question). Save the result as little_mermaid_roles.
-
-little_mermaid_roles <- roles %>%
-  filter(movie_id == 192017)
-
-```
-
-```{r}
-# Question 3.
-# Carry out a left join on this new data frame and the actors data frame, to find the actors which appeared in The Little Mermaid.
-
-little_mermaid_roles %>%
-  left_join(actors, by = c("actor_id" = "id"))
-
-```
-
-```{r}
-# Question 4.
-# Do the last join, but with an inner join instead. Is the data different? Why is that?
-
-little_mermaid_roles %>%
-  inner_join(actors, by = c("actor_id" = "id"))
-
-
-# same data, because there is no missing information!
-
-```
-
-
-```{r}
-# 3 Question 1.
-# For all actors who have appeared in at least two films. Call this data frame actors_more_than_once.
-
-actors_more_than_once <-
-  actors %>%
-  filter(film_count >= 2)
-
-```
-
-```{r}
-# Question 2.
-# Left join actors_more_than_once to roles, so we can see all the actors roles those actors played in.
-
-actors_more_than_once %>%
-  left_join(roles, by = c("id" = "actor_id"))
-
-```
-
-```{r}
-# Question 3.
-# Left join the result from above to movies, so we can see details of each movie for these roles
-# 
-
-actors_more_than_once %>%
-  left_join(roles, by = c("id" = "actor_id")) %>%
-  left_join(movies, by = c("movie_id" = "id"))
-
-```
-
-```{r}
-# Question 4.
-# For each actor, find the average rating of the films they appeared. Find the five actors with the highest average rank of films they appeared in.
-# 
-
-actors_more_than_once %>%
-  left_join(roles, by = c("id" = "actor_id")) %>%
-  left_join(movies, by = c("movie_id" = "id")) %>%
-  mutate(rank = as.numeric(rank)) %>%
-  group_by(first_name, last_name) %>%
+weather_report <- function(weather){
+  # Our average temperature, humidity and wind speed 
+  weather_means <- 
+  weather %>% 
   summarise(
-    average_rank = mean(rank, na.rm = TRUE)
-  ) %>%
-  ungroup() %>%
-  slice_max(average_rank, n = 5)
+    mean_temp = mean(temp),
+    mean_humidity = mean(humidity),
+    mean_windspeed = mean(wind_speed)
+  )
 
+# Show hot and humid days
+hot_and_humid <- 
+weather %>% 
+  filter(temp > 20) %>% 
+  filter(humidity > 55)
+
+return(list(weather_means, hot_and_humid))
+}
+
+weather_report(weather_one)
+```
+
+```{r}
+#how will this function handle a different dataset?
+weather_report(weather_two)
+```
+
+```{r}
+library(assertr)
+
+#package to begin to 'fix'/amend our code
 ```
 
 
 ```{r}
-# 4
-# Question 1.
-# Find the actor who has appeared in most films. List the films they appeared in, the year the film was released and their role in the film.
+weather_report <- function(weather){
+  weather %>%
+    verify(temp >= -35 & temp <= 55) %>%
+    verify(wind_speed >= 0 & wind_speed <= 108) %>%
+    verify(humidity >= 0 & humidity <= 100)
 
-actors %>%
-  arrange(desc(film_count))
+  # Our average temperature, humidity and wind speed 
+  weather_means <- 
+  weather %>% 
+  summarise(
+    mean_temp = mean(temp),
+    mean_humidity = mean(humidity),
+    mean_windspeed = mean(wind_speed)
+  )
 
-movies %>%
-  left_join(roles, by = c("id" = "movie_id"))
+# Show hot and humid days
+hot_and_humid <- 
+weather %>% 
+  filter(temp > 20) %>% 
+  filter(humidity > 55)
 
+return(list(weather_means, hot_and_humid))
+}
+
+#using verify(), which is similar to filter
+```
+
+```{r}
+#testing again
+weather_report(weather_two)
+
+```
+
+```{r}
+#a different function is stop_if_not
+```
+```{r}
+#amending the function again, with stop if not
+
+weather_report <- function(weather){
+  stopifnot(
+    nrow(weather) > 15,
+    ncol(weather) == 4,
+    drop_na(weather) == weather
+  )
+  
+  weather %>%
+    verify(temp >= -35 & temp <= 55) %>%
+    verify(wind_speed >= 0 & wind_speed <= 108) %>%
+    verify(humidity >= 0 & humidity <= 100)
+
+  # Our average temperature, humidity and wind speed 
+  weather_means <- 
+  weather %>% 
+  summarise(
+    mean_temp = mean(temp),
+    mean_humidity = mean(humidity),
+    mean_windspeed = mean(wind_speed)
+  )
+
+# Show hot and humid days
+hot_and_humid <- 
+weather %>% 
+  filter(temp > 20) %>% 
+  filter(humidity > 55)
+
+return(list(weather_means, hot_and_humid))
+}
+
+weather_report(weather_one)
+
+```
+
+```{r}
+weather_one
 
 ```
 
 
-TIDY DATA
 
+
+
+## 4.1 Tidy data
+###To be edited ALOT
 
 ```{r}
 # What is tidy data?
@@ -1193,71 +849,483 @@ hospital_visits_unite <- hospital_visits_coded %>%
 
 
 
-TIDY DATA LAB
-
-
-```{r}
-# Tidy data lab 
-
-# Task 1.
-# Load in the country_data.csv file and take a look at it. What needs changed in this to make it tidy? Which columns need made into long format, and which need spread to rows?
-# 
-# 
-# Task 2.
-# Do the appropriate pivoting of your columns using R
-# 
-# 
-# Task 3.
-# Separate the country variable so you have the name in one column and the number in another.
-# 
-# 
-# Task 4.
-# Unite the code_letter and code_numb variables so that they are both in one column, with no spaces separating them.
-```
+## 5.1 Regular expressions (regex)
+###To be edited ALOT
 
 ```{r}
+# Regex - regular expressions
+
 library(tidyverse)
-country_data <- read_csv("4_tidy_data_mini_lab/data/country_data.csv")
 ```
 
 ```{r}
-country_data_long <- country_data %>%
-  pivot_longer(
-    cols = starts_with("Y"),
-    names_to = "year",
-    values_to = "count",
-    names_prefix = "Y"
-  )
-
-country_data_wide <- country_data_long %>%
-  pivot_wider(
-    names_from = "type",
-    values_from = "count"
-  )
+single_string <- "string a"
+strings <- c("string a", "string b", "string c", "string d", "striiiiiiing e")
 
 ```
 
 ```{r}
-country_data_non_coded <- country_data_wide %>%
-  separate(country,
-           c("code_numb", "country"),
-           sep = "\\."
-  )
+pattern <- "a"
+```
+
+```{r}
+single_string %>%
+  str_detect(pattern)
+
+strings %>%
+  str_detect(pattern)
+```
+
+```{r}
+pattern <- "str"
+strings %>%
+  str_detect(pattern)
+```
+```{r}
+pattern <- "[abc]"
+strings %>%
+  str_detect(pattern)
+
+# the square brackets are what make it regex: it's looking for a or b or c
+```
+
+```{r}
+pattern <- "[a]" # look for letters between a and c
+strings %>%
+  str_detect(pattern)
+```
+
+```{r}
+pattern <- "[a-zA-Z]" # look for lower and upper case a-z (if you included ",", it would look for commas)
+strings %>%
+  str_detect(pattern)
+```
+
+```{r}
+pattern <- "i{3}" # find where there's 3 consecutive lowercase i's
+strings %>%
+  str_detect(pattern)
+```
+
+```{r}
+# Task - 10 mins
+# Make a vector containing the following strings:
+# “We’re having great fun learning about data analysis at CodeClan!”
+# “CodeClan is at 37 Castle Terrace in Edinburgh, ClockWise in Glasgow, and Wasps Academy in Inverness”
+# “Our cohort code starts with DE, DG or D”
+# “You get a great view of the castle or the national conservatoire from just outside CodeClan’s door”
+# Write and test regular expressions which will match:
+# Any string mentioning CodeClan
+# Any string containing two consecutive capital letters
+# Any string not including the word “castle” or “Castle”
+```
+
+```{r}
+
+test_strings <- c(
+  "We're having great fun learning about data analysis at CodeClan!",
+  "CodeClan is at 37 Castle Terrace in Edinburgh, ClockWise in Glasgow, and Wasps Academy in Inverness",
+  "Our cohort code starts with DE, DG or D",
+  "You get a great view of the castle or the national conservatoire from just outside CodeClan's door"
+)
 
 ```
 
 ```{r}
-country_data_united <- country_data_non_coded %>%
-  unite(code, c("code_numb", "code_letter"),
-        sep = ""
-  )
+
+test_pattern <- "CodeClan"
+test_strings %>%
+  str_detect(test_pattern)
+
+test_pattern_two <- "[A-Z]{2}"
+test_strings %>%
+  str_detect(test_pattern_two)
+
+!str_detect(test_strings, "[cC]astle")
 
 ```
 
-DAY 2 
+```{r}
+# recap
 
-STRINGS
+# [] - or (in strings)
+# {} - number of occurrences
 
+```
+
+```{r}
+strings <- c(
+  "This string has an_address@email.com in it", 
+  "This one has user.name@company.co.uk", 
+  "Now we've got other_person_123@server.net and my.name@runningoutofideas.com"
+)
+```
+
+```{r}
+# (?i) negates the capitalizaton
+
+# "(?i)[a-zA-Z]"
+```
+
+```{r}
+pattern <- "[a-z]"
+strings %>%
+  str_extract(pattern)
+
+# is vectorised, i.e it was applied to each vector 
+```
+
+```{r}
+pattern <- "[a-z]@"
+strings %>%
+  str_extract(pattern)
+```
+
+```{r}
+# further modifiers
+
+# * - zero or more occurences
+# + - one or more occurences
+```
+
+```{r}
+invalid_email <- "@emailprovider.com"
+pattern <- "[a-z]*@emailprovider.com"
+
+invalid_email %>%
+  str_extract(pattern)
+
+#ALSO includes none, basically a default behaviour
+```
+
+```{r}
+invalid_email <- "@emailprovider.com"
+pattern <- "[a-z]+@emailprovider.com"
+
+invalid_email %>%
+  str_extract(pattern)
+
+#will fail becuase there's nothing before the @
+```
+
+```{r}
+pattern <- "[a-z]+@"
+strings %>%
+  str_extract(pattern)
+```
+
+```{r}
+pattern <- "[a-z]+@"
+strings %>%
+  str_extract(pattern)
+
+pattern <- "[a-z0-9]+@[a-z]+"
+strings %>%
+  str_extract(pattern)
+
+```
+
+```{r}
+pattern <- "[a-z0-9_\\.]+@[a-z\\.]+"
+strings %>%
+  str_extract(pattern)
+
+```
+
+to get all the email addresses, we need to run a different function
+ 
+strings %>%   str_extract_all(pattern)
+
+
+```{r}
+#changing email addresses
+
+pattern <- "[a-z0-9_\\.]+@[a-z\\.]+"
+strings %>%
+  str_replace(pattern, "REDACTED")
+
+
+pattern <- "[a-z0-9_\\.]+@[a-z\\.]+"
+strings %>%
+  str_replace_all(pattern, "REDACTED")
+
+```
+
+```{r}
+#task
+# Make a vector containing the strings:
+# “Colin’s mobile number definitely isn’t 07777777777.”
+# “A landline might be 01010 123456.”
+# “Mhairi, Del, Aileen and Steph have been some of your instructors so far.”
+# “I’m called your_name_here and I live in your_town_here.”
+# Use regular expressions to:
+# Extract all the names
+# Extract the landline number
+# Insert your name and where you live into the fourth string
+
+task_string <- c("Colin’s mobile number definitely isn’t 07777777777.”,
+                  “A landline might be 01010 123456.”,
+                  “Mhairi, Del, Aileen and Steph have been some of your instructors so far.”,
+                  “I’m called your_name_here and I live in your_town_here.")
+
+# Extract all the names
+name_pattern <- "[A-Z]+[a-z,]+[ ]"
+task_string %>%
+  str_extract_all(name_pattern)
+
+number_pattern <- "[0-9]{5}"
+task_string %>%
+  str_extract_all(number_pattern)
+
+# ANSWERS
+name_pattern <- "[A-Z][a-z]+"
+task_string %>%
+  str_extract_all(name_pattern)
+
+#pattern is that;
+#it starts with a capital, followed by a lowercase, and there is more than one occurrence
+
+#ANSWER FOR NUMBER TWO
+number_pattern <- "[0-9]{5} [0-9]{6}"
+task_string %>%
+  str_extract_all(number_pattern)
+
+#ANSWER FOR WHAT I WAS TRYING TO DO
+number_pattern <- "[0-9]{5} [0-9]{6}|[0-9]{11}"
+task_string %>%
+  str_extract_all(number_pattern)
+
+my_address <- "Edinburgh"
+my_name <- "Louise"
+task_string %>%
+  str_replace("your_name_here", my_name) %>%
+  str_replace("your_town_here", my_address)
+
+```
+
+```{r}
+punct_strings <- c(
+  "Why is this a question?", 
+  "I am a sentence with no punctation",
+  "I am a well punctuated sentence.", 
+  "WOW!"
+)
+```
+
+```{r}
+#punctuation strings
+
+punct_strings %>%
+  str_extract_all("[:punct:]")
+
+punct_strings %>%
+  str_extract_all("[A-Z]{3}[:punct:]") %>%
+  flatten_chr()
+
+```
+
+```{r}
+# using the ^ - denotes the start of the string
+# and $ - denotes the end of the string
+```
+
+```{r}
+test_strings <- c(
+  "abc", 
+  "Abc",
+  "abC",
+  "s"
+)
+
+test_strings %>%
+  str_extract_all("[a-z]")
+```
+
+```{r}
+# if we only want where the string starts with x 
+
+test_strings %>%
+  str_extract_all("^[a-z]")
+```
+
+```{r}
+# if we want it to end with x
+
+test_strings %>%
+  str_extract_all("[a-z]$")
+
+```
+
+```{r}
+# if we want a string in all xx (e.g. lowercase, so start END end with)
+# only returns one ("s"), because we don't use the +
+
+test_strings %>%
+  str_extract_all("^[a-z]$")
+```
+
+Dealing with strings within a tibble
+
+```{r}
+student <- c("Abigail", "Bjorn", "Caitlin")
+age <- c(25, 56, 40)
+emails <- c("abigal12@company.co.uk", "bsmith@gmail.co.uk", "caitlin_1980")
+
+student_info <- tibble(student, age, emails)
+
+student_info 
+```
+
+```{r}
+student_info %>%
+  mutate(email_detect = str_detect(emails, "[a-z0-9]+@"))
+```
+
+```{r}
+student_info %>%
+  mutate(emails = str_extract(emails, "[a-z0-9_\\.]+@[a-z\\.]+"))
+```
+
+
+
+```{r}
+# Question 1.
+# Are the Thought Police ever mentioned?
+
+whole_text %>%
+  str_extract_all(
+    "(?i)thought police"
+  )
+
+# ANSWER
+# pattern <- "[tT]hought +[pP]olice"
+# 
+# whole_text %>%
+#   str_detect(pattern)
+```
+
+```{r}
+# Question 2.
+# Count how often Big Brother is mentioned
+
+whole_text %>%
+  str_extract_all("(?i)big brother") %>%
+  flatten_chr()
+
+# becomes a vector (therefore need to count length / number of instances in the vector)
+
+#20
+
+# ANSWER
+# pattern <- "[Bb][Ii][Gg] +[Bb][Rr][Oo][Tt][Hh][Ee][Rr]"
+# 
+# whole_text %>%
+#   str_extract_all(pattern) %>%
+#   flatten_chr() %>%
+#   length()
+```
+
+```{r}
+# Question 3.
+# The chapter is written from the point of view of the protagonist, Winston. Does he ever mention the other main character (Julia) by name?
+
+whole_text %>%
+  str_extract_all("(?i)Julia")
+
+OR
+
+whole_text %>%
+  str_detect("(?i)Julia")
+
+# ANSWER
+# pattern <- "[jJ]ulia"
+# 
+# whole_text %>%
+#   str_detect(pattern)
+
+```
+
+```{r}
+# Question 4.
+# Winston writes the date in a specific format: month nth, year eg. August 5th, 2019. Write a regular expression to match dates in that format and find the date written in his diary.
+
+whole_text %>%
+  str_extract_all("[A-Za-z]+[ ][0-9a-z]+,[ ][0-9]+")
+
+# ANSWER
+# pattern <- "[A-Z][a-z]+ [0-9]+(th|rd|st|nd), [0-9]{4}"
+# whole_text %>%
+#   str_extract(pattern)
+```
+
+```{r}
+# Question 5.
+# Winston wants some anonymity, redact his name somehow.
+
+whole_text %>%
+  str_extract_all("(?i)Winston") %>%
+  flatten_chr() %>%
+  str_replace_all("Winston", "REDACTED")
+
+
+# ANSWER
+# pattern <- "[wW]inston"
+
+# whole_text <- whole_text %>%
+#   str_replace_all(pattern, "REDACTED")
+
+# #check that there are no winstons mentioned
+# whole_text %>%
+#   str_detect(pattern)
+
+```
+
+```{r}
+# Question 6.
+# Stocks of Victory Gin have run out and the people of Oceania will have to drink vodka instead. Replace “gin” with “vodka”, matching case wherever possible. There’s still loads of Victory Coffee, though, so don’t replace that.
+
+#my answer/suggestion - did not give the correct words
+# whole_text %>%
+#   str_extract_all("gin") %>%
+#   flatten_chr() %>%
+#   str_replace_all("gin", "vodka")
+
+pattern <- "[ ,\\.-][gG][iI][nN][ ,\\.-]"
+whole_text %>%
+  str_extract_all(pattern)
+
+whole_text %>%
+  str_extract_all("Vodka")
+
+
+# ANSWER
+#pattern <- "[ ,\\.-][gG][iI][nN][ ,\\.-]"
+# whole_text %>%
+#   str_extract_all(pattern) %>%
+#   flatten_chr()
+# 
+# whole_text <- whole_text %>%
+#   str_replace_all(" GIN.", " VODKA.") %>%
+#   str_replace_all(" gin.", " vodka.") %>%
+#   str_replace_all(" gin ", " vodka ")
+```
+
+```{r}
+#Q7 - did not get this far
+
+whole_text <- whole_text %>%
+  str_replace_all("Department", "Section") %>%
+  str_replace_all("Ministry", "Department") %>%
+  str_replace_all("Ministrie", "Department") %>%
+  str_replace_all("Mini", "Dep")
+```
+
+
+
+
+
+## 5.2 Strings
+###To be edited ALOT
 
 ```{r}
 # defining strings
@@ -1471,603 +1539,8 @@ spotify_cleaned <- spotify_songs %>%
 ```
 
 
-REGEX
-
-
-```{r}
-# Regex - regular expressions
-
-library(tidyverse)
-```
-
-```{r}
-single_string <- "string a"
-strings <- c("string a", "string b", "string c", "string d", "striiiiiiing e")
-
-```
-
-```{r}
-pattern <- "a"
-```
-
-```{r}
-single_string %>%
-  str_detect(pattern)
-
-strings %>%
-  str_detect(pattern)
-```
-
-```{r}
-pattern <- "str"
-strings %>%
-  str_detect(pattern)
-```
-```{r}
-pattern <- "[abc]"
-strings %>%
-  str_detect(pattern)
-
-# the square brackets are what make it regex: it's looking for a or b or c
-```
-
-```{r}
-pattern <- "[a]" # look for letters between a and c
-strings %>%
-  str_detect(pattern)
-```
-
-```{r}
-pattern <- "[a-zA-Z]" # look for lower and upper case a-z (if you included ",", it would look for commas)
-strings %>%
-  str_detect(pattern)
-```
-
-```{r}
-pattern <- "i{3}" # find where there's 3 consecutive lowercase i's
-strings %>%
-  str_detect(pattern)
-```
-
-```{r}
-# Task - 10 mins
-# Make a vector containing the following strings:
-# “We’re having great fun learning about data analysis at CodeClan!”
-# “CodeClan is at 37 Castle Terrace in Edinburgh, ClockWise in Glasgow, and Wasps Academy in Inverness”
-# “Our cohort code starts with DE, DG or D”
-# “You get a great view of the castle or the national conservatoire from just outside CodeClan’s door”
-# Write and test regular expressions which will match:
-# Any string mentioning CodeClan
-# Any string containing two consecutive capital letters
-# Any string not including the word “castle” or “Castle”
-```
-
-```{r}
-
-test_strings <- c(
-  "We're having great fun learning about data analysis at CodeClan!",
-  "CodeClan is at 37 Castle Terrace in Edinburgh, ClockWise in Glasgow, and Wasps Academy in Inverness",
-  "Our cohort code starts with DE, DG or D",
-  "You get a great view of the castle or the national conservatoire from just outside CodeClan's door"
-)
-
-```
-
-```{r}
-
-test_pattern <- "CodeClan"
-test_strings %>%
-  str_detect(test_pattern)
-
-test_pattern_two <- "[A-Z]{2}"
-test_strings %>%
-  str_detect(test_pattern_two)
-
-!str_detect(test_strings, "[cC]astle")
-
-```
-
-```{r}
-# recap
-
-# [] - or (in strings)
-# {} - number of occurrences
-
-```
-
-```{r}
-strings <- c(
-  "This string has an_address@email.com in it", 
-  "This one has user.name@company.co.uk", 
-  "Now we've got other_person_123@server.net and my.name@runningoutofideas.com"
-)
-```
-
-```{r}
-# (?i) negates the capitalizaton
-
-# "(?i)[a-zA-Z]"
-```
-
-```{r}
-pattern <- "[a-z]"
-strings %>%
-  str_extract(pattern)
-
-# is vectorised, i.e it was applied to each vector 
-```
-
-```{r}
-pattern <- "[a-z]@"
-strings %>%
-  str_extract(pattern)
-```
-
-```{r}
-# further modifiers
-
-# * - zero or more occurences
-# + - one or more occurences
-```
-
-```{r}
-invalid_email <- "@emailprovider.com"
-pattern <- "[a-z]*@emailprovider.com"
-
-invalid_email %>%
-  str_extract(pattern)
-
-#ALSO includes none, basically a default behaviour
-```
-
-```{r}
-invalid_email <- "@emailprovider.com"
-pattern <- "[a-z]+@emailprovider.com"
-
-invalid_email %>%
-  str_extract(pattern)
-
-#will fail becuase there's nothing before the @
-```
-
-```{r}
-pattern <- "[a-z]+@"
-strings %>%
-  str_extract(pattern)
-```
-
-```{r}
-pattern <- "[a-z]+@"
-strings %>%
-  str_extract(pattern)
-
-pattern <- "[a-z0-9]+@[a-z]+"
-strings %>%
-  str_extract(pattern)
-
-```
-
-```{r}
-pattern <- "[a-z0-9_\\.]+@[a-z\\.]+"
-strings %>%
-  str_extract(pattern)
-
-```
-
-```{r}
-# to get all the email addresses, we need to run a different function
-
-strings %>%
-  str_extract_all(pattern)
-
-```
-
-```{r}
-#changing email addresses
-
-pattern <- "[a-z0-9_\\.]+@[a-z\\.]+"
-strings %>%
-  str_replace(pattern, "REDACTED")
-
-
-pattern <- "[a-z0-9_\\.]+@[a-z\\.]+"
-strings %>%
-  str_replace_all(pattern, "REDACTED")
-
-```
-
-```{r}
-#task
-# Make a vector containing the strings:
-# “Colin’s mobile number definitely isn’t 07777777777.”
-# “A landline might be 01010 123456.”
-# “Mhairi, Del, Aileen and Steph have been some of your instructors so far.”
-# “I’m called your_name_here and I live in your_town_here.”
-# Use regular expressions to:
-# Extract all the names
-# Extract the landline number
-# Insert your name and where you live into the fourth string
-
-task_string <- c("Colin’s mobile number definitely isn’t 07777777777.”,
-                  “A landline might be 01010 123456.”,
-                  “Mhairi, Del, Aileen and Steph have been some of your instructors so far.”,
-                  “I’m called your_name_here and I live in your_town_here.")
-
-# Extract all the names
-name_pattern <- "[A-Z]+[a-z,]+[ ]"
-task_string %>%
-  str_extract_all(name_pattern)
-
-number_pattern <- "[0-9]{5}"
-task_string %>%
-  str_extract_all(number_pattern)
-
-# ANSWERS
-name_pattern <- "[A-Z][a-z]+"
-task_string %>%
-  str_extract_all(name_pattern)
-
-#pattern is that;
-#it starts with a capital, followed by a lowercase, and there is more than one occurrence
-
-#ANSWER FOR NUMBER TWO
-number_pattern <- "[0-9]{5} [0-9]{6}"
-task_string %>%
-  str_extract_all(number_pattern)
-
-#ANSWER FOR WHAT I WAS TRYING TO DO
-number_pattern <- "[0-9]{5} [0-9]{6}|[0-9]{11}"
-task_string %>%
-  str_extract_all(number_pattern)
-
-my_address <- "Edinburgh"
-my_name <- "Louise"
-task_string %>%
-  str_replace("your_name_here", my_name) %>%
-  str_replace("your_town_here", my_address)
-
-```
-
-```{r}
-punct_strings <- c(
-  "Why is this a question?", 
-  "I am a sentence with no punctation",
-  "I am a well punctuated sentence.", 
-  "WOW!"
-)
-```
-
-```{r}
-#punctuation strings
-
-punct_strings %>%
-  str_extract_all("[:punct:]")
-
-punct_strings %>%
-  str_extract_all("[A-Z]{3}[:punct:]") %>%
-  flatten_chr()
-
-```
-
-```{r}
-# using the ^ - denotes the start of the string
-# and $ - denotes the end of the string
-```
-
-```{r}
-test_strings <- c(
-  "abc", 
-  "Abc",
-  "abC",
-  "s"
-)
-
-test_strings %>%
-  str_extract_all("[a-z]")
-```
-
-```{r}
-# if we only want where the string starts with x 
-
-test_strings %>%
-  str_extract_all("^[a-z]")
-```
-
-```{r}
-# if we want it to end with x
-
-test_strings %>%
-  str_extract_all("[a-z]$")
-
-```
-
-```{r}
-# if we want a string in all xx (e.g. lowercase, so start END end with)
-# only returns one ("s"), because we don't use the +
-
-test_strings %>%
-  str_extract_all("^[a-z]$")
-```
-
-Dealing with strings within a tibble
-
-```{r}
-student <- c("Abigail", "Bjorn", "Caitlin")
-age <- c(25, 56, 40)
-emails <- c("abigal12@company.co.uk", "bsmith@gmail.co.uk", "caitlin_1980")
-
-student_info <- tibble(student, age, emails)
-
-student_info 
-```
-
-```{r}
-student_info %>%
-  mutate(email_detect = str_detect(emails, "[a-z0-9]+@"))
-```
-
-```{r}
-student_info %>%
-  mutate(emails = str_extract(emails, "[a-z0-9_\\.]+@[a-z\\.]+"))
-```
-
-REGEX LAB
-
-
-```{r}
-whole_text <- "It was a bright cold day in April, and the clocks were striking thirteen. Winston Smith, his chin nuzzled into his breast in an effort to escape the vile wind, slipped quickly through the glass doors of Victory Mansions, though not quickly enough to prevent a swirl of gritty dust from entering along with him. 
-
-The hallway smelt of boiled cabbage and old rag mats. At one end of it a coloured poster, too large for indoor display, had been tacked to the wall. It depicted simply an enormous face, more than a metre wide: the face of a man of about forty-five, with a heavy black moustache and ruggedly handsome features. Winston made for the stairs. It was no use trying the lift. Even at the best of times it was seldom working, and at present the electric current was cut off during daylight hours. It was part of the economy drive in preparation for Hate Week. The flat was seven flights up, and Winston, who was thirty-nine and had a varicose ulcer above his right ankle, went slowly, resting several times on the way. On each landing, opposite the lift-shaft, the poster with the enormous face gazed from the wall. It was one of those pictures which are so contrived that the eyes follow you about when you move. BIG BROTHER IS WATCHING YOU, the caption beneath it ran. 
-
-Inside the flat a fruity voice was reading out a list of figures which had something to do with the production of pig-iron. The voice came from an oblong metal plaque like a dulled mirror which formed part of the surface of the right-hand wall. Winston turned a switch and the voice sank somewhat, though the words were still distinguishable. The instrument (the telescreen, it was called) could be dimmed, but there was no way of shutting it off completely. He moved over to the window: a smallish, frail figure, the meagreness of his body merely emphasized by the blue overalls which were the uniform of the party. His hair was very fair, his face naturally sanguine, his skin roughened by coarse soap and blunt razor blades and the cold of the winter that had just ended. 
-
-Outside, even through the shut window-pane, the world looked cold. Down in the street little eddies of wind were whirling dust and torn paper into spirals, and though the sun was shining and the sky a harsh blue, there seemed to be no colour in anything, except the posters that were plastered everywhere. The blackmoustachio'd face gazed down from every commanding corner. There was one on the house-front immediately opposite. BIG BROTHER IS WATCHING YOU, the caption said, while the dark eyes looked deep into Winston's own. Down at streetlevel another poster, torn at one corner, flapped fitfully in the wind, alternately covering and uncovering the single word INGSOC. In the far distance a helicopter skimmed down between the roofs, hovered for an instant like a bluebottle, and darted away again with a curving flight. It was the police patrol, snooping into people's windows. The patrols did not matter, however. Only the Thought Police mattered. 
-
-Behind Winston's back the voice from the telescreen was still babbling away about pig-iron and the overfulfilment of the Ninth Three-Year Plan. The telescreen received and transmitted simultaneously. Any sound that Winston made, above the level of a very low whisper, would be picked up by it, moreover, so long as he remained within the field of vision which the metal plaque commanded, he could be seen as well as heard. There was of course no way of knowing whether you were being watched at any given moment. How often, or on what system, the Thought Police plugged in on any individual wire was guesswork. It was even conceivable that they watched everybody all the time. But at any rate they could plug in your wire whenever they wanted to. You had to live -- did live, from habit that became instinct -- in the assumption that every sound you made was overheard, and, except in darkness, every movement scrutinized. 
-
-Winston kept his back turned to the telescreen. It was safer, though, as he well knew, even a back can be revealing. A kilometre away the Ministry of Truth, his place of work, towered vast and white above the grimy landscape. This, he thought with a sort of vague distaste -- this was London, chief city of Airstrip One, itself the third most populous of the provinces of Oceania. He tried to squeeze out some childhood memory that should tell him whether London had always been quite like this. Were there always these vistas of rotting nineteenth-century houses, their sides shored up with baulks of timber, their windows patched with cardboard and their roofs with corrugated iron, their crazy garden walls sagging in all directions? And the bombed sites where the plaster dust swirled in the air and the willow-herb straggled over the heaps of rubble; and the places where the bombs had cleared a larger patch and there had sprung up sordid colonies of wooden dwellings like chicken-houses? But it was no use, he could not remember: nothing remained of his childhood except a series of bright-lit tableaux occurring against no background and mostly unintelligible. 
-
-The Ministry of Truth -- Minitrue, in Newspeak -- was startlingly different from any other object in sight. It was an enormous pyramidal structure of glittering white concrete, soaring up, terrace after terrace, 300 metres into the air. From where Winston stood it was just possible to read, picked out on its white face in elegant lettering, the three slogans of the Party: 
-
-WAR IS PEACE 
-
-FREEDOM IS SLAVERY 
-
-IGNORANCE IS STRENGTH 
-
-The Ministry of Truth contained, it was said, three thousand rooms above ground level, and corresponding ramifications below. Scattered about London there were just three other buildings of similar appearance and size. So completely did they dwarf the surrounding architecture that from the roof of Victory Mansions you could see all four of them simultaneously. They were the homes of the four Ministries between which the entire apparatus of government was divided. The Ministry of Truth, which concerned itself with news, entertainment, education, and the fine arts. The Ministry of Peace, which concerned itself with war. The Ministry of Love, which maintained law and order. And the Ministry of Plenty, which was responsible for economic affairs. Their names, in Newspeak: Minitrue, Minipax, Miniluv, and Miniplenty. 
-
-The Ministry of Love was the really frightening one. There were no windows in it at all. Winston had never been inside the Ministry of Love, nor within half a kilometre of it. It was a place impossible to enter except on official business, and then only by penetrating through a maze of barbed-wire entanglements, steel doors, and hidden machine-gun nests. Even the streets leading up to its outer barriers were roamed by gorilla-faced guards in black uniforms, armed with jointed truncheons. 
-
-Winston turned round abruptly. He had set his features into the expression of quiet optimism which it was advisable to wear when facing the telescreen. He crossed the room into the tiny kitchen. By leaving the Ministry at this time of day he had sacrificed his lunch in the canteen, and he was aware that there was no food in the kitchen except a hunk of dark-coloured bread which had got to be saved for tomorrow's breakfast. He took down from the shelf a bottle of colourless liquid with a plain white label marked VICTORY GIN. It gave off a sickly, oily smell, as of Chinese ricespirit. Winston poured out nearly a teacupful, nerved himself for a shock, and gulped it down like a dose of medicine. 
-
-Instantly his face turned scarlet and the water ran out of his eyes. The stuff was like nitric acid, and moreover, in swallowing it one had the sensation of being hit on the back of the head with a rubber club. The next moment, however, the burning in his belly died down and the world began to look more cheerful. He took a cigarette from a crumpled packet marked VICTORY CIGARETTES and incautiously held it upright, whereupon the tobacco fell out on to the floor. With the next he was more successful. He went back to the living-room and sat down at a small table that stood to the left of the telescreen. From the table drawer he took out a penholder, a bottle of ink, and a thick, quarto-sized blank book with a red back and a marbled cover. 
-
-For some reason the telescreen in the living-room was in an unusual position. Instead of being placed, as was normal, in the end wall, where it could command the whole room, it was in the longer wall, opposite the window. To one side of it there was a shallow alcove in which Winston was now sitting, and which, when the flats were built, had probably been intended to hold bookshelves. By sitting in the alcove, and keeping well back, Winston was able to remain outside the range of the telescreen, so far as sight went. He could be heard, of course, but so long as he stayed in his present position he could not be seen. It was partly the unusual geography of the room that had suggested to him the thing that he was now about to do. 
-
-But it had also been suggested by the book that he had just taken out of the drawer. It was a peculiarly beautiful book. Its smooth creamy paper, a little yellowed by age, was of a kind that had not been manufactured for at least forty years past. He could guess, however, that the book was much older than that. He had seen it lying in the window of a frowsy little junk-shop in a slummy quarter of the town (just what quarter he did not now remember) and had been stricken immediately by an overwhelming desire to possess it. Party members were supposed not to go into ordinary shops ('dealing on the free market', it was called), but the rule was not strictly kept, because there were various things, such as shoelaces and razor blades, which it was impossible to get hold of in any other way. He had given a quick glance up and down the street and then had slipped inside and bought the book for two dollars fifty. At the time he was not conscious of wanting it for any particular purpose. He had carried it guiltily home in his briefcase. Even with nothing written in it, it was a compromising possession. 
-
-The thing that he was about to do was to open a diary. This was not illegal (nothing was illegal, since there were no longer any laws), but if detected it was reasonably certain that it would be punished by death, or at least by twenty-five years in a forced-labour camp. Winston fitted a nib into the penholder and sucked it to get the grease off. The pen was an archaic instrument, seldom used even for signatures, and he had procured one, furtively and with some difficulty, simply because of a feeling that the beautiful creamy paper deserved to be written on with a real nib instead of being scratched with an ink-pencil. Actually he was not used to writing by hand. Apart from very short notes, it was usual to dictate everything into the speakwrite which was of course impossible for his present purpose. He dipped the pen into the ink and then faltered for just a second. A tremor had gone through his bowels. To mark the paper was the decisive act. In small clumsy letters he wrote: 
-
-April 4th, 1984. 
-
-He sat back. A sense of complete helplessness had descended upon him. To begin with, he did not know with any certainty that this was 1984. It must be round about that date, since he was fairly sure that his age was thirty-nine, and he believed that he had been born in 1944 or 1945; but it was never possible nowadays to pin down any date within a year or two. 
-
-For whom, it suddenly occurred to him to wonder, was he writing this diary? For the future, for the unborn. His mind hovered for a moment round the doubtful date on the page, and then fetched up with a bump against the Newspeak word doublethink. For the first time the magnitude of what he had undertaken came home to him. How could you communicate with the future? It was of its nature impossible. Either the future would resemble the present, in which case it would not listen to him: or it would be different from it, and his predicament would be meaningless. 
-
-For some time he sat gazing stupidly at the paper. The telescreen had changed over to strident military music. It was curious that he seemed not merely to have lost the power of expressing himself, but even to have forgotten what it was that he had originally intended to say. For weeks past he had been making ready for this moment, and it had never crossed his mind that anything would be needed except courage. The actual writing would be easy. All he had to do was to transfer to paper the interminable restless monologue that had been running inside his head, literally for years. At this moment, however, even the monologue had dried up. Moreover his varicose ulcer had begun itching unbearably. He dared not scratch it, because if he did so it always became inflamed. The seconds were ticking by. He was conscious of nothing except the blankness of the page in front of him, the itching of the skin above his ankle, the blaring of the music, and a slight booziness caused by the gin. 
-
-Suddenly he began writing in sheer panic, only imperfectly aware of what he was setting down. His small but childish handwriting straggled up and down the page, shedding first its capital letters and finally even its full stops: 
-
-April 4th, 1984. Last night to the flicks. All war films. One very good one of a ship full of refugees being bombed somewhere in the Mediterranean. Audience much amused by shots of a great huge fat man trying to swim away with a helicopter after him, first you saw him wallowing along in the water like a porpoise, then you saw him through the helicopters gunsights, then he was full of holes and the sea round him turned pink and he sank as suddenly as though the holes had let in the water, audience shouting with laughter when he sank. then you saw a lifeboat full of children with a helicopter hovering over it. there was a middle-aged woman might have been a jewess sitting up in the bow with a little boy about three years old in her arms. little boy screaming with fright and hiding his head between her breasts as if he was trying to burrow right into her and the woman putting her arms round him and comforting him although she was blue with fright herself, all the time covering him up as much as possible as if she thought her arms could keep the bullets off him. then the helicopter planted a 20 kilo bomb in among them terrific flash and the boat went all to matchwood. then there was a wonderful shot of a child's arm going up up up right up into the air a helicopter with a camera in its nose must have followed it up and there was a lot of applause from the party seats but a woman down in the prole part of the house suddenly started kicking up a fuss and shouting they didnt oughter of showed it not in front of kids they didnt it aint right not in front of kids it aint until the police turned her turned her out i dont suppose anything happened to her nobody cares what the proles say typical prole reaction they never -- 
-
-Winston stopped writing, partly because he was suffering from cramp. He did not know what had made him pour out this stream of rubbish. But the curious thing was that while he was doing so a totally different memory had clarified itself in his mind, to the point where he almost felt equal to writing it down. It was, he now realized, because of this other incident that he had suddenly decided to come home and begin the diary today. 
-
-It had happened that morning at the Ministry, if anything so nebulous could be said to happen. 
-
-It was nearly eleven hundred, and in the Records Department, where Winston worked, they were dragging the chairs out of the cubicles and grouping them in the centre of the hall opposite the big telescreen, in preparation for the Two Minutes Hate. Winston was just taking his place in one of the middle rows when two people whom he knew by sight, but had never spoken to, came unexpectedly into the room. One of them was a girl whom he often passed in the corridors. He did not know her name, but he knew that she worked in the Fiction Department. Presumably -- since he had sometimes seen her with oily hands and carrying a spanner she had some mechanical job on one of the novel-writing machines. She was a bold-looking girl, of about twenty-seven, with thick hair, a freckled face, and swift, athletic movements. A narrow scarlet sash, emblem of the Junior Anti-Sex League, was wound several times round the waist of her overalls, just tightly enough to bring out the shapeliness of her hips. Winston had disliked her from the very first moment of seeing her. He knew the reason. It was because of the atmosphere of hockey-fields and cold baths and community hikes and general clean-mindedness which she managed to carry about with her. He disliked nearly all women, and especially the young and pretty ones. It was always the women, and above all the young ones, who were the most bigoted adherents of the Party, the swallowers of slogans, the amateur spies and nosers-out of unorthodoxy. But this particular girl gave him the impression of being more dangerous than most. Once when they passed in the corridor she gave him a quick sidelong glance which seemed to pierce right into him and for a moment had filled him with black terror. The idea had even crossed his mind that she might be an agent of the Thought Police. That, it was true, was very unlikely. Still, he continued to feel a peculiar uneasiness, which had fear mixed up in it as well as hostility, whenever she was anywhere near him. 
-
-The other person was a man named O'Brien, a member of the Inner Party and holder of some post so important and remote that Winston had only a dim idea of its nature. A momentary hush passed over the group of people round the chairs as they saw the black overalls of an Inner Party member approaching. O'Brien was a large, burly man with a thick neck and a coarse, humorous, brutal face. In spite of his formidable appearance he had a certain charm of manner. He had a trick of resettling his spectacles on his nose which was curiously disarming -- in some indefinable way, curiously civilized. It was a gesture which, if anyone had still thought in such terms, might have recalled an eighteenth-century nobleman offering his snuffbox. Winston had seen O'Brien perhaps a dozen times in almost as many years. He felt deeply drawn to him, and not solely because he was intrigued by the contrast between O'Brien's urbane manner and his prize-fighter's physique. Much more it was because of a secretly held belief -- or perhaps not even a belief, merely a hope -- that O'Brien's political orthodoxy was not perfect. Something in his face suggested it irresistibly. And again, perhaps it was not even unorthodoxy that was written in his face, but simply intelligence. But at any rate he had the appearance of being a person that you could talk to if somehow you could cheat the telescreen and get him alone. Winston had never made the smallest effort to verify this guess: indeed, there was no way of doing so. At this moment O'Brien glanced at his wrist-watch, saw that it was nearly eleven hundred, and evidently decided to stay in the Records Department until the Two Minutes Hate was over. He took a chair in the same row as Winston, a couple of places away. A small, sandy-haired woman who worked in the next cubicle to Winston was between them. The girl with dark hair was sitting immediately behind. 
-
-The next moment a hideous, grinding speech, as of some monstrous machine running without oil, burst from the big telescreen at the end of the room. It was a noise that set one's teeth on edge and bristled the hair at the back of one's neck. The Hate had started. 
-
-As usual, the face of Emmanuel Goldstein, the Enemy of the People, had flashed on to the screen. There were hisses here and there among the audience. The little sandy-haired woman gave a squeak of mingled fear and disgust. Goldstein was the renegade and backslider who once, long ago (how long ago, nobody quite remembered), had been one of the leading figures of the Party, almost on a level with Big Brother himself, and then had engaged in counter-revolutionary activities, had been condemned to death, and had mysteriously escaped and disappeared. The programmes of the Two Minutes Hate varied from day to day, but there was none in which Goldstein was not the principal figure. He was the primal traitor, the earliest defiler of the Party's purity. All subsequent crimes against the Party, all treacheries, acts of sabotage, heresies, deviations, sprang directly out of his teaching. Somewhere or other he was still alive and hatching his conspiracies: perhaps somewhere beyond the sea, under the protection of his foreign paymasters, perhaps even -- so it was occasionally rumoured -- in some hiding-place in Oceania itself. 
-
-Winston's diaphragm was constricted. He could never see the face of Goldstein without a painful mixture of emotions. It was a lean Jewish face, with a great fuzzy aureole of white hair and a small goatee beard -- a clever face, and yet somehow inherently despicable, with a kind of senile silliness in the long thin nose, near the end of which a pair of spectacles was perched. It resembled the face of a sheep, and the voice, too, had a sheep-like quality. Goldstein was delivering his usual venomous attack upon the doctrines of the Party -- an attack so exaggerated and perverse that a child should have been able to see through it, and yet just plausible enough to fill one with an alarmed feeling that other people, less level-headed than oneself, might be taken in by it. He was abusing Big Brother, he was denouncing the dictatorship of the Party, he was demanding the immediate conclusion of peace with Eurasia, he was advocating freedom of speech, freedom of the Press, freedom of assembly, freedom of thought, he was crying hysterically that the revolution had been betrayed -- and all this in rapid polysyllabic speech which was a sort of parody of the habitual style of the orators of the Party, and even contained Newspeak words: more Newspeak words, indeed, than any Party member would normally use in real life. And all the while, lest one should be in any doubt as to the reality which Goldstein's specious claptrap covered, behind his head on the telescreen there marched the endless columns of the Eurasian army -- row after row of solid-looking men with expressionless Asiatic faces, who swam up to the surface of the screen and vanished, to be replaced by others exactly similar. The dull rhythmic tramp of the soldiers' boots formed the background to Goldstein's bleating voice.
-
-Before the Hate had proceeded for thirty seconds, uncontrollable exclamations of rage were breaking out from half the people in the room. The self-satisfied sheep-like face on the screen, and the terrifying power of the Eurasian army behind it, were too much to be borne: besides, the sight or even the thought of Goldstein produced fear and anger automatically. He was an object of hatred more constant than either Eurasia or Eastasia, since when Oceania was at war with one of these Powers it was generally at peace with the other. But what was strange was that although Goldstein was hated and despised by everybody, although every day and a thousand times a day, on platforms, on the telescreen, in newspapers, in books, his theories were refuted, smashed, ridiculed, held up to the general gaze for the pitiful rubbish that they were in spite of all this, his influence never seemed to grow less. Always there were fresh dupes waiting to be seduced by him. A day never passed when spies and saboteurs acting under his directions were not unmasked by the Thought Police. He was the commander of a vast shadowy army, an underground network of conspirators dedicated to the overthrow of the State. The Brotherhood, its name was supposed to be. There were also whispered stories of a terrible book, a compendium of all the heresies, of which Goldstein was the author and which circulated clandestinely here and there. It was a book without a title. People referred to it, if at all, simply as the book. But one knew of such things only through vague rumours. Neither the Brotherhood nor the book was a subject that any ordinary Party member would mention if there was a way of avoiding it. 
-
-In its second minute the Hate rose to a frenzy. People were leaping up and down in their places and shouting at the tops of their voices in an effort to drown the maddening bleating voice that came from the screen. The little sandy-haired woman had turned bright pink, and her mouth was opening and shutting like that of a landed fish. Even O'Brien's heavy face was flushed. He was sitting very straight in his chair, his powerful chest swelling and quivering as though he were standing up to the assault of a wave. The dark-haired girl behind Winston had begun crying out 'Swine! Swine! Swine!' and suddenly she picked up a heavy Newspeak dictionary and flung it at the screen. It struck Goldstein's nose and bounced off; the voice continued inexorably. In a lucid moment Winston found that he was shouting with the others and kicking his heel violently against the rung of his chair. The horrible thing about the Two Minutes Hate was not that one was obliged to act a part, but, on the contrary, that it was impossible to avoid joining in. Within thirty seconds any pretence was always unnecessary. A hideous ecstasy of fear and vindictiveness, a desire to kill, to torture, to smash faces in with a sledge-hammer, seemed to flow through the whole group of people like an electric current, turning one even against one's will into a grimacing, screaming lunatic. And yet the rage that one felt was an abstract, undirected emotion which could be switched from one object to another like the flame of a blowlamp. Thus, at one moment Winston's hatred was not turned against Goldstein at all, but, on the contrary, against Big Brother, the Party, and the Thought Police; and at such moments his heart went out to the lonely, derided heretic on the screen, sole guardian of truth and sanity in a world of lies. And yet the very next instant he was at one with the people about him, and all that was said of Goldstein seemed to him to be true. At those moments his secret loathing of Big Brother changed into adoration, and Big Brother seemed to tower up, an invincible, fearless protector, standing like a rock against the hordes of Asia, and Goldstein, in spite of his isolation, his helplessness, and the doubt that hung about his very existence, seemed like some sinister enchanter, capable by the mere power of his voice of wrecking the structure of civilization. 
-
-It was even possible, at moments, to switch one's hatred this way or that by a voluntary act. Suddenly, by the sort of violent effort with which one wrenches one's head away from the pillow in a nightmare, Winston succeeded in transferring his hatred from the face on the screen to the dark-haired girl behind him. Vivid, beautiful hallucinations flashed through his mind. He would flog her to death with a rubber truncheon. He would tie her naked to a stake and shoot her full of arrows like Saint Sebastian. He would ravish her and cut her throat at the moment of climax. Better than before, moreover, he realized why it was that he hated her. He hated her because she was young and pretty and sexless, because he wanted to go to bed with her and would never do so, because round her sweet supple waist, which seemed to ask you to encircle it with your arm, there was only the odious scarlet sash, aggressive symbol of chastity. 
-
-The Hate rose to its climax. The voice of Goldstein had become an actual sheep's bleat, and for an instant the face changed into that of a sheep. Then the sheep-face melted into the figure of a Eurasian soldier who seemed to be advancing, huge and terrible, his sub-machine gun roaring, and seeming to spring out of the surface of the screen, so that some of the people in the front row actually flinched backwards in their seats. But in the same moment, drawing a deep sigh of relief from everybody, the hostile figure melted into the face of Big Brother, black-haired, black-moustachio'd, full of power and mysterious calm, and so vast that it almost filled up the screen. Nobody heard what Big Brother was saying. It was merely a few words of encouragement, the sort of words that are uttered in the din of battle, not distinguishable individually but restoring confidence by the fact of being spoken. Then the face of Big Brother faded away again, and instead the three slogans of the Party stood out in bold capitals: 
-
-WAR IS PEACE 
-
-FREEDOM IS SLAVERY 
-
-IGNORANCE IS STRENGTH 
-
-But the face of Big Brother seemed to persist for several seconds on the screen, as though the impact that it had made on everyone's eyeballs was too vivid to wear off immediately. The little sandyhaired woman had flung herself forward over the back of the chair in front of her. With a tremulous murmur that sounded like 'My Saviour!' she extended her arms towards the screen. Then she buried her face in her hands. It was apparent that she was uttering a prayer. 
-
-At this moment the entire group of people broke into a deep, slow, rhythmical chant of 'B-B! ...B-B!' -- over and over again, very slowly, with a long pause between the first 'B' and the second-a heavy, murmurous sound, somehow curiously savage, in the background of which one seemed to hear the stamp of naked feet and the throbbing of tom-toms. For perhaps as much as thirty seconds they kept it up. It was a refrain that was often heard in moments of overwhelming emotion. Partly it was a sort of hymn to the wisdom and majesty of Big Brother, but still more it was an act of self-hypnosis, a deliberate drowning of consciousness by means of rhythmic noise. Winston's entrails seemed to grow cold. In the Two Minutes Hate he could not help sharing in the general delirium, but this sub-human chanting of 'B-B! ...B-B!' always filled him with horror. Of course he chanted with the rest: it was impossible to do otherwise. To dissemble your feelings, to control your face, to do what everyone else was doing, was an instinctive reaction. But there was a space of a couple of seconds during which the expression of his eyes might conceivably have betrayed him. And it was exactly at this moment that the significant thing happened -- if, indeed, it did happen. 
-
-Momentarily he caught O'Brien's eye. O'Brien had stood up. He had taken off his spectacles and was in the act of resettling them on his nose with his characteristic gesture. But there was a fraction of a second when their eyes met, and for as long as it took to happen Winston knew-yes, he knew!-that O'Brien was thinking the same thing as himself. An unmistakable message had passed. It was as though their two minds had opened and the thoughts were flowing from one into the other through their eyes. 'I am with you,' O'Brien seemed to be saying to him. 'I know precisely what you are feeling. I know all about your contempt, your hatred, your disgust. But don't worry, I am on your side!' And then the flash of intelligence was gone, and O'Brien's face was as inscrutable as everybody else's. 
-
-That was all, and he was already uncertain whether it had happened. Such incidents never had any sequel. All that they did was to keep alive in him the belief, or hope, that others besides himself were the enemies of the Party. Perhaps the rumours of vast underground conspiracies were true after all -- perhaps the Brotherhood really existed! It was impossible, in spite of the endless arrests and confessions and executions, to be sure that the Brotherhood was not simply a myth. Some days he believed in it, some days not. There was no evidence, only fleeting glimpses that might mean anything or nothing: snatches of overheard conversation, faint scribbles on lavatory walls -- once, even, when two strangers met, a small movement of the hand which had looked as though it might be a signal of recognition. It was all guesswork: very likely he had imagined everything. He had gone back to his cubicle without looking at O'Brien again. The idea of following up their momentary contact hardly crossed his mind. It would have been inconceivably dangerous even if he had known how to set about doing it. For a second, two seconds, they had exchanged an equivocal glance, and that was the end of the story. But even that was a memorable event, in the locked loneliness in which one had to live. 
-
-Winston roused himself and sat up straighter. He let out a belch. The gin was rising from his stomach. 
-
-His eyes re-focused on the page. He discovered that while he sat helplessly musing he had also been writing, as though by automatic action. And it was no longer the same cramped, awkward handwriting as before. His pen had slid voluptuously over the smooth paper, printing in large neat capitals - 
-
-DOWN WITH BIG BROTHER 
-
-DOWN WITH BIG BROTHER 
-
-DOWN WITH BIG BROTHER 
-
-DOWN WITH BIG BROTHER 
-
-DOWN WITH BIG BROTHER 
-
-over and over again, filling half a page. 
-
-He could not help feeling a twinge of panic. It was absurd, since the writing of those particular words was not more dangerous than the initial act of opening the diary, but for a moment he was tempted to tear out the spoiled pages and abandon the enterprise altogether. 
-
-He did not do so, however, because he knew that it was useless. Whether he wrote DOWN WITH BIG BROTHER, or whether he refrained from writing it, made no difference. Whether he went on with the diary, or whether he did not go on with it, made no difference. The Thought Police would get him just the same. He had committed -- would still have committed, even if he had never set pen to paper -- the essential crime that contained all others in itself. Thoughtcrime, they called it. Thoughtcrime was not a thing that could be concealed for ever. You might dodge successfully for a while, even for years, but sooner or later they were bound to get you. 
-
-It was always at night -- the arrests invariably happened at night. The sudden jerk out of sleep, the rough hand shaking your shoulder, the lights glaring in your eyes, the ring of hard faces round the bed. In the vast majority of cases there was no trial, no report of the arrest. People simply disappeared, always during the night. Your name was removed from the registers, every record of everything you had ever done was wiped out, your one-time existence was denied and then forgotten. You were abolished, annihilated: vaporized was the usual word. 
-
-For a moment he was seized by a kind of hysteria. He began writing in a hurried untidy scrawl: 
-
-theyll shoot me i don't care theyll shoot me in the back of the neck i dont care down with big brother they always shoot you in the back of the neck i dont care down with big brother -- 
-
-He sat back in his chair, slightly ashamed of himself, and laid down the pen. The next moment he started violently. There was a knocking at the door. 
-
-Already! He sat as still as a mouse, in the futile hope that whoever it was might go away after a single attempt. But no, the knocking was repeated. The worst thing of all would be to delay. His heart was thumping like a drum, but his face, from long habit, was probably expressionless. He got up and moved heavily towards the door."
-
-```
-
-```{r}
-# Question 7.
-# Big Brother is rebranding and has decided that the various ministries will now be known as departments. The old departments are now called sections. The Newspeak titles will use “Dep” instead of “Mini”.
-```
-
-```{r}
-# Question 1.
-# Are the Thought Police ever mentioned?
-
-whole_text %>%
-  str_extract_all(
-    "(?i)thought police"
-  )
-
-# ANSWER
-# pattern <- "[tT]hought +[pP]olice"
-# 
-# whole_text %>%
-#   str_detect(pattern)
-```
-
-```{r}
-# Question 2.
-# Count how often Big Brother is mentioned
-
-whole_text %>%
-  str_extract_all("(?i)big brother") %>%
-  flatten_chr()
-
-# becomes a vector (therefore need to count length / number of instances in the vector)
-
-#20
-
-# ANSWER
-# pattern <- "[Bb][Ii][Gg] +[Bb][Rr][Oo][Tt][Hh][Ee][Rr]"
-# 
-# whole_text %>%
-#   str_extract_all(pattern) %>%
-#   flatten_chr() %>%
-#   length()
-```
-
-```{r}
-# Question 3.
-# The chapter is written from the point of view of the protagonist, Winston. Does he ever mention the other main character (Julia) by name?
-
-whole_text %>%
-  str_extract_all("(?i)Julia")
-
-OR
-
-whole_text %>%
-  str_detect("(?i)Julia")
-
-# ANSWER
-# pattern <- "[jJ]ulia"
-# 
-# whole_text %>%
-#   str_detect(pattern)
-
-```
-
-```{r}
-# Question 4.
-# Winston writes the date in a specific format: month nth, year eg. August 5th, 2019. Write a regular expression to match dates in that format and find the date written in his diary.
-
-whole_text %>%
-  str_extract_all("[A-Za-z]+[ ][0-9a-z]+,[ ][0-9]+")
-
-# ANSWER
-# pattern <- "[A-Z][a-z]+ [0-9]+(th|rd|st|nd), [0-9]{4}"
-# whole_text %>%
-#   str_extract(pattern)
-```
-
-```{r}
-# Question 5.
-# Winston wants some anonymity, redact his name somehow.
-
-whole_text %>%
-  str_extract_all("(?i)Winston") %>%
-  flatten_chr() %>%
-  str_replace_all("Winston", "REDACTED")
-
-
-# ANSWER
-# pattern <- "[wW]inston"
-
-# whole_text <- whole_text %>%
-#   str_replace_all(pattern, "REDACTED")
-
-# #check that there are no winstons mentioned
-# whole_text %>%
-#   str_detect(pattern)
-
-```
-
-```{r}
-# Question 6.
-# Stocks of Victory Gin have run out and the people of Oceania will have to drink vodka instead. Replace “gin” with “vodka”, matching case wherever possible. There’s still loads of Victory Coffee, though, so don’t replace that.
-
-#my answer/suggestion - did not give the correct words
-# whole_text %>%
-#   str_extract_all("gin") %>%
-#   flatten_chr() %>%
-#   str_replace_all("gin", "vodka")
-
-pattern <- "[ ,\\.-][gG][iI][nN][ ,\\.-]"
-whole_text %>%
-  str_extract_all(pattern)
-
-whole_text %>%
-  str_extract_all("Vodka")
-
-
-# ANSWER
-#pattern <- "[ ,\\.-][gG][iI][nN][ ,\\.-]"
-# whole_text %>%
-#   str_extract_all(pattern) %>%
-#   flatten_chr()
-# 
-# whole_text <- whole_text %>%
-#   str_replace_all(" GIN.", " VODKA.") %>%
-#   str_replace_all(" gin.", " vodka.") %>%
-#   str_replace_all(" gin ", " vodka ")
-```
-
-```{r}
-#Q7 - did not get this far
-
-whole_text <- whole_text %>%
-  str_replace_all("Department", "Section") %>%
-  str_replace_all("Ministry", "Department") %>%
-  str_replace_all("Ministrie", "Department") %>%
-  str_replace_all("Mini", "Dep")
-```
-
-WEEK 2 DAY 3
-
+## 6.1 Matricies and lists
+###To be edited ALOT
 
 
 ```{r}
@@ -2270,841 +1743,128 @@ colSums(my_matrix)
 
 ```
 
+
+
+## 10.1 Code chunks from homework
+
+## 10.2 Weekend homework 1
+###To be edited ALOT
+
 ```{r}
-#Control Flow
+# Creating my main dataframe - removing row_ID, ISBN, ISBN13,
+# publication_date and text_reviews_count
+books <- read_csv("data/books.csv")
+main_books_data <- books %>%
+  select(-rowid, -isbn, -isbn13, -text_reviews_count, -bookID)
+
+#Q1 - What is the highest rated book from the original series in English by JK?
+highest_hp_rating <- main_books_data %>%
+  select(title, authors, average_rating) %>%
+  filter(str_detect(authors, "Rowling"),
+         str_detect(title, "Harry Potter and the"),
+         !str_detect(title, "Sorcerer's")) %>%
+  group_by(average_rating, title) %>%
+  distinct(title) %>%
+  ungroup() %>%
+  slice_max(1)
+
+#Q2 - Is the average of HP1-7 higher than the average of LotR?
+# Calculating the Harry Potter average
+hp_avg_rating <- main_books_data %>%
+  select(title, authors, average_rating) %>%
+  filter(str_detect(authors, "Rowling"),
+         str_detect(title, "Harry Potter and the"),
+         !str_detect(title, "Sorcerer's")) %>%
+  distinct(title, average_rating) %>%
+  summarise(avg_rating = mean(average_rating))
+hp_avg_rating
+
+# Calculating the LotR average
+lotr_avg_rating <- main_books_data %>%
+  select(title, authors, average_rating, publisher) %>%
+  filter(str_detect(title, "The Return of the King|The Fellowship of the Ring|The Two Towers"),
+         str_detect(publisher, "Houghton Mifflin|Mariner Books"), 
+         authors != "Jude Fisher/Viggo Mortensen",
+         publisher != "Houghton Mifflin Harcourt"
+  ) %>%
+  summarise(avg_rating = mean(average_rating))
+lotr_avg_rating
+
+higher_hp_lotr_rating <- hp_avg_rating > lotr_avg_rating
+higher_hp_lotr_rating
+#TRUE - HP is higher than LOTR
+
+#Q3 What are the ratings and titles of the top 5 rated french books
+#ranked by number of ratings (not rating)
+top_french_books <- main_books_data %>%
+  select(title, average_rating, ratings_count, language_code) %>%
+  filter(language_code == "fre") %>%
+  group_by(ratings_count, average_rating) %>%
+  arrange(desc(ratings_count))
+
+head(top_french_books, 5)
+
+#top_french_books gives the output
+
+#Q4 - What is the mean rating for books published by Puffin?
+mean_puffin_rating <- main_books_data %>%
+  select(title, average_rating, publisher) %>%
+  summarise(puffin_avg_rating = (mean(average_rating)))
+
+# answer is 3.934075
+
+#Q5 - Are shorter books, rated lower than longer books?
+# low book rating 
+short_book <- main_books_data %>%
+  select(title, average_rating, num_pages) %>%
+  mutate(length_of_book = case_when(
+    num_pages < 200 ~ "under 200",
+    num_pages > 200 & num_pages < 400 ~ "200 to 400",
+    TRUE ~ "above 2000")) %>%
+  filter(length_of_book == "200 to 400") %>%
+  summarise(low_book_avg_rating = mean(average_rating))
+
+long_book <- main_books_data %>%
+  select(title, average_rating, num_pages) %>%
+  mutate(length_of_book = case_when(
+    num_pages < 600 ~ "under 200",
+    num_pages > 600 & num_pages < 800 ~ "600 to 800",
+    TRUE ~ "above 2000")) %>%
+  filter(length_of_book == "600 to 800") %>%
+  summarise(high_book_avg_rating = mean(average_rating))
+
+highest_book_split_rating <- short_book < long_book
+highest_book_split_rating
+#TRUE
+
+#OR
+book_summ <- books %>%
+  select(title, average_rating, num_pages) %>%
+  mutate(length_of_book = case_when(
+    num_pages < 200 ~ "0. under 200",
+    num_pages >= 200 & num_pages < 400 ~ "1. 200 to 400",
+    num_pages >= 400 & num_pages < 600 ~ "2. 400 to 600",
+    num_pages >= 600 & num_pages < 800 ~ "3. 600 to 800",
+    TRUE ~ "4. above 800")) %>%
+  # filter(length_of_book == "200 to 400") %>%
+  group_by(length_of_book) %>%
+  summarise(avg_rating = mean(average_rating))
 ```
 
-```{r}
-# if statements
-
-# already explored, na.if
-
-if (condition) {
-  # code that runs if condition is met 
-}
-```
-
-```{r}
-# conditional operators
-
-# `==` equal to
-# `!=` not equal to
-# `<` less than
-# `>` greater than
-# `>=` greater than OR equal to
-# `%in%` is in the set
-```
-
-```{r}
-x <- 7
-y <- 8
-
-if (x <= y) (
-  print("it's less than or equal to y")
-)
-
-
-```
-
-```{r}
-# task
-# Write an if statement that prints 'Yes that divides by 2' if a number x is divisible by 2 (hint: use %% 2 == 0 as your expression), try it out for different values of x.
-
-x <- 9
-
-if (x %% 2 == 0) {
-  print("yes that divides by 2")
-}
-```
-
-```{r}
-# Nested if statements
-
-# we can write more complicated if statements
-
-if (10 != 5) {
-  if (2 > 0) {
-   print("the second condition was met") 
-  }
-  print("the first condition was met")
-}
-```
-
-```{r}
-#Task
-
-#check if various statements are met
-
-if (x > y) {
-  print("Start of outer if block")
-
-  if (x %% y == 0) {
-    print("Inner if block 1")
-  }
-
-  if (y %in% c(1:5)) {
-    print("Inner if block 2")
-  }
-
-  print("End of outer if block")
-}
-
-print("After if statement")
-```
-
-```{r}
-# if else statements
-
-# if (condition) {
-#   # do something
-# } else {
-#   # do something else
-# }
-```
-
-```{r}
-# if (rain) {
-#   wear_wellies()
-# } else {
-#   wear_trainers()
-# }
-```
-
-```{r}
-if (4 < 5) {
-  print("yes it's less")
-} else {
-  print("no it's not")
-}
-
-```
-
-```{r}
-if (4 < 5) {
-  print("yes it's less")
-} else if (6 > 8) {
-  print("no it's not")
-} else if (9 < 6) {
-  print("hello")
-} else {
-  print("meow")
-}
-```
-
-```{r}
-# Task
-# Edit your code from the first exercise so that it prints ‘Yes that divides’ when x is divisible by 2, and prints ‘No that does not divide’ otherwise.
-
-x <- 9
-
-if (x %% 2 == 0) {
-  print("yes that divides")
-} else {
-  print("not it doesn't divide")
-}
-```
-
-```{r}
-# for loops
-
-# basic syntax
-
-for (item in basket) {
-  hang_up(item)
-}
-```
-
-```{r}
-print("the day is Monday")
-print("the day is Tuesday")
-print("The day is Wednesday")
-print("The day is Thursday")
-print("The day is Friday")
-```
-
-```{r}
-weekdays <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
-
-for (day in weekdays) {
-  phrase <- paste("the day is", day, sep = " ")
-  print(phrase)
-}
-```
-
-```{r}
-# task
-# 
-# Task - 10 mins
-# 
-# Change the code below to use a for loop:
-
-print(1)
-print(2)
-print(3)
-print(4)
-print(5)
-
-numbers <- c("1", "2", "3", "4", "5")
-
-for (num in numbers) {
-  print(num)
-}
-```
-
-```{r}
-# while loops
-
-while (snowing) {
-  clear_drive()
-}
-```
-
-```{r}
-#R example
-
-# set beginning value, and stop value
-
-current_value <- 1
-stop_value <- 10
-
-while (current_value < stop_value){
-  print(current_value)
-  current_val <- current_val + 1
-}
-
-```
-
-```{r}
-# for loop indexing
-
-weekdays <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
-
-for (i in 1:length(weekdays)) {
-  print(i)
-  phrase <- paste("the day is", weekdays[i], sep = " ")
-  print(phrase)
-}
-
-```
-
-```{r}
-# nested loops
-# loops within loops
-
-my_matrix <- replicate(5, floor(rnorm(5) *100))
-my_matrix
-
-
-# printing all the rows and columns from a matrix
-
-for (row in 1:5) {
-  for (col in 1:5) {
-    print(my_matrix[row, col])
-  }
-}
-
-# if we don't know how many rows and columns
-n_rows <- nrow(my_matrix)
-n_cols <- ncol(my_matrix)
-
-for (row in 1:n_rows) {
-  for (col in 1:n_cols) {
-    print(my_matrix[row, col])
-  }
-}
-
-```
-
-```{r}
-product_matrix <- matrix(nrow = 5, ncol = 5)
-product_matrix
-
-new_matrix <- for (row in 1:1) {
-  for (col in 1:1) {
-    (product_matrix[[1,1]])
-  }
-}
-
-my_matrix[2,3]
-
-#answer
-
-for (x in 1:nrow) {
-  for (y in 1:ncol) {
-    product_matrix[x,y] <- x * y
-  }
-}
-
-
-```
-
-```{r}
-#creates a numeric vector
-my_vector <- c(1, 4, 6, 2, 4)
-
-#creates a temporary vector (length 5)
-temp_vector <- numeric(length(my_vector))
-
-for (i in 1:length(my_vector)) {
-  temp_vector[i] <- my_vector[i] + 1
-}
-
-# overwrite inital vector
-my_vector <- temp_vector
-
-my_vector
-
-```
-
-```{r}
-# apply family of functions
-
-apply()
-lapply()
+### NOTES TO TIDY
+library(MASS)
+select(mtcars, mpg) - will give an error if MASS is loaded
+error is that it's trying to run the select function from MASS
+dplyr::select(mtcars, mpg) - to load a function directly from the package
+
+separate()
+unite()
+rowSums(m)
+colSums(m)
 sapply()
+lapply()
+apply()
 
-purrr:
-  map()
+purrr library
 
-# these allow you to take a function and apply it in a vectorised way
-
-```
-
-```{r}
-
-sapply(iris, class)
-
-# sapply() - will try to return the simplest data structure it can (vectors)
-
-# lapply() - will usually return a list
- 
-
-
-```
-
-```{r}
-# Final Task from me (5 mins):
-# Using the starwars list from the CodeClanData package, do the following:
-# Print the name for every character in the list
-# You can use for loops or apply
-
-library(CodeClanData)
-
-starwars
-
-for (x in starwars) {
-    print(x$star_wars)
-}
-
-# not quite right
-
-```
-
-
-```{r}
-#functions
-
-#to see code of the functions, run without brackets
-
-library
-
-nchar()
-
-# there are many arguments that can be passed in, but we often skip many of them
-# by being explicit, you can move the arguments around, syntax doesn't matter
-# what is more common, is passing arguments by place, but when one is skipped, R throws errors
-
-
-
-```
-
-```{r}
-my_fun <- function(x, y, z) {
-      1+1
-}
-
-# good practice to not return on the last line
-```
-
-```{r}
-multiply_by_5 <- function(x) {
-  x * 5
-}
-
-multiply_by_5(5)
-```
-```{r}
-multiply_by <- function(x, y) {
-  x * y
-}
-
-multiply_by(1:3, 10)
-```
-
-```{r}
-beaver1
-```
-
-
-```{r}
-make_price <- function(x) {
-  paste("£", x)
-}
-make_price(4)
-
-# paste0 is what you need to remove the space
-
-# round() rounds to two decimal places
-
-```
-
-```{r}
-triangle_function <- function(x) {
-  (x*(x+1))/2
-}
-
-triangle_function(5)
-```
-
-```{r}
-#global assignment operator
-
-
-```
-```{r}
-# to debug functions
-
-#debug() is an option
-# but not great because you have to stop it
-#undebug()
-#debugonce() is better - goes through the code line by line
-
-
-
-```
-
-WEEK 2 DAY 4
-
-```{r}
-# Reproducibility
-
-#Unit testing
-
-#creating code to test out code that you have created previously
-
-
-```
-
-```{r}
-#creating test function
-
-is_leap_year <- function(year) {
-  if (year %% 100 == 0){
-    if (year %% 400 == 0) {
-      return(TRUE)
-    } else {
-      return(FALSE)
-      }
-  }  
-  
-  if (year %% 4 == 0 ) {
-    return(TRUE)
-  } else {
-    return(FALSE)
-  }
-}
-```
-```{r}
-is_leap_year(2013)
-```
-
-```{r}
-# to unit test, install package thatthat
-```
-```{r}
-library(testthat)
-```
-
-```{r}
-expect_equal()
-expect_error()
-```
-
-```{r}
-a <- 10
-```
-```{r}
-expect_equal(a, 11) # gives an error
-```
-
-```{r}
-test_that("real leap year return true", {
-  expect_equal(is_leap_year(2012), TRUE)
-  expect_equal(is_leap_year(2001), TRUE)
-})
-
-#test function, with lines included
-```
-
-```{r}
-test.dir("")
-#can test code in a rscript or similar, requires a directory path
-```
-```{r}
-#task
-
-# second test : one expectation
-test_that("Character input returns an error", {
-  expect_error(is_leap_year("year"))
-})
-
-# what is the test name
-# what is the expectation
-# what are you expecting the test to do
-```
-
-```{r}
-test_that("Character input returns an error", {
-  expect_error(is_leap_year("year"))
-  expect_error(is_leap_year(TRUE))
-})
-
-# true and false don't work within this operation as they translate to 0 and 1
-```
-
-```{r}
-#amending the test function
-
-is_leap_year <- function(year) {
-  if (!is.numeric(year)){
-    stop("non-numeric-input :( ")
-  }
-  if (year %% 100 == 0){
-    if (year %% 400 == 0) {
-      return(TRUE)
-    } else {
-      return(FALSE)
-      }
-  }  
-  if (year %% 4 == 0 ) {
-    return(TRUE)
-  } else {
-    return(FALSE)
-  }
-}
-
-```
-
-```{r}
-is_leap_year(TRUE)
-```
-
-
-```{r}
-# write test for 2017 and 1990 are correctly identified as not being leap years by our function
-
-test_that("real leap year return true", {
-  expect_equal(is_leap_year(2017), FALSE)
-  expect_equal(is_leap_year(1900), FALSE)
-})
-
-```
-
-```{r}
-#different types of expect functions
-
-num1 <- 5
-num2 <- (sqrt(5))^2
-
-expect_equal(num1, num2)
-
-#these values are equal, but not identical
-
-expect_identical(num1, num2)
-
-expect_gt(3, 3)
-
-expect_gte(2, 3)
-#greater than or equal to
-
-```
-
-```{r}
-#functions for strings
-
-string <- "is there a match?"
-
-expect_match(string, "there a") - 
-  #can take argument ignore.case = TRUE
-#happy with that, because there is a match
-
-```
-
-```{r}
-# when do you build tests?
-# when there are bigger, more advanced functions which can give more errors
- 
-```
-
-```{r}
-
-```
-
-```{r}
-# assertive programming
-# checking / looking at the data going into your code
-```
-
-
-```{r}
-library(tidyverse)
-```
-
-```{r}
-weather_one <- read_csv("data/delhi_weather_one.csv")
-weather_two <- read_csv("data/delhi_weather_two.csv")
-```
-
-```{r}
-weather_report <- function(weather){
-  # Our average temperature, humidity and wind speed 
-  weather_means <- 
-  weather %>% 
-  summarise(
-    mean_temp = mean(temp),
-    mean_humidity = mean(humidity),
-    mean_windspeed = mean(wind_speed)
-  )
-
-# Show hot and humid days
-hot_and_humid <- 
-weather %>% 
-  filter(temp > 20) %>% 
-  filter(humidity > 55)
-
-return(list(weather_means, hot_and_humid))
-}
-
-weather_report(weather_one)
-```
-
-```{r}
-#how will this function handle a different dataset?
-weather_report(weather_two)
-```
-
-```{r}
-library(assertr)
-
-#package to begin to 'fix'/amend our code
-```
-
-```{r}
-weather_report <- function(weather){
-  weather %>%
-    verify(temp >= -35 & temp <= 55) %>%
-    verify(wind_speed >= 0 & wind_speed <= 108) %>%
-    verify(humidity >= 0 & humidity <= 100)
-
-  # Our average temperature, humidity and wind speed 
-  weather_means <- 
-  weather %>% 
-  summarise(
-    mean_temp = mean(temp),
-    mean_humidity = mean(humidity),
-    mean_windspeed = mean(wind_speed)
-  )
-
-# Show hot and humid days
-hot_and_humid <- 
-weather %>% 
-  filter(temp > 20) %>% 
-  filter(humidity > 55)
-
-return(list(weather_means, hot_and_humid))
-}
-
-#using verify(), which is similar to filter
-```
-
-```{r}
-#testing again
-weather_report(weather_two)
-
-```
-
-```{r}
-#a different function is stop_if_not
-```
-```{r}
-#amending the function again, with stop if not
-
-weather_report <- function(weather){
-  stopifnot(
-    nrow(weather) > 15,
-    ncol(weather) == 4,
-    drop_na(weather) == weather
-  )
-  
-  weather %>%
-    verify(temp >= -35 & temp <= 55) %>%
-    verify(wind_speed >= 0 & wind_speed <= 108) %>%
-    verify(humidity >= 0 & humidity <= 100)
-
-  # Our average temperature, humidity and wind speed 
-  weather_means <- 
-  weather %>% 
-  summarise(
-    mean_temp = mean(temp),
-    mean_humidity = mean(humidity),
-    mean_windspeed = mean(wind_speed)
-  )
-
-# Show hot and humid days
-hot_and_humid <- 
-weather %>% 
-  filter(temp > 20) %>% 
-  filter(humidity > 55)
-
-return(list(weather_means, hot_and_humid))
-}
-
-weather_report(weather_one)
-
-```
-
-```{r}
-weather_one
-
-```
-
-```{r}
-
-```
-
-
-```{r}
-# reproducibility
-
-# how to achieve this
-
-```
-```{r}
-# key to be organised, and keep a good folder structure
-```
-
-```{r}
-student <- c("Abigail", "Bjorn", "Caitlin", "Dave", "Elly", "Francis")
-question_1 <- c(10, 3, 1, 5, 5, 8)
-question_2 <- c(2, 5, 5, 4, 5, 6)
-question_3 <- c(4, 5, 9, 7, 6, 8)
-exam_results <- data.frame(student, question_1, question_2, question_3)
-```
-
-```{r}
-# This is NOT reproducible 
-
-exam_results[, 1]
-```
-
-```{r}
-exam_results <- exam_results %>%
-  select(question_2, student)
-# 
-# a more robust/reproducible way is by naming the data, i.e. the column 
-exam_results[, "student"]
-```
-
-```{r}
-# organising your code so that it is easy to read - one way of doing this
-# is by creating functions, or modulising it
-
-```
-
-```{r}
-# source function - looks in the working directory for various files
-# source() 
-# grabs the functon from e.g. an R script, and places in the global env, so it can be run
-
-e.g. 
-source("01_multiply_function.R") # this would be a separate script
-source("02_add_function.R") # this would be a separate script
-
-a <- multiply_by_n(2, 4)
-b <- add_two(a)
-b
-```
-
-```{r}
-# in an R script, you can add headers / tails
-
-# shift + cmd + r
-
-# on r script, you can select the little lines menu on top right which automatically indexes
-
-```
-
-```{r}
-# documentation
-
-# main points (comments)
-# purpose and objective - WHY
-# instruct how to follow the code
-
-# key things to note and include:
-#date (e.g. if packages or similar are or become out of date)
-#sources
-# evidence
-# decision making process
-# assume the reader has no prior knowledge
-```
-
-```{r}
-#restart and run all chunks, is safest way to avoid creating objects etc outside
-# of the active / required environment/notebook
-
-# if you do want to do this, sourcing is a good way to do this
-
-# if scripts are very long / take long to run, you can save scripts to a specfic workspace
-
-saveRDS(object, file = "name")
-
-# but comment it out after saving it the first time
-```
-
-
-
-
-```{r}
-# relative file path
-
-# difference between relative file path and absolute file path
-
-# relative file path is relative to your working directory, i.e. you do not need
-# to input the entire filepath
-```
-
-```{r}
-#absolute file path
-
-library(tidyverse)
-read_csv("/Users/louiseshambrook/GitHub/codeclan_work/codeclan_work/week_02/day_4/w2_d4_reproducability/no_project_example/")
-# trying to read in data, but unable to locate it / your files have not been set up correctly
-# 
-# by using ~, it brings you to the top of your directory
-
-# This is NOT reproducible, as their file structure may differ (and likely will)
-```
-
-```{r}
-read_csv("no_project_example/data/students.csv")
-```
-
-
-```{r}
-# if the data file is not accessible on the same level (e.g. if the data is not
-# contained within the same folder as the rproj, then the library(data) with the 
-#function data can correct this)
-# e.g. read_csv(here("data/students")
-```
-
+rename()

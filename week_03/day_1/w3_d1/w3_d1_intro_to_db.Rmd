@@ -1,0 +1,35 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+# SQL - how SQL is related to a relational database system
+
+# CRUD opertions
+
+```
+
+```{r}
+#relational database system
+
+# this works similarly to joins in R; where two tables share a key, and can then
+# be joined be a key. therefore a 
+```
+
+```{r}
+# 5 types of data
+# 
+
+#varchar
+#int
+#real
+#boolean
+#timestamp
+
+```
+
+```{r}
+
+```
+

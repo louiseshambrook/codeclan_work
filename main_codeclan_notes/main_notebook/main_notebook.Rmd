@@ -44,6 +44,8 @@ Updated 11/11/2021
 
 2.4 - Functions
 
+2.4.1 - Debugging functions 
+
 3.1 - Styling and best practice
 
 3.2 - Reproducibility and file paths
@@ -286,7 +288,7 @@ apply() - will try to return the simplest data structure it can (vectors)
 
 lapply() - will usually return a list
 
-
+An advantage of a matrix, is to be able to perform calculations on entire matrix, e.g. (m * 5)
 
 ## 1.7 Unit testing
 
@@ -357,7 +359,7 @@ for (i in 1:length(weekdays)) {
 }
 ```
 
-It is often important to add a counter, e.g.
+It is often important to add a counter to avoid infinite loops, e.g.
 ```{r}
 for (i in 1:length(my_vector)) {
   temp_vector[i] <- my_vector[i] + 1
@@ -366,187 +368,95 @@ for (i in 1:length(my_vector)) {
 
 
 ## 2.3 Which statements
-###To be edited ALOT
 
-
+Basic syntax
 
 ```{r}
-# while loops
-
 while (snowing) {
   clear_drive()
 }
 ```
 
-```{r}
-#R example
-
-# set beginning value, and stop value
-
-current_value <- 1
-stop_value <- 10
-
-while (current_value < stop_value){
-  print(current_value)
-  current_val <- current_val + 1
-}
-
-```
-
+`while(){}` - while loop
 
 
 ## 2.4 Functions
 
+Many arguments can be passed into all functions in R. By being explicit, syntax doesn't matter. What is more common, is passing arguments by place, but when an argument is then skipped, R will throw an error.
+
+Basic syntax
 ```{r}
-#functions
-
-#to see code of the functions, run without brackets
-
-library
-
-nchar()
-
-# there are many arguments that can be passed in, but we often skip many of them
-# by being explicit, you can move the arguments around, syntax doesn't matter
-# what is more common, is passing arguments by place, but when one is skipped, R throws errors
-
-
-
-```
-
-```{r}
-my_fun <- function(x, y, z) {
-      1+1
+name_function <- function(banana){
+  print(banana)
 }
-
-# good practice to not return on the last line
 ```
 
-```{r}
-multiply_by_5 <- function(x) {
-  x * 5
-}
-
-multiply_by_5(5)
-```
-```{r}
-multiply_by <- function(x, y) {
-  x * y
-}
-
-multiply_by(1:3, 10)
-```
-
-```{r}
-beaver1
-```
+`function(){}` - function. It is good practice to not return on the last line
 
 
-```{r}
-make_price <- function(x) {
-  paste("£", x)
-}
-make_price(4)
+## 2.4.1 Debugging functions 
 
-# paste0 is what you need to remove the space
+`debug()` - is an option for debugging a function, but will not stop, and will require a separate function to be run
 
-# round() rounds to two decimal places
+`undebug()` - top stop debugging
 
-```
-
-```{r}
-triangle_function <- function(x) {
-  (x*(x+1))/2
-}
-
-triangle_function(5)
-```
-
-```{r}
-#global assignment operator
-
-
-```
-```{r}
-# to debug functions
-
-#debug() is an option
-# but not great because you have to stop it
-#undebug()
-#debugonce() is better - goes through the code line by line
-
-
-
-```
-
-
+`debugonce` - better way to debug; opens a panel to go through code line by line
 
 
 ## 3.1 Styling and Best Practice
-###To be edited ALOT
 
-Snakecase is best practice
-Objects should be nouns and functions should be verbs
-Cannot use numbers in objects in the first character, e.g. 1_file
-Always start with library calls
+Naming objects and layout of code
+Snakecase is best practice. Objects should be nouns and functions should be verbs. It is not possible to use numbers in objects in the first character, e.g. 1_file. Always start code with library calls. 
 
 Spacing and assignment
-Put spaces after commas, and after operations
-No space after the start/end of brackets (e.g. (function, bleep) )
-No space after calling a function, e.g mean(bleep)
-Space before and after assignment operators ( <- )
+Put spaces after commas, and after operations. There should not be space after the start/end of brackets (e.g. (function, bleep) ). There should not be space after calling a function, e.g mean(bleep). There should be space before and after assignment operators ( <- ).
 
 Line length
-Code should not be more than 80 char per line
-Code can be split across multiple lines
-Should have function name and opening bracket on one line
-Args on the next line
+Code should not be more than 80 characters per line. Code can be split across multiple lines. Code should have the function name and opening bracket on one line. The arguments should be on the next line.
 
-Quotation marks
-Double and single quotation marks are equally valid as a string
-Some strings may have an apostrophe, and then the string breaks
-Convention is therefore to use double quotation marks
+Quotation marks / Strings
+Double and single quotation marks are equally valid as a string, but some strings may have an apostrophe, and then the string breaks. Convention is therefore to use double quotation marks
 
 Comments
-Comments are powerful and important in understanding code
-Comment above the code
+Comments are powerful and important in understanding code, and therefore comments should be made above the code.
 
-
-## 3.2 Reproducibility and file paths
+## 3.2 Reproducibility and Documentation
 ###To be edited ALOT
 
-How to Achieve reproducibility
+Reproducibility
+To achieve reproducibility, it is key to be organised, and maintain a good folder structure.
+It is important to organise your code so that it is easy to read; one way of doing this is by creating functions, or modulising it.
 
-key to be organised, and keep a good folder structure
+exam_results[, 1]
+This is not reproducible code, as column layout may change.
 
-exam_results[, 1] - This is NOT reproducible 
-a more robust/reproducible way is by naming the data, i.e. the column 
 exam_results[, "student"]
+This is a more reproducible way of designing your code.
 
+Modulising code / using source function
+By using the source function, this looks in the working directory for a file and grabs the function (e.g. from an R script), and places it int he global environment, so that it can be run. 
 
-organising your code so that it is easy to read - one way of doing this
-is by creating functions, or modulising it
+`source()` - source function
 
-
-source function - looks in the working directory for various files
-source()
-grabs the functon from e.g. an R script, and places in the global env, so it can be run
-
-e.g. 
+Example
+```{r}
 source("01_multiply_function.R") # this would be a separate script
 source("02_add_function.R") # this would be a separate script
 a <- multiply_by_n(2, 4)
 b <- add_two(a)
 b
+```
 
+Adding headers / tails in an R script
+In an R script, you can add headers / tails, to denote the start/end of chunks. This automatically indexes your code.
+The shortcut is Shift+cmd+R, or you can do this manually by entering: # TEXT ---
 
-in an R script, you can add headers / tails
-shift + cmd + r
-on r script, you can select the little lines menu on top right which automatically indexes
+Documentation
+Documentation is a key part of reproducibility. A large part of this is done through commenting, and git. In comments, the purpose and objective of a given project should be clear, and should provide the reader instructions for how to execute the code.
 
+Key points to include are:
+The date, 
 
-
-documentation
 
 main points (comments)
 purpose and objective - WHY
@@ -593,6 +503,10 @@ e.g. read_csv(here("data/students")
 ```{r}
 # assertive programming
 # checking / looking at the data going into your code
+
+# One of the very useful things about writing code to do data analysis is that it’s easy to repeat the same analysis over again. Often reports need to be generated monthly, weekly or even daily. Having code that can create that report can save you a huge amount of time.
+# 
+# However, once you start running the same code but with different data you will soon run into problems! You have learnt all about data cleaning - how important, but also how time consuming it is. Well, how do you clean data that you’ve never seen before? You can try write code that will take care of problems in the data that you’ve already seen, but data can go wrong in more ways that you can possibly imagine…
 ```
 
 
@@ -626,11 +540,15 @@ return(list(weather_means, hot_and_humid))
 }
 
 weather_report(weather_one)
+#this is run the first time, with no problems
 ```
 
 ```{r}
 #how will this function handle a different dataset?
 weather_report(weather_two)
+
+# the second time this is run, i.e. the dataset is updated, there is an error.
+#this can be fixed with assertive programming. 
 ```
 
 ```{r}
@@ -647,6 +565,10 @@ weather_report <- function(weather){
     verify(wind_speed >= 0 & wind_speed <= 108) %>%
     verify(humidity >= 0 & humidity <= 100)
 
+#this is where we are amending the code, because this is where the error was.
+# it was initially coded so that it would just calculate a mean, but now we are setting limits on it, e.g. for humidity which is a percentage, to be between 0 and 100, which is realistic. 
+  
+  
   # Our average temperature, humidity and wind speed 
   weather_means <- 
   weather %>% 
@@ -667,6 +589,21 @@ return(list(weather_means, hot_and_humid))
 
 #using verify(), which is similar to filter
 ```
+
+```{r}
+# two ways to do assertive programming, is
+
+verify()
+
+#and
+
+stopifnot()
+
+#verify can be written inside filter functions
+
+#stopifnot is a more general check, and can stop code from executing if any of the statements are false
+```
+
 
 ```{r}
 #testing again
@@ -1540,210 +1477,89 @@ spotify_cleaned <- spotify_songs %>%
 
 
 ## 6.1 Matricies and lists
-###To be edited ALOT
 
+A vector is a ...
 
+Example:
 ```{r}
-# Matrices and lists
-
-# Data structures
-
-# vectors
 num <- 1:5
 strings <- c("This is a string", "hello")
 boolean <- c(TRUE, FALSE)
-
-# atomic vector - hold one type of data
-# versus list vector, aka list
-
-class(nums)
 ```
+
+An atomic vector holds one type of data
+versus list vector, aka list
+
+A list is a...
+
+`list()` - 
+
+Example
 ```{r}
 list("text", TRUE, c(1, 2, 3), list("meep", 4))
 ```
-
+or
 ```{r}
 # as.list() - is the other way of making lists
 ```
 
+Indexing / Subsetting lists
 ```{r}
-# indexing and accessing a list - subsetting lists
-
 x <- list(1, "a", TRUE, c(1, 2, 3))
 
 x[[2]]
-
-# [] will always return the same data structure that you were trying to access
 ```
 
+By naming a list, an item can be accessed
 ```{r}
-# can also be accessed by naming lists
-
 # $ denotes that a is a name in the list
 
 named_list <- list(a = "I love R", b = 1:10)
 
 named_list$a
-```
-
-```{r}
-# access through []
 
 named_list[["a"]]
 ```
 
+Nested lists
 ```{r}
-# Nested lists
-
-# you can lists within a list inside another list
-
 student_info <- list(
                 "Agnes" = list(height = 1.8, shoe_size = 8L),
                 "Bobby" = list(height = 2.1, gender = "Male"),
                 "Charlie" = list(gender = "Female", likes_beets = TRUE)
 )
 
-student_info
-
-# extract the data/lists
-
 student_info$Bobby$height
-#gives bobby's height
 
 student_info[["Agnes"]][["shoe_size"]]
 ```
 
+A matrix is a data structure that holds rectangular data. Matrices must hold the same data type.
+
+`matrix()` - to create a matrix
+
+Example
 ```{r}
-#Task
-
-# Task - 5 minutes
-# 
-# Make a named list that contains a numeric vector and a character vector.
-# 
-# Access the second element of your list using double square brackets [[]]. What is it's class?
-# 
-# Access the second element of your list using single square brackets []. What is it's class?
-# 
-# Access the second element of your list by name. What is it's class?
-```
-
-```{r}
-task_list <- list(a = c(4, 5, 6), b = c("meep", "hello", "here"))
-
-task_list[[2]]
-
-class(task_list[[2]])
-  
-task_list[2]
-
-class(task_list[2])
-
-task_list$b
-class(task_list$b)
-
-```
-
-```{r}
-# Matrices
-
-# a data structure that holds rectangular data
-
 matrix(1:4, nrow = 2, ncol = 2)
 
-# if we want it populated rowwise (default is by column)
-
+# To be populated rowwise (default is by column)
 matrix(1:4, nrow = 2, ncol = 2, byrow = TRUE)
 ```
 
+Selecting elements from a matrix
 ```{r}
-m <- matrix(1:6, nrow = 2, ncol = 3)
-
-class(m)
-
-# key distinction between matrices and DF's - matrices they MUST be the same type
-```
-
-```{r}
-# selecting elemnts from the matrix
+# One item
 m[1,3]
 
-# select entire row
+# Entire row
 m[1,]
 
-#select entire column
+# Select entire column
 m[,3]
 
-
-```
-```{r}
-# you can select multiple rows or columns by passing a vector
-
+# Select multiple rows or columns by passing a vector; returns all rows for 1st and 3rd column
 m[, c(1,3)]
-#returns all rows for 1st and 3rd column
 ```
-
-```{r}
-# advantage of matrix, is to be able to perform calculations on entire matrix
-
-m * 5
-```
-
-```{r}
-library(dplyr)
-library(magrittr)
-
-numers <- iris %>% select(-Species)
-
-# if it's all the same data type
-numers * 3
-
-# access the first row of a df
-numers[1, ]
-```
-
-```{r}
-# Working with rows and columns
-
-# want to get the mean average of a column
-
-#colMeans()
-
-colMeans(m)
-```
-
-```{r}
-# Other convenience functions
-
-`rowSums`
-
-`colSums`
-
-`rowMeans`
-
-rowSums(m)
-colSums(m)
-
-```
-```{r}
-# Task
-# Make a matrix with 3 rows and 4 columns. Each column should contain the numbers 1 to 3.
-# Find the element in the 2nd row, 3rd column.
-# Check that all the columns are identical by checking that their sums are the same.
-```
-
-```{r}
-#Make a matrix
-
-my_matrix <- matrix(1:3, nrow = 3, ncol = 4)
-
-my_matrix[2,3]
-
-colSums(my_matrix)
-
-
-```
-
-
 
 ## 10.1 Code chunks from homework
 
@@ -1868,3 +1684,18 @@ apply()
 purrr library
 
 rename()
+nchar()
+paste()
+paste0() - will paste without a space
+round() - rounds a number to two decimal places
+
+library(magrittr)
+colMeans(m)
+`rowSums`
+
+`colSums`
+
+`rowMeans`
+
+rowSums(m)
+colSums(m)

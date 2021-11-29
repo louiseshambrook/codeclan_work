@@ -1,0 +1,102 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Lesson 2 - Facets
+
+The plot with chickens is difficult because it shows too much information, but
+by using an average of all of them together, you hide information, so you want to show as much
+as possible.
+```{r}
+# this is where facet wrap comes in.
+
+# it breaks up a graph into individual plots
+
+```
+
+facet_wrap()
+```{r}
+ggplot(chick_weight) + 
+  aes(x = time, y = weight, group = chick, colour = diet) +
+  geom_line() +
+  facet_wrap(~ diet)
+```
+
+```{r}
+# within facet wrap, you can specify nrow, ncol, scales
+```
+
+
+
+facet_grid
+```{r}
+ggplot(chick_weight) + 
+  aes(x = time, y = weight, group = chick, colour = diet) +
+  geom_line() +
+  facet_wrap(~ diet, ncol = 4)
+
+```
+
+
+```{r}
+unemployment <- read_csv("benefits.csv")
+```
+
+```{r}
+Use geom_histogram to create a histogram showing the number of unemployed by age. Then facet the graph based on biological sex.
+Hint: geom_histogram is almost the same as geom_bar, but is better suited to plotting continuous data because of the binning.
+```
+
+```{r}
+ggplot(unemployment) + 
+geom_histogram(aes(x = age, fill = sex), col = "white") + 
+facet_wrap( ~ sex, ncol = 2)
+```
+
+
+```{r}
+ggplot(unemployment) + 
+  geom_histogram(aes(x = age, fill = sex), col = "white") + 
+  facet_wrap(married ~ sex)
+```
+
+```{r}
+ggplot(unemployment) + 
+  geom_histogram(aes(x = age, fill = sex), col = "white") + 
+  facet_grid(married ~ sex)
+```
+
+
+```{r}
+# Task - 5 mins
+#     Use the same dataset, but base the facet_grid() on marital status (married) and if the individual has children (dkids).
+#     Extension: can you improve the way that the facets are labled.
+```
+
+```{r}
+ggplot(unemployment) + 
+  geom_histogram(aes(x = age, fill = dkids), col = "white") + 
+  facet_grid(married ~ dkids)
+
+ggplot(unemployment) + 
+  geom_bar(aes(x = married, fill = dkids), col = "white") + 
+  facet_grid(married ~ dkids, labeller = "label_value")
+
+```
+
+This misrepresents our data
+```{r}
+ggplot(unemployment) + 
+  geom_bar(aes(x = married, fill = dkids), col = "white") + 
+  facet_grid(married ~ dkids, scales = "free_y")
+```
+
+It is not terriblt useful on THIS dataset, because the names are short, but it
+can be good on very long names of bar graphs as it "widens" the x axis
+```{r}
+ggplot(unemployment) + 
+  geom_bar(aes(x = married, fill = dkids), col = "white") + 
+  facet_grid(married ~ dkids, scales = "free_x")
+```
+

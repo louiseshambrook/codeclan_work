@@ -1,0 +1,155 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+ggplot2
+
+#gg = grammar of graphics
+
+
+to create a plot, call ggplot()
+
+
+geoms = shape
+aes = aesthetics
+
+in the gpplot function, is where the + argument/function comes in (where you add layers)
+
+fill inside the aes code, will set the fill colour, except if in inverted commas
+code, then it will map it to the argugement, and if not in upside down commas,
+then it will include the word hard coded in a legend
+
+position = dodge will set an area next to a bar chart, to compare the areas
+
+the dataset we're working with has 14 rows, but ggplot calculated this for us
+automatically
+to demonstate the quantity, do:
+stat = count (as an argument)
+ 
+perhaps better to do:
+dplyr function
+group_by(superpower, school_year)%>%
+  summarise(n=n())
+ 
+or
+ dplyr function
+ count(superpower, school_year)
+
+# labelling
+
+labs - is a function which can be used for labelling
+
+labs(x = 'superpower',
+      y = 'count',
+      title = "preferred superpower by year",
+      subtitle = "data from students",
+      caption = "sourced from")
+
+caption = goes in bottom right corner
+
+they can also be put as seperate arguments in the function
+
+```{r}
+olympics_medals <- CodeClanData::olympics_overall_medals
+```
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+top_10 <- olympics_medals %>%
+  filter(season == "Summer", medal == "Gold") %>%
+  arrange(desc(count)) %>%
+  top_n(10)
+top_10
+```
+
+```{r}
+top_10 %>%
+  ggplot(aes(x = count, y = team)
+         )
+  
+```
+
+NOTE
+
+To build the graphic:
+- You cannot follow the documentation as aes argument MUST be INSIDE the aes
+  argument, therefore you create the geoms BEFORE the aes, despite that being
+  the FIRST layer
+-Additionally, despite the argument being: geom_point
+  This is CONVERTED when you set the type, e.g. column or bar
+  
+```{r}
+ggplot(top_10) +
+  geom_col(aes(x = count, y = team, fill = team)
+         )
+  
+```
+
+Layering of ggplot
+
+Chickweight (is a dataset built into R)
+
+```{r}
+chick_weight <- janitor::clean_names(ChickWeight)
+```
+
+```{r}
+ggplot(chick_weight) +
+  geom_line(aes(x = time, y = weight, group = chick, colour = diet)) 
+```
+
+adding another layer
+```{r}
+ggplot(chick_weight) +
+  geom_line(aes(x = time, y = weight, group = chick, colour = diet))  +
+  geom_point(aes(x = time, y = weight))
+```
+
+adding geom_smooth, which adds an "average" line
+```{r}
+ggplot(chick_weight) +
+  geom_line(aes(x = time, y = weight, group = chick, colour = diet))  +
+  geom_point(aes(x = time, y = weight, colour = diet)) +
+  geom_smooth(aes(x = time, y = weight, group = diet, colour = diet))
+```
+
+```{r}
+students_superpower <- CodeClanData::students
+```
+
+```{r}
+ggplot(students_superpower) +
+  geom_point(aes(x = height_cm, y = reaction_time, colour = superpower))
+```
+
+```{r}
+pets <- read_csv("pets.csv")
+```
+```{r}
+ggplot(pets, aes(x = age, y = weight)) +
+  geom_point(aes(colour = sex, shape = animal), size = 4) +
+  geom_text(
+    aes(label = name),
+                nudge_x = 0.5,
+                nudge_y = 0.1)
+
+```
+
+Saving reports
+```{r}
+last_plot()
+#will repeat the last plot you made
+
+ggsave()
+# takes advantage of this function
+
+# plots can also be assigned to variables
+
+
+
+```
+

@@ -60,7 +60,11 @@ Updated 11/11/2021
 
 6.1 - Matricies and lists
 
-10.1 - Notes from weekend homework
+10.1 - SQL - Main operators
+
+10.2 - Joins in SQL
+
+20.1 - Notes from weekend homework
 
 ## 0.1 Libraries
 
@@ -1561,9 +1565,39 @@ m[,3]
 m[, c(1,3)]
 ```
 
-## 10.1 Code chunks from homework
+## 10.1 SQL - Main commands
 
-## 10.2 Weekend homework 1
+CRUD operators
+
+`SELECT`
+
+`FROM`
+
+`WHERE`
+
+`GROUP BY`
+
+`AS`
+
+`CAST`
+
+
+
+## 10.2 - Joins in SQL
+
+INNER JOIN
+
+LEFT JOIN
+
+RIGHT JOIN
+
+OUTER JOIN
+
+
+
+## 20.1 Code chunks from homework
+
+## 20.2 Weekend homework 1
 ###To be edited ALOT
 
 ```{r}

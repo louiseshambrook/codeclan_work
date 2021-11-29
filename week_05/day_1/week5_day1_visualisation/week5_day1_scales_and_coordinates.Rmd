@@ -1,0 +1,144 @@
+---
+title: "R Notebook"
+output: html_notebook
+editor_options: 
+  chunk_output_type: console
+---
+Scales and coordinates
+Scales
+Labels
+
+
+by adding scale_x_continuous / scale_y, the plot is getting closer together
+```{r}
+ggplot(data = pets, mapping = aes (x = age, y = weight, colour = sex)) +
+  geom_point() +
+  scale_x_continuous(breaks = 1:13) +
+  scale_y_continuous(breaks = c(5, 7, 9, 11))
+
+```
+
+```{r}
+ggplot(data = pets, mapping = aes (x = age, y = weight, colour = sex)) +
+  geom_point() +
+  scale_x_continuous(breaks = 1:13, limits = c(1, 8)
+                     )
+```
+The problem with limits is that if the dataset/line continues, and the limit is
+then set at e.g. 10, the line will then chop off at 10, even though there is 
+data beyond that (leaving a clear line, with data points on the x axis)
+Coord_cartesian is a better way to zoom in on your dataset
+
+```{r}
+# d %>% 
+#   ggplot(aes(x, y)) +
+#   geom_path() +
+#   coord_cartesian(xlim = c(1, 8))
+```
+
+TASK - eliminate pets who weigh more than 8kg from the plot
+```{r}
+ggplot(data = pets, mapping = aes(age, weight, colour = sex)) +
+  geom_point() +
+  scale_y_continuous(limits = c(1, 8))
+```
+
+```{r}
+seq()
+# creates a sequence of numbers
+# e.g. # seq(12) will give 1 2 3 4 5 6 7 8 9 10 11 12
+```
+
+```{r}
+ggplot(pets) +
+  aes(age, weight, colour = sex) +
+  geom_point() +
+  scale_x_continuous(breaks = 1:13) # adjust breaks here
+```
+
+```{r}
+ggplot(pets) +
+  aes(age, weight, colour = sex) +
+  geom_point() +
+  scale_x_continuous(breaks = 1:13) + 
+  scale_y_continuous(breaks = c(5, 7, 9, 11))
+```
+
+Flipping a plot
+
+```{r}
+ggplot(pets, mapping = aes(x = animal, fill= sex)) +
+  geom_bar()
+```
+there are two ways to flip this plot
+either swap which object is x and which is y
+
+OR coord_flip() func
+
+```{r}
+ggplot(pets, mapping = aes(x = animal, fill= sex)) +
+  geom_bar() +
+  coord_flip()
+```
+
+Factors
+```{r}
+# factors are strings which have levels, but these are assigned levels, and these
+# levels are assigned an alphabetical order
+# factor levels are not intrinsically ordered (according to R)but they CAN
+# be ordered, if assigned an ordered, if the argument for T is set
+# you DON'T want factors to be ordered
+# factors CAN be converted to numeric
+
+```
+
+Formatting of labels
+
+```{r}
+monthly_sales <- read_csv("monthly_sales.csv")
+monthly_sales %>%
+  mutate(month = factor(month, levels = c("Jan", "Feb", "March", "April"))) %>%
+  ggplot(monthly_sales) +
+  aes(x = branch, y = sales, fill = month) +
+  geom_col(position = "dodge") +
+  coord_flip()
+```
+
+```{r}
+monthly_sales %>%
+  mutate(month = factor(month, levels = c("Jan", "Feb", "March", "April")),
+         sales_thousands = sales / 1000) %>%
+  ggplot(aes(x = branch, y = sales_thousands, fill = month)) +
+  geom_col(position = "dodge") +
+  coord_flip() +
+  labs(y = "sales (1000 units)")
+  
+```
+
+```{r}
+monthly_sales %>%
+  mutate(month = factor(month, levels = c("Jan", "Feb", "March", "April")),
+         sales_thousands = sales / 1000) %>%
+  ggplot(aes(x = branch, y = sales_thousands, fill = month)) +
+  geom_col(position = "dodge") +
+  scale_y_continuous(labels = scales::comma)+
+  labs(y = "sales (1000 units)") +
+  coord_flip()
+```
+
+log scales
+
+```{r}
+monthly_sales %>%
+  mutate(month = factor(month, levels = c("Jan", "Feb", "March", "April")),
+         sales_thousands = sales / 1000) %>%
+  ggplot(aes(x = branch, y = sales_thousands, fill = month)) +
+  geom_col(position = "dodge") +
+  scale_y_log10() +
+  coord_flip()
+```
+
+```{r}
+
+```
+

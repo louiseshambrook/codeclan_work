@@ -1,0 +1,142 @@
+---
+title: "R Notebook"
+output: html_notebook
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+```
+
+
+Colours and themes
+
+Colours in R
+
+3 types of colour scheme are generally used
+sequential (logical order)
+diverging(going in different order)
+categorical
+
+(all pretty self-explanatory)
+
+R has its own inbuilt palette - palette()
+
+ggplot has it own though
+
+you can also use RGB encoding
+```{r}
+ggplot(pets, mapping = aes(weight, age)) +
+  geom_point(colour = "#33ceff")
+```
+
+```{r}
+ggplot(pets, aes(x = age, y = weight, colour = sleep)) +
+  geom_point()+
+  scale_colour_gradient(low = "grey5", high = "grey50")
+
+ggplot(pets, aes(x = age, y = weight, colour = sleep)) +
+  geom_point()+
+  scale_colour_gradient(low = "red", high = "blue")
+
+```
+
+```{r}
+ggplot(pets, aes(x = age, y = weight, colour = sleep)) +
+  geom_point()+
+  scale_colour_gradient(low = "light blue", high = "purple")
+```
+
+Can have a divergent scale
+```{r}
+ggplot(pets, aes(x = age, y = weight, colour = sleep)) +
+  geom_point()+
+  scale_colour_gradient2(midpoint = 10, low = "red", high = "purple")
+```
+
+
+```{r}
+students_superpower %>%
+  mutate(school_year = factor(school_year,
+                              levels = c("Year 7",
+                                         "Year 8",
+                                         "Year 9",
+                                         "Year 10",
+                                         "Year 11",
+                                         "Year 12"))) %>%
+  ggplot(mapping = aes(x = school_year, fill = superpower)) +
+  geom_bar() +
+  scale_fill_manual(
+    values = c("Fly" = "red",
+                "Freeze time" = "blue",
+                "Invisibility" = "white",
+                "Telepathy" = "green")
+                    )
+```
+
+improving colour choices with colour brewer
+
+```{r}
+ggplot(pets, aes(weight, age, colour = sleep)) +
+  geom_point() +
+  scale_colour_distiller(palette = "PiYG")
+```
+
+```{r}
+ggplot(students_superpower, aes(x = school_year, fill = superpower)) +
+  geom_bar() +
+  scale_fill_brewer(palette = "PiYG")
+```
+
+Task - change the palette of students to a colour friendly one
+```{r}
+ggplot(students_superpower, aes(x = school_year, fill = superpower)) +
+  geom_bar() +
+  scale_fill_brewer(palette = "PuRd")
+```
+
+To set / develop / apply themes, you can use / install ggthemes
+```{r}
+# looks like a really old journal article!
+
+ggplot(students_superpower, aes(x = school_year, fill = superpower)) +
+  geom_bar() +
+  theme_void() +
+  facet_wrap(~superpower)
+```
+
+Themes available (just a short list)
+```{r}
+theme_minimal()
+theme_bw()
+theme_classic()
+theme_light()
+theme_void()
+```
+
+Theme elements
+```{r}
+# the grid
+# the title
+# labelling of axis
+
+#by using theme() you can modify specific elements of the plot
+# e.g.
+# theme(axis.title = )
+```
+
+Task with custom theme
+```{r}
+scottish_exports <- read_csv("scottish_exports.csv")
+
+ggplot(scottish_exports) +
+  geom_line(aes(x = year, y = exports, colour = sector)) +
+  facet_wrap(~sector, scales = 'free_y')
+```
+
+```{r}
+my_theme <- 
+```
+

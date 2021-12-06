@@ -1,0 +1,66 @@
+---
+title: "Shiny Basics & Advanced UI Practice"
+output:
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_float: yes
+    css: ../../styles.css
+  pdf_document:
+    number_sections: no
+    toc: no
+---
+
+We want to create a new Shiny app which lets you compare the medal count between our top 5 countries. You'll need to start a new project that contains the olympics data used today. 
+
+## Create the layout
+
+Create a sidebar layout, with the title 'Five Country Medal Comparison'.
+
+## Add inputs
+
+Create two sets of radio buttons, one with ID "season" the other with ID "medal", that let you pick between the two seasons (Winter or Summer) and the three medal types (Gold, Silver or Bronze) respectively.
+
+## Add outputs
+
+Add the following plot to the output, but with inputs that depend on the two radio buttons. (Hint: you want to change the code where it says `<INPUT>`)
+
+\hfill 
+
+```{r, eval = FALSE}
+olympics_overall_medals %>%
+  filter(team %in% c("United States",
+                  "Soviet Union",
+                  "Germany",
+                  "Italy",
+                  "Great Britain")) %>%
+  filter(medal == <INPUT>) %>%
+  filter(season == <INPUT>) %>%
+ggplot() +
+  aes(x = team, y = count) +
+  geom_col()
+```
+
+\hfill
+
+## Adding colour
+
+This one may be a bit more tricky! Make the colour of the bars depend on the type of medal that's being compared.
+
+**Hint:** You can use the ggplot function `scale_fill_manual()` inside `renderPlot`.
+
+## Advanced UI
+
+Use some of the tools learnt in the 'Advanced UI' lesson to make some changes, for example:
+
+* Using HTML to change some of the font
+* Use a different layout (such as grid)
+* Adding more than 1 tab
+* Changing the theme (from `shinythemes` or your own CSS stylesheet)
+
+
+## Make an app of your choice
+
+We have uploaded a lot of data to the data folder within the server. Have a go at reading some data in, and making a simple app from it that picks out a key insight. It can be any layout you prefer, and can be as detailed design wise as you want. The main point is to find something interesting. 
+
+

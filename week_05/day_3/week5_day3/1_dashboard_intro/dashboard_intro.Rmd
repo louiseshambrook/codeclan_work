@@ -1,0 +1,345 @@
+---
+title: "Introduction to dashboards"
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    css: ../../styles.css
+    toc: yes
+    toc_float: yes
+---
+  
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.align = 'center')
+```
+
+\newpage
+
+# Learning Objectives
+
+* Know what constitutes a dashboard
+* Understand good dashboard design
+
+Although this course will focus mainly on the practical aspects of using R Shiny to build dashboards, it is important that we first cover some basics. This lesson will be a brief introduction to dashboards: what they are, how they're used and what constitutes a good versus a bad dashboard. 
+
+\hfill
+
+# What is a dashboard?
+
+> A dashboard is a **visual display** of the **most important information** needed to **achieve one or more objectives** that has been consolidated on a **single computer screen** so it can be **monitored at a glance**.
+- Stephen Few
+
+\hfill
+
+There are many differing views about what a dashboard is, but probably the best definition is given above. Let's break this up a bit more:
+
+* **Visual display:** The information is a combination of text and graphics, with a focus on graphics so that the human brain can process it quickly.
+
+* **Most important information:** Diverse sources of information are brought together. These are not necessarily KPIs, but it doesn't contain everything that is available.
+
+* **Achieve specific objectives:** Each dashboard is designed for a specific purpose
+
+* **Single computer screen:** Our brains struggle to retain information, or carry out comparisons if they need to shift between screens or scroll. Dashboards should always ensure that all required information is available within a single eye span.
+
+* **Monitor at a glance:** Just like in a car where the dashboard got its name from, the viewer should be able to spot if something is amiss at a glance. If effort is required to understand what the dashboard is saying then its not a dashboard.
+
+
+Let's have a quick look at some examples that you can find on [the rstudio shiny web gallery](https://shiny.rstudio.com/gallery/)
+
+\hfill
+
+```{r, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("images/dashboard.png")
+```
+[New Zealand trade dashboard](https://gallery.shinyapps.io/nz-trade-dash/?_ga=2.84186512.883318883.1604348421-1014937653.1604348421)
+
+\hfill
+
+
+```{r, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("images/dashboard2.png")
+```
+
+[rstudio conference tweet dashboard](https://gadenbuie.shinyapps.io/tweet-conf-dash/?_ga=2.113113485.883318883.1604348421-1014937653.1604348421)
+
+<br>
+
+
+\hfill\break
+
+# What makes a good dashboard? 
+
+The most effective and impactful dashboards are designed to be simple and clean, so that the eye can pick up the key points without dealing with lots of lines, borders, grid lines or distracting graphics.
+
+Here are some design tips for dashboards:
+
+1. Emphasise the important stuff. Highlight/emphasise the parts of the dashboard/graphs hold data information, such as points, bars or lines. Look to de-emphasise bits of the graph, such as the title, axis labels, graphics, legends and grid backgrounds, which don't hold data information. Also look to remove any unnecessary non-data parts which can detract from the important bits!
+
+2. Take care with colour. Treat colours as an encoding. Use neutral backgrounds.
+
+3. De-lineate with white space rather than borders.
+
+4. Avoid clutter with control buttons, instructions and non-changing text. Use a separate screen for instructions that will only be referred to very rarely.
+
+5. Put the most important information in the top left-corner.
+
+6. Don't highlight everything, or nothing will stand out.
+
+7. Make sure to include context with metrics.
+
+
+
+\hfill\break
+
+# Dashboard widgets
+
+Dashboards are a collection of widgets that give you an overview of the reports and metrics you care about most. Widgets are the core components that make up a dashboard. There is an enormous choice of graphical widgets that could be used to display information, but not all of them work well in a dashboard context, when you are trying to get across the information clearly and quickly.
+
+<br>
+
+\hfill\break
+
+## Recommended dashboard widgets
+
+Some display types work really well on dashboards:
+
+* Bar graphs and dot plots
+* Line graphs
+* Box plots
+* Scatter plots
+* Spatial plots/maps
+
+Some others that are also options:
+
+\hfill
+
+### Sparklines
+
+Sparklines are useful to show time series data where the shape of the graph trend is more important than the scale. It is good practice to use a larger final dot with the actual value, as shown here so a feeling for scale can be given. These are very space-efficient and can used for a number of metrics.
+
+Use `geom_line()` with facets and a minimal theme
+
+\hfill 
+
+```{r, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("images/Sparkline_chart_example.png")
+```
+
+
+
+### Bullet graphs
+
+A bullet graph is a single bar, with inbuilt targets and thresholds. It is very space efficient and multiples can be used on dashboards to cover many different metrics.
+
+Use `geom_bar()` or borrow the `bulletgraph()` function from [bulletgraph](https://github.com/mtorchiano/MTkR/wiki/Bullet-Graph) or the `bulletGraph()` function from [bulletGraph](https://github.com/sipemu/d3Dashboard)
+
+
+\hfill 
+
+```{r, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("images/bullet-1.png")
+```
+
+
+
+### Data tables
+
+
+Don't forget that sometimes the raw data is often useful. This can be augmented with colours, directional trends and differential formatting to support highlighting.
+
+The `formattable` or `kableExtra` packages can make your tables look really nice.
+
+
+\hfill 
+
+```{r, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("images/Table_example.png")
+```
+
+
+
+
+### Text Values 
+
+Sometimes single raw values are necessary. If these are KPIs then they should be augmented with some context.
+
+
+\hfill 
+
+```{r, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("images/Value_Pair_example.png")
+```
+
+
+
+### Heat maps
+
+Heat maps can be used in conjunction with spatial plots, or independently. Colour intensity is often useful to represent the information where precision is not too important.
+
+Use `geom_tile()`
+
+
+\hfill 
+
+```{r, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("images/heat-map-sample.png")
+```
+
+
+
+### Tree maps
+
+Tree maps encode information as relative sizes. A bar chart could also be used, but sometimes a tree map is more space efficient.
+
+
+\hfill 
+
+```{r, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("images/tree_map_example.jpg")
+```
+
+
+
+
+## Discouraged dashboard widgets
+
+Some display types work very badly and should be avoided. They can almost always be replaced by one of the better display types.
+
+* Pie charts and donuts
+* Stacked area graphs
+* Anything 3-D
+
+Some others that are used:
+
+### Gauges
+
+Gauges hark back to the dashboard analogy, but often raw metrics with context are easier to read and more space-efficient. Angles are difficult for our brains to process, which is why in modern cars, we are starting to see raw figures on dashboards, rather than the circular dials.
+
+
+\hfill 
+
+```{r, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("images/Gauge_component_example.png")
+```
+
+
+
+
+### Traffic lights
+
+
+Traffic lights are difficult for users to work out how near or far from the thresholds they are, as these are normally not disclosed.
+
+
+\hfill 
+
+```{r, echo=FALSE, out.width = '40%'}
+knitr::include_graphics("images/traffic_light_example.png")
+```
+
+
+
+### Funnels
+
+People like funnels as they like to see what drops out as a % of the whole. However, a horizontal bar would be cleaner and much easier to read.
+
+
+\hfill 
+
+```{r, echo=FALSE, out.width = '70%'}
+knitr::include_graphics("images/Funnel_example.png")
+```
+
+
+
+### Radar graphs
+
+
+Radar graphs imply a relationship between different axes that doesn't really exist. A bar graph would be much easier to read.
+
+Use the `ggradar` package if you must.
+
+
+\hfill 
+
+```{r, echo=FALSE, out.width = '40%'}
+knitr::include_graphics("images/radar_graph_example.png")
+```
+
+
+
+\hfill
+
+# Reviewing dashboards
+
+Now we have an idea about what works and what doesn't. Let's have a look at a few good and bad examples.
+
+## Good dashboards
+
+Here are a few example of some okay but definitely not perfect dashboards. Let's take a look at them and comment on what we can see.
+
+
+\hfill 
+
+```{r, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("images/Web-Analytics-Dashboard-datapine.png")
+```
+
+
+This dashboard uses colour well, with a nice layout and the patterns are clean and easy to see. However, there are no targets attached to each KPI so it can't deliver any action. The pie chart could be replaced with a different graphics choice. We also don't have named pages for the Top Pages, so a casual user would find this difficult to understand what is working and what isn't at a glance. 
+
+
+\hfill 
+
+```{r, echo=FALSE, out.width = '100%'}
+knitr::include_graphics("images/social-media-dashboard-example-klipfolio.jpg")
+```
+
+
+This dashboard uses a dark background, which is popular for screen displays. The metrics all have both a context and a direction and the colour choices are restrained. The graphics choices are pretty good, bullet graphs and sparklines used to show the LinkedIn metrics. However, there is the ability to choose the timespan being covered being makes this a little harder to understand meant by the "prev" period?
+
+
+\hfill 
+
+```{r, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("images/good-dashboard-examples-2.jpg")
+```
+
+
+This is in the "good" dashboard section, but you can decide whether you think it should be here. It claims to be a good example of a dashboard with drill-down functionality. It uses filters to drill down into the data, by either time period or location. However, its unclear how the filters are then reset. The metrics themselves don't have context as targets and have not been set for all combinations of period and location. The portrait aspect ratio may not work on most computer screens and scrolling may be required to see all the details. However, the colour choices limited and the information displayed is clear.
+
+\hfill\break
+
+## Bad dashboards
+
+Below are some examples not so great dashboards:
+
+
+\hfill 
+
+```{r, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("images/maxresdefault.jpg")
+```
+
+
+This example at first glance isn't too bad. It has a clear layout, it's on a single screen, but its impossible to read any of the information as the text is too small. The graphics choices alongside the colour choices could easily be improved, perhaps freeing up some real-estate to include additional information.
+
+
+\hfill 
+
+```{r, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("images/bad-dashboard-examples-2.jpg")
+```
+
+
+This dashboard only contains two separate visualisations. The use of colour implies that they are related, but on closer inspection the top and bottom colours don't relate to the same things. On the top graph, the graphics choice could be changed. On the bottom graph it is impossible to extract any insight. Its not obvious what it is trying to show. By splitting this information up, it might be easier to identify any problems, although metrics and targets would need to be added to understand whether the student numbers are good or bad. Interestingly the dashboard name has "metrics" in it, without the use of a single actual metric.
+
+
+\hfill\break
+
+# More resources
+
+* An archive of the work of Stephen Few: https://www.perceptualedge.com
+* Infogram - dashboard examples: https://infogram.com/examples/dashboards
+* Klipfolio online learning: https://www.klipfolio.com/marketing-dashboard-course-sign-up
+* Storytelling with Data: http://www.storytellingwithdata.com 

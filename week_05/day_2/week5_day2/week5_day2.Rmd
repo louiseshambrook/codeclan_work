@@ -1,0 +1,101 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+```{r}
+library(tidyverse)
+
+total_sales <- read_csv("total_sales.csv")
+got_ratings <- read_csv("got_ratings.csv")
+table_of_numbers <- read_csv("table_of_numbers.csv")
+monthly_sales <- read_csv("monthly_sales.csv")
+```
+
+Day 2
+Making effective plots
+
+Cleveland Mcgill scale
+
+Remaking the plot from the notes, but in a bar plot
+```{r}
+ggplot(total_sales) +
+  aes(x = branch, y = sales) +
+  geom_col() +
+  coord_flip()
+```
+
+changing the order of the bars with reorder()
+```{r}
+ggplot(total_sales) +
+  aes(x = reorder(branch, sales), y = sales) +
+  geom_col() +
+  coord_flip()
+```
+
+Preattentive attributes
+- Size
+- Colour
+- Orientation
+- Added marks (underlining)
+- Enclosure
+
+```{r}
+ggplot(total_sales) +
+  aes(x = reorder(branch, sales), y = sales, fill = branch == "Edinburgh") +
+  geom_col() +
+  scale_fill_manual(values = c("grey60", "light blue"), guide = "none") +
+  coord_flip() 
+
+```
+
+Annotating graphs
+```{r}
+total_sales_annotated <- total_sales %>%
+  mutate(label_text = ifelse(branch == "Edinburgh", "Edinburgh branch has 620k sales", NA))
+
+ggplot(total_sales_annotated) +
+  aes(x = reorder(branch, sales), y = sales, fill = branch == "Edinburgh") +
+  geom_col() +
+  scale_fill_manual(values = c("grey60", "light blue"), guide = "none") +
+  coord_flip() +
+  geom_text(aes(label = label_text), color = "darkblue", size = 4, hjust = -0.1)
+
+```
+
+TASK
+Rewrite the graph above in a more compelling manner. Consider how you could emphasise which branches have been most successful in the month of April compared to January.
+```{r}
+
+monthly_sales %>%
+  mutate(month = factor(month, levels = c("Jan", "Feb", "March", "April"))) %>%
+head(monthly_sales)
+
+monthly_annotated <- monthly_sales %>%
+  mutate(label = ifelse(branch == "Leeds", "Leeds improved", NA),
+         label2 = ifelse(branch == "Glasgow", "Glasgows improved", NA),
+         label3 = ifelse(branch == "Manchester", "Edinburgh improved", NA))
+
+ggplot(monthly_sales) +
+      aes(x = reorder(branch, sales), y = sales, fill = month) +
+      geom_col(position = "dodge") +
+      coord_flip() +
+      scale_fill_manual(values = c("lightgrey", "skyblue", "lightgrey", "blue"), guide = "none") +
+      geom_text(aes(label1 = label), color = "darkblue", size = 4, hjust = -0.1) +
+      geom_text(aes(label2 = label), color = "darkblue", size = 4, hjust = -0.1) +
+      geom_text(aes(label3 = label), color = "darkblue", size = 4, hjust = -0.1)
+
+```
+
+TASK
+```{r}
+ggplot(monthly_sales) +
+  aes(x = month, y = sales, group = branch, colour = branch) +
+  geom_line() 
+```
+Questions to think about
+Which graph is superior for comparing sales growth between branches?  
+Which graph is superior for comparing sales in April between branches?
+A colleague proposes using the grouped bar chart but changing the order of branches between months so they are ordered by sales numbers in that month. Comment on this suggestion.
+A senior manager suspects the proportion of sales arising from Northern offices (Edinburgh, Glasgow, Leeds, Manchester) are growing relative to southern offices. Produce a visualisation that speaks to this.
+
+

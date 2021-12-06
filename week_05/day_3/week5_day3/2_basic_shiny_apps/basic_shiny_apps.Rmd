@@ -1,0 +1,751 @@
+---
+title: "Basic Shiny Apps"
+output:
+  pdf_document:
+    number_sections: no
+    toc: yes
+  html_document:
+    df_print: paged
+    toc: yes
+    toc_float: yes
+    css: ../../styles.css
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, fig.align = "center", message = FALSE, warning = FALSE)
+```
+
+\newpage
+
+# Learning Objectives<br>
+
+* Know how to create a basic Shiny app
+* Understand how to use inputs and outputs to create interactively  
+
+<br> 
+
+# What are Shiny apps?
+
+Shiny is a way of developing **interactive web applications**, through writing R code. Generally Shiny apps are used for interactive exploration of data. Shiny apps can be very basic: for example, just one plot with some interactive element. They can also be very complicated: for example, a large dashboard that lets you visualise complicated data in many ways. In this lesson you will learn how to build a basic Shiny app by adding its components step-by-step.
+
+
+# Example Shiny apps
+
+On https://shiny.rstudio.com/gallery/ you can see some Shiny apps from the RShiny community, for example the [interactive COVID-19 tracker](https://vac-lshtm.shinyapps.io/ncov_tracker/) seen below:
+
+\hfill 
+
+```{r, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("images/covid_tracker.png")
+```
+
+
+# Basic Shiny App
+
+To make a Shiny app, start by opening RStudio. Then go File > New Project > In a new directory > Shiny Web App.
+
+Now we have a Project which is set up for creating apps. There should be an example app loaded.
+
+Press 'Run App' in the top right of the code panel. This runs the code in front of you and shows you the working app.
+
+You have several options for how to view the app. These can be chosen from the drop down button next to 'Run App'. They are:
+
+- Window: In another RStudio window
+- Viewer Panel: In the bottom left panel of RStudio
+- External: In a web browser
+
+For the basic apps we'll be working on at first, you probably want to view the app in the **viewer panel**. This means you don't have to leave RStudio. However, later when you make more complicated apps you'll probably want to run them in a window or in a browser.
+
+
+**Task - 5 mins** 
+
+Look at the code for the default app. Use the existing comments to think about which parts produce what output. What do you notice about how the code is structured?
+
+\hfill 
+
+```{r, echo=FALSE, out.width = '80%'}
+knitr::include_graphics("images/default_app.png")
+```
+\hfill 
+
+Press the **red stop button** on the top right of the console to stop the app from running and get your normal R console back.
+
+This app is pretty basic, but we want to go even simpler!
+
+Delete all the code in the `app.R` file and replace it with this:
+
+\hfill 
+
+```{r, eval = FALSE}
+library(shiny)
+
+ui <- fluidPage()
+
+server <- function(input, output) {
+}
+
+shinyApp(ui = ui, server = server)
+```
+
+\hfill 
+
+This is the **most basic structure** of a Shiny app, which results in an empty app.
+
+Firstly, we load the Shiny R package. On the next line, we define the **UI** (user interface) which determines the layout and appearance of your Shiny app. Next, we define the **server**, which defines the logic of your Shiny app. The final part is the **shinyApp()** function, where the UI and server are passed as arguments. These basic components are usually saved in an R script named `app.R` (which is what automatically happens if you create a Shiny Web App in the File tab).
+
+Above, the UI object is defined using `fluidPage`. Other functions to create a UI are available, but we'll be using `fluidPage` for now. The server object is just a function with two parameters: input and output.
+
+
+# The UI
+
+We're going to build our Shiny App piece by piece, starting with the UI. We're going to use `titlePanel` and `sidebarLayout` to create an app that has a title, a sidebar and a main section.
+
+\hfill
+
+```{r, eval = FALSE}
+ui <- fluidPage(
+
+  titlePanel("Title"),
+
+  sidebarLayout(
+    sidebarPanel(
+      "Sidebar"
+    ),
+
+    mainPanel(
+      "Main section"
+    )
+  )
+)
+
+server <- function(input, output) {
+
+}
+
+shinyApp(ui = ui, server = server)
+```
+
+
+\hfill 
+
+```{r, echo=FALSE, out.width = '100%'}
+knitr::include_graphics("images/basic_ui_1.png")
+```
+
+
+Compare what this app looks like in the viewer pane, compared to running it externally. Since there isn't enough space in the viewer pane, the sidebar layout has been compressed. You can also expand the viewer pane to see the full layout.
+
+
+You can add more UI elements inside both the sidebarpanel and the mainPanel **separated by commas**.
+
+\hfill
+
+```{r, eval = FALSE}
+ui <- fluidPage(
+
+  titlePanel("Title"),
+
+  sidebarLayout(
+    sidebarPanel(
+      "Sidebar",
+      "Some other text in the sidebar"
+    ),
+
+    mainPanel(
+      "Main section",
+      "Some other text in the main section"
+    )
+  )
+)
+
+server <- function(input, output) {
+
+}
+
+shinyApp(ui = ui, server = server)
+```
+
+
+\hfill 
+
+```{r, echo=FALSE, out.width = '100%'}
+knitr::include_graphics("images/basic_ui_2.png")
+```
+
+
+To add a new line break between UI elements, place a `br()` function between elements (also separated by commas).
+
+\hfill 
+
+```{r, eval = FALSE}
+ui <- fluidPage(
+
+  titlePanel("Title"),
+
+  sidebarLayout(
+    sidebarPanel(
+      "Sidebar",
+      br(),
+      "Some other text in the sidebar"
+    ),
+
+    mainPanel(
+      "Main section",
+      br(),
+      br(),
+      br(),
+      "Some other text in the main section"
+    )
+  )
+)
+
+server <- function(input, output) {
+
+}
+
+shinyApp(ui = ui, server = server)
+```
+
+
+\hfill 
+
+```{r, echo=FALSE, out.width = '100%'}
+knitr::include_graphics("images/basic_ui_3.png")
+```
+
+
+This morning we'll be using the above layout for our apps. However, be aware that there are a lot of other layouts available, which can be seen in the Shiny documentation - we will go through some of these this afternoon. https://shiny.rstudio.com/articles/layout-guide.html
+
+\hfill\break
+
+
+## Widgets
+
+Now we're going to add a widget to our app. Widgets are the basis of the interactivity in our apps; you use the widgets to set values which can affect what can be seen in the dashboard.
+
+
+### Basic structure of a widget
+
+This is the basic structure of widget:
+
+```{r, eval = FALSE}
+
+widgetInput(inputId = "id", 
+            label = "widget label", 
+            choices = c("choice A", "choice B", "choice C"))
+
+```
+
+Each argument does the following: 
+
+
+| Argument | Description                                                                                             |
+|----------|---------------------------------------------------------------------------------------------------------|
+| inputId  | Here you give an ID label for your widget. This is how you will refer to widget inside the server code. |
+| label    | The text that is displayed in the UI next to or above the widget.                                                |
+| choices  | For widgets that let you choose between several values, you list the values here.                       |
+
+
+Let's put a radio button into the sidebar. We'll replace everything currently in our sidebarPanel and in our mainPanel. Be careful when highlighting parts to delete as it's a perfect opportunity for commas and brackets to suddenly go missing.
+
+\hfill 
+
+```{r, eval = FALSE}
+ui <- fluidPage(
+  titlePanel("Title"),
+
+  sidebarLayout(
+    sidebarPanel(
+      radioButtons("season_input", #inputId
+        "Summer or Winter Olympics?", #label
+        choices = c("Summer", "Winter")
+      )
+    ),
+
+    mainPanel(
+    )
+  )
+)
+
+server <- function(input, output) {
+}
+
+shinyApp(ui = ui, server = server)
+```
+
+
+
+\hfill 
+
+```{r, echo=FALSE, out.width = '100%'}
+knitr::include_graphics("images/widgets_1.png")
+```
+
+
+
+As the current radio buttons we added are not connected to anything in the server logic, selecting either 'Summer' or 'Winter' will not actually change anything. We have just changed the UI, i.e. what our app looks like.
+
+There's **lots of different widgets** that you can add to your shiny app. The table below shows them:
+
+### Widget types
+
+| Button             | Description                                                           |
+|--------------------|-----------------------------------------------------------------------|
+| actionButton       | Action Button, can be used with reactivity, which we will cover later |
+| checkboxGroupInput | A group of check boxes                                                |
+| checkboxInput      | A single check box                                                    |
+| dateInput          | A calendar to aid date selection                                      |
+| dateRangeInput     | A pair of calendars for selecting a date range                        |
+| fileInput          | A file upload control wizard                                          |
+| helpText           | Help text that can be added to an input form                          |
+| numericInput       | A field to enter numbers                                              |
+| radioButtons       | A set of radio buttons                                                |
+| selectInput        | A box with choices to select from                                     |
+| sliderInput        | A slider bar                                                          |
+| submitButton       | A submit button, similar to an action button                          |
+| textInput          | A field to enter text                                                 |
+
+You can see what these widgets look like here: https://shiny.rstudio.com/gallery/widget-gallery.html
+
+Each widget has its own help file, if you aren't sure how to use them. However, they all follow the same pattern for the first few arguments:
+
+\hfill 
+
+**Task - 10 mins**
+
+Add a `selectInput` widget to the UI that allows you to choose between the teams "United States", "Soviet Union", "Germany", "Italy", and "Great Britain".
+
+\hfill 
+**Answer**
+
+```{r, eval = FALSE}
+library(shiny)
+
+ui <- fluidPage(
+  titlePanel("Title"),
+
+  sidebarLayout(
+    sidebarPanel(
+
+      radioButtons("season_input",
+        "Summer or Winter Olympics?",
+        choices = c("Summer", "Winter")
+      ),
+
+      selectInput("team_input",
+        "Which Team?",
+        choices = c("United States",
+                    "Soviet Union",
+                    "Germany",
+                    "Italy",
+                    "Great Britain")
+      )
+    ),
+
+    mainPanel(
+      
+    )
+  )
+)
+
+
+server <- function(input, output) {
+}
+
+shinyApp(ui = ui, server = server)
+```
+
+
+\hfill 
+
+```{r, echo=FALSE, out.width = '100%'}
+knitr::include_graphics("images/widgets_2.png")
+```
+
+\hfill\break
+
+# The server
+
+The UI defines how our app looks: the layout, all the static text, where our widgets are, where all our plots and other outputs are.
+
+The server is everything that happens 'behind the scenes'. It defines how we generate all the plots and tables seen by the user. It also defines how the inputs from our widgets affect these plots and tables.
+
+\hfill
+
+## Creating outputs
+
+You saw earlier that the server is a function with two parameters: input and output.
+
+For just now we'll only discuss the output. The output comes from the code in the server. In the server you define elements of a list called `output`. Each element of this list is of class `shiny.render.function`, and these special objects are made using the render functions. 
+
+For example, to make a plot output you use `renderPlot`. To create text you use `renderText`. And to create a table you use `renderTable`.
+
+Below is a table of the different `shiny.render.functions`:
+
+| render function | output                                          |
+|-----------------|-------------------------------------------------|
+| renderTable     | data frame, matrix, other table like structures |
+| renderText      | character strings                               |
+| renderPlot      | plots                                           |
+| renderImage     | images                                          |
+| renderUI        | a Shiny tag object or html                      |
+| renderDataTable | DataTable                                       |
+| renderPrint     | any printed output                              |
+
+
+
+Now, let's use the dataset `olympics_overall_medals` available in our data folder to add data into our app, and give our buttons something to do. Let's make a simple plot showing the medals won by Britain in the summer Olympics. 
+
+We start by doing this outside the Shiny framework and then move it into the server. This is usually the way you would add plots to your Shiny app - you first make sure the plot is working outside of the app and looks the way you want, and only after that you try to incorporate it into your app.
+
+\hfill
+
+```{r, eval = FALSE}
+library(tidyverse)
+library(shiny)
+
+
+olympics_overall_medals <- read_csv("../../data/olympics_overall_medals.csv")
+
+olympics_overall_medals %>%
+  filter(team == "Great Britain") %>%
+  filter(season == "Summer") %>%
+ggplot() +
+  aes(x = medal, y = count, fill = medal) +
+  geom_col()
+```
+
+\hfill
+
+Cool. So we have a plot that works. If we wanted to include this plot in our shiny app, then we'd need to
+
+1. Wrap the code in `renderPlot`
+2. Assign the value to an output slot
+3. Put this all inside the server function   
+
+\hfill
+
+```{r, eval = FALSE}
+# This is inside the server
+
+output$medal_plot <- renderPlot({
+
+  olympics_overall_medals %>%
+    filter(team == "Great Britain") %>%
+    filter(season == "Summer") %>%
+    ggplot() +
+    aes(x = medal, y = count, fill = medal) +
+    geom_col()
+
+})
+```
+
+\hfill 
+
+And we also need to change the UI. We will specify where in the app this plot is going to go by adding a `plotOutput` object into the UI.
+
+\hfill
+
+```{r, eval = FALSE}
+# This is in the UI mainPanel()
+
+plotOutput("medal_plot")
+
+```
+
+\hfill 
+
+The name given in `plotOutput` has to match the output slot we selected in the server.
+
+Each render function has an associated output function, for example:
+
+| Render function | Output function |
+|-----------------|-----------------|
+| renderPlot      | plotOutput      |
+| renderText      | textOutput      |
+| renderTable     | tableOutput     |
+
+
+Putting this all together, and creating a new title gives us this app:
+
+\hfill
+
+```{r, eval = FALSE}
+library(tidyverse)
+library(shiny)
+
+
+olympics_overall_medals <- read_csv("../../data/olympics_overall_medals.csv")
+
+ui <- fluidPage(
+  titlePanel("British Olympic Medals"),
+
+    sidebarLayout(
+      sidebarPanel(
+
+        radioButtons("season_input",
+          "Summer or Winter Olympics?",
+          choices = c("Summer", "Winter")
+        ),
+
+        selectInput("team_input",
+          "Which Team?",
+          choices = c("United States",
+                      "Soviet Union",
+                      "Germany",
+                      "Italy",
+                      "Great Britain")
+        )
+    ),
+
+    mainPanel(
+      plotOutput("medal_plot")
+    )
+  )
+)
+
+server <- function(input, output) {
+  output$medal_plot <- renderPlot({
+
+    olympics_overall_medals %>%
+      filter(team == "Great Britain") %>%
+      filter(season == "Summer") %>%
+      ggplot() +
+      aes(x = medal, y = count, fill = medal) +
+      geom_col()
+  })
+}
+
+shinyApp(ui = ui, server = server)
+```
+
+
+
+\hfill 
+
+```{r, echo=FALSE, out.width = '100%'}
+knitr::include_graphics("images/olympics_plot_1.png")
+```
+
+
+If you try to change the season or team using the widgets, you will notice that the plot does not change. That's because the inputs and the outputs are not yet connected. Let's look at this now. 
+
+\hfill 
+
+## Using inputs
+
+The inputs come from widgets. Depending on the action of the user, the inputs will have different values. For example our radio button can have two different values: 'Summer' or 'Winter'. The widgets create a list called `input`, and each widget's value can be found using the `inputId` we defined earlier. For example, to get the value from our `season_input` radio button, and use it in our server we would refer to it as `input$season_input`.
+
+We can use these values inside the render functions. This will create a plot which changes, depending on the value selected in the widget.
+
+\hfill 
+
+```{r, eval = FALSE}
+
+server <- function(input, output) {
+  
+  output$medal_plot <- renderPlot({
+    olympics_overall_medals %>%
+      filter(team == "Great Britain") %>%
+      filter(season == input$season_input) %>%
+      ggplot() +
+      aes(x = medal, y = count, fill = medal) +
+      geom_col()
+  })
+  
+}
+```
+
+
+Putting this into our full app gives us:
+
+```{r, eval = FALSE}
+ui <- fluidPage(
+  titlePanel("British Olympic Medals"),
+
+    sidebarLayout(
+      sidebarPanel(
+
+        radioButtons("season_input",
+          "Summer or Winter Olympics?",
+          choices = c("Summer", "Winter")
+        ),
+
+        selectInput("team_input",
+          "Which Team?",
+          choices = c("United States",
+                      "Soviet Union",
+                      "Germany",
+                      "Italy",
+                      "Great Britain")
+        )
+    ),
+
+    mainPanel(
+      plotOutput("medal_plot")
+    )
+  )
+)
+
+server <- function(input, output) {
+  output$medal_plot <- renderPlot({
+
+    olympics_overall_medals %>%
+      filter(team == "Great Britain") %>%
+      filter(season == input$season_input) %>%
+      ggplot() +
+      aes(x = medal, y = count, fill = medal) +
+      geom_col()
+  })
+}
+
+shinyApp(ui, server)
+```
+
+
+\hfill 
+
+```{r, echo=FALSE, out.width = '100%'}
+knitr::include_graphics("images/inputs_1.png")
+```
+
+
+**Task - 5 mins**
+
+Change the existing app so that you can control the team being plotted as well.
+
+**Answer**
+\hfill 
+
+```{r, eval = FALSE}
+library(tidyverse)
+library(shiny)
+
+ui <- fluidPage(
+  titlePanel("Olympic Medals"),
+
+    sidebarLayout(
+      sidebarPanel(
+
+        radioButtons("season_input",
+          "Summer or Winter Olympics?",
+          choices = c("Summer", "Winter")
+        ),
+
+        selectInput("team_input",
+          "Which Team?",
+          choices = c("United States",
+                      "Soviet Union",
+                      "Germany",
+                      "Italy",
+                      "Great Britain")
+        )
+    ),
+
+    mainPanel(
+      plotOutput("medal_plot")
+    )
+  )
+)
+
+server <- function(input, output) {
+  output$medal_plot <- renderPlot({
+
+    olympics_overall_medals %>%
+      filter(team == input$team_input) %>%
+      filter(season == input$season_input) %>%
+      ggplot() +
+      aes(x = medal, y = count, fill = medal) +
+      geom_col()
+  })
+}
+
+shinyApp(ui = ui, server = server)
+```
+
+
+\hfill 
+
+```{r, echo=FALSE, out.width = '100%'}
+knitr::include_graphics("images/inputs_2.png")
+```
+
+
+\hfill\break
+
+# Code outside the UI and Server 
+
+You might have noticed that we placed all the library calls before the UI and server.
+
+Any code here will be run as soon as the app is launched. This makes it easy to write code which can be used by either the UI or the server. 
+
+For example, here we've found out all the team names first, which lets you chose between any of the teams in the select widget. We can then use this in our drop down selector, instead of us typing out every choice possible.   
+
+\hfill 
+
+```{r all teams, eval = FALSE}
+library(tidyverse)
+library(shiny)
+
+olympics_overall_medals <- read_csv("../../data/olympics_overall_medals.csv")
+
+all_teams <- unique(olympics_overall_medals$team)
+
+ui <- fluidPage(
+  titlePanel("Olympic Medals"),
+
+  sidebarLayout(
+    sidebarPanel(
+      radioButtons("season_input",
+        "Summer or Winter Olympics?",
+        choices = c("Summer", "Winter")
+      ),
+
+      selectInput("team_input",
+        "Which Team?",
+        choices = all_teams,
+        selected = "Great Britain"
+      )
+    ),
+
+    mainPanel(
+      plotOutput("medal_plot")
+    )
+  )
+)
+
+server <- function(input, output) {
+  
+  output$medal_plot <- renderPlot({
+    olympics_overall_medals %>%
+      filter(team == input$team_input) %>%
+      filter(season == input$season_input) %>%
+      ggplot() +
+      aes(x = medal, y = count, fill = medal) +
+      geom_col()
+  })
+  
+}
+
+shinyApp(ui = ui, server = server)
+```
+
+
+\hfill 
+
+```{r, echo=FALSE, out.width = '100%'}
+knitr::include_graphics("images/all_teams.png")
+```
+
+And there you go, your first Shiny App!
+
+\hfill
+
+# Tips
+
+* Shiny can be tricky! It can be really hard to keep track of what everything does and close all the brackets.
+* Indent everything correctly as you go.
+* Turn on rainbow brackets! 
+* Use the warning and error indicators next to the line numbers in RStudio.
+* If the cursor is next to a bracket RStudio will highlight the matching bracket. Check each bracket matches up where you think it should.
+* The error: `Error in tag("div", list(...)) : argument is missing, with no default` or similar, probably means there's an extra comma somewhere. It's expecting another UI element because of the comma but isn't finding one.

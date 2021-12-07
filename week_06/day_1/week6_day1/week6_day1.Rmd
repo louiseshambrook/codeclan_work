@@ -1,0 +1,258 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Statistics and probability
+
+```{r}
+library(prob)
+library(tidyverse)
+```
+
+```{r}
+s_two_dice <- rolldie(2)
+s_two_dice
+
+```
+
+```{r}
+s_sum_equals_seven <- s_two_dice %>%
+  filter(X1 + X2 == 7)
+
+s_sum_equals_seven %>%
+  summarise(size_of_event_space = n())
+```
+
+```{r}
+s_two_dice <- s_two_dice %>%
+  mutate(total = X1 + X2)
+
+s_two_dice
+  
+```
+
+```{r}
+s_two_dice <- s_two_dice %>%
+  mutate(first_die_even = X1 %% 2 == 0)
+
+s_two_dice
+
+```
+
+
+Lesson two
+```{r}
+s <- rolldie(2)
+
+total_seven <- s %>%
+  filter(X1 + X2 == 7)
+
+prob_total_seven <- nrow(total_seven) / nrow(s)
+prob_total_seven
+```
+
+
+```{r}
+s_die <- rolldie(1)
+s_coin <- tosscoin(1)
+
+s_total <- merge(s_coin, s_die)
+
+head_six <- s_total %>%
+  filter(toss1 == "H", X1 == 6)
+
+prob_head_six <- nrow(head_six) / nrow(s_total)
+prob_head_six 
+```
+
+```{r}
+library(gtools)
+```
+```{r}
+# create vector of choices contains ten employees, n = 10. 
+employees <- c("Alice", "Bob", "Carole", "David", "Elaine", "Fred", "Gabra", "Hua", "Inigo", "Hugo")
+
+# Choose three at a time, r = 3
+# Don't replace an employee once chosen: repeats.allowed = FALSE
+seniors <- as_tibble(permutations(n = 10, r = 3, v = employees, repeats.allowed = FALSE))
+
+# rename the variables in seniors to something better
+seniors <- seniors %>%
+  rename(
+    CEO = V1,
+    CTO = V2,
+    COO = V3
+  )
+
+# let's see what the seniors matrix looks like
+seniors
+```
+
+```{r}
+alice_CEO_bob_CTO <- seniors %>%
+  filter(CEO == "Alice", CTO == "Bob")
+
+alice_CEO_bob_CTO
+
+prob_alice_bob <- nrow(alice_CEO_bob_CTO) / nrow(seniors)
+```
+
+```{r}
+num_draws <- choose(50, 6)
+num_draws
+1 / num_draws
+```
+
+```{r}
+flavours <- c("vanilla", "chocolate", "raspberry", "strawberry", "pistachio")
+
+as_tibble(combinations(n = 5, r = 3, v = flavours, repeats.allowed = TRUE))
+```
+
+3rd lesson (after lunch)
+```{r}
+# note re complements - it is something that completes something else
+# in stats / probability, it is the subset of a set which is not in A (i.e. A^C)
+```
+
+```{r}
+s_four_coins <-tosscoin(4) %>%
+  mutate(row = row_number())
+
+s_four_coins <- s_four_coins %>%
+  mutate(num_heads = rowSums(. == "H"))
+```
+
+
+```{r}
+s_at_least_two_heads <- s_four_coins %>%
+  filter(num_heads >= 2)
+prob_two_plus_heads <- nrow(s_at_least_two_heads) / nrow(s_four_coins)
+
+s_less_than_two_heads <- s_four_coins %>%
+  filter(num_heads < 2)
+
+prob_of_less_than_two_heads <- 1 - prob_two_plus_heads
+
+```
+
+task 
+```{r}
+s_four_coins <- s_four_coins %>%
+  mutate(num_tails = rowSums(. == "T"))
+
+one_head_one_tail <- s_four_coins %>%
+  filter(num_heads >= 1 & num_tails >= 1)
+
+prob_one_head_tail <- nrow(one_head_one_tail) / nrow(s_four_coins)
+```
+
+mutually exclusive (probability)
+```{r}
+s_four_coins %>%
+  filter(num_heads >= 3 & num_tails >= 2)%>%
+  summarise(prob = n() / nrow(s_four_coins))
+```
+
+```{r}
+s_two_dice <- rolldie(2)
+
+s_two_dice %>%
+  filter(X1 %% 2 == 0 | X2 == 5) %>%
+  summarise(prob = n() / nrow(s_two_dice))
+```
+
+task - combining events
+```{r}
+first_die_even <- s_two_dice %>%
+  filter(X1 %% 2 == 0) %>%
+  summarise(prob = n() / nrow(s_two_dice))
+
+second_die_5 <- s_two_dice %>%
+  filter(X2 == 5) %>%
+  summarise(prob = n() / nrow(s_two_dice))
+
+both_conditions <- s_two_dice %>%
+  filter(X1 %% 2 == 0 & X2 == 5) %>%
+  summarise(prob = n() / nrow(s_two_dice))
+
+pr_union <- first_die_even + 
+  second_die_5 - 
+  both_conditions
+
+```
+
+conditional probability
+```{r}
+colour_blindness <- read.csv("colour_blindness.csv")
+```
+
+```{r}
+library(janitor)
+
+table <- colour_blindness %>%
+  tabyl(bio_sex, cblind)
+
+```
+
+```{r}
+table <- table %>%
+  adorn_totals(where = c("row", "col"))
+```
+
+```{r}
+table <- table %>%
+  adorn_percentages(denominator = "all") %>%
+  adorn_title()
+table
+```
+
+```{r}
+prob_female <- colour_blindness %>%
+  summarise(prob = sum(bio_sex == "female") / n())
+prob_female
+```
+
+```{r}
+prob_male <- colour_blindness %>%
+  summarise(prob = sum(bio_sex == "male") / n())
+
+prob_male
+```
+
+```{r}
+prob_cblind <- colour_blindness %>%
+  summarise(prob = sum(cblind == TRUE) / n())
+prob_cblind
+
+prob_not_cblind <- colour_blindness %>%
+  summarise(prob = sum(cblind == FALSE) / n())
+prob_not_cblind
+```
+
+```{r}
+prob_female_cb <- colour_blindness %>%
+  filter(bio_sex == "female" & cblind == TRUE) %>%
+  summarise(prob = n() / nrow(colour_blindness))
+```
+
+```{r}
+prob_female * prob_cblind == prob_female_cb
+```
+
+conditional probability task
+```{r}
+prob_cb_given_female <- colour_blindness %>%
+  filter(bio_sex == "female") %>%
+  summarise(prob = sum(cblind) / n())
+prob_cb_given_female
+
+
+prob_cb_given_male <- colour_blindness %>%
+  filter(bio_sex == "male") %>%
+  summarise(prob = sum(cblind) / n())
+prob_cb_given_male
+
+```
+

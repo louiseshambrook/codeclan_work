@@ -3,17 +3,245 @@ title: "R Notebook"
 output: html_notebook
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
-
 ```{r}
-plot(cars)
+library(prob)
+library(tidyverse)
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+## Lesson 1
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+Distributions - measures of centre
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+definition
+- all the possible outcome of a random variable, with the corresponding frequency
+(freq distribution), or prob values (prob distr)
+
+distr tell us how common/likely various outcomes are
+
+```{r}
+s_three_coins <- tosscoin(3)
+s_three_coins
+```
+
+Distribution 1 : uniform distribution
+```{r}
+s_three_coins_p <- s_three_coins %>%
+  mutate(label = str_c(toss1, toss2, toss3)) %>%
+  mutate(prob = 1/n())
+
+s_three_coins_p %>%
+  ggplot() +
+  geom_col(aes(x = label, y = prob))
+```
+Uniform distribution 
+all the bars are the same height, indicating each probability is the same
+(same likelihood of occurring)
+
+
+What are the probabilities of getting 0, 1, 2, heads, on 3 unbiased coins
+
+```{r}
+s_three_coins_p %>%
+  mutate(n_heads = str_count(label, "H")) %>%
+  group_by(n_heads) %>%
+  summarise(prob = sum(prob)) %>%
+  ggplot()+
+  geom_col(aes(x = n_heads, y = prob))
+```
+distribution is no longer uniform, but it is still discrete.
+the bars have differing heights.
+
+
+General properties of discrete distributions
+x-axis = outcomes
+y-axis = probabilitiy / freq
+THE PROB MUST SUM TO 1
+
+If you stacked all the bars on top of each other, the y axis would reach one
+
+
+
+Measures of centrality - mean, median and mode
+
+
+```{r}
+# loading in data
+library(janitor)
+library(lubridate)
+
+air_con_data <- read.csv("AirConSales.csv")
+air_con_data <- clean_names(air_con_data)
+
+# wrangle date column
+air_con_data <- air_con_data %>%
+  mutate(date = mdy(date))
+
+```
+
+
+We've got measurements for each day, but we want to look at how likely it will be
+to sell a certain of number of units (air cons)
+
+
+Generating a freq table
+
+```{r}
+sales_freq_table <- air_con_data %>%
+  tabyl(units_sold)
+```
+
+```{r}
+# generate freq distr from freq table
+sales_freq_table %>%
+  ggplot() +
+  geom_col(aes(x = units_sold, y = n))
+```
+
+
+`mean` = sum of all values /n of all values
+`median` = 50% of data beneath, 50% of data above
+`mode` = most frequently occurring value
+
+R has a mean and median function but not a mode function
+
+```{r}
+# generates mode
+get_mode <- function(data){
+
+  tabled_data <- table(data)
+  table_names <- names(tabled_data)
+  
+  return(as.numeric(table_names[tabled_data == max(tabled_data) ]))
+  
+}
+```
+
+Let's calculate these values for our distribution
+
+```{r}
+air_con_data %>%
+  summarise(mean_daily_sales = mean(units_sold),
+            median_daily_sales = median(units_sold),
+            mode_daily_sales = get_mode(units_sold))
+```
+
+The mean is more heavily/easily skewed by extremes, aka the bill gates effect
+
+
+Measures of centre and outliers
+If you suspect or observe outliers, be careful which measure of centre you use.
+Always look at the shape/distr of your data.
+
+
+Modality
+- number of peaks in the distribution
+
+Unimodal - one
+Bimodal - two
+
+
+Skew / Skewness / Asymmetry
+
+Left-skew = left-tailed - typically falls mean < median < mode
+Right-skew = right-tailed - typically falls mean > median > mode
+
+
+Calculating skew
+
+```{r}
+library(e1071)
+```
+
+```{r}
+left_skewed <- read_csv("leftskew.csv")
+right_skewed <- read_csv("rightskew.csv")
+
+left_skewed %>%
+  summarise(skewness = skewness(x, type = 1))
+
+right_skewed %>%
+  summarise(skewness = skewness(x, type = 1))
+```
+
+left-skew = ~-1
+right-skew = ~0.7
+
+direction - positive/negative
+negative skew = left skew
+positive skew = right skew
+
+magnitude - 0-0.5 = fairly symmetrical
+            0.5 -1 = moderately skewed
+            '> 1' = heavily skewed
+
+
+```{r}
+skew_air_con <- air_con_data %>%
+  summarise(skewness = skewness(units_sold, type = 1))
+
+# heavily skewed to the right
+```
+
+Key takeaway
+
+**It's important to visualise your data**
+
+
+
+## Lesson 2 
+
+### Distributions - Measures of spread
+
+Range
+
+From the lowest value to the highest
+range = max_value - min value
+
+```{r}
+jobs <- read.csv("TyrellCorpJobs.csv")
+jobs <- clean_names(jobs)
+```
+
+range of salaries if the max - the min
+
+```{r}
+jobs %>%
+  summarise(max = max(salary),
+            min = min(salary),
+            range = max(salary) - min(salary))
+# note - R has a range function, but it returns the max and min values
+```
+
+
+```{r}
+# positions together
+
+jobs %>%
+  ggplot() +
+  geom_histogram(aes(x = salary), col = "white", bins = 25)
+```
+
+```{r}
+# seperating positions
+jobs %>%
+  ggplot() +
+  geom_histogram(aes(x = salary), col = "white", bins = 25) +
+  facet_wrap(~position)
+```
+
+```{r}
+jobs %>%
+  group_by(position) %>%
+  summarise(range = diff(range(salary)))
+```
+
+A potential problem with using the range as a measure of spread - is is very
+strongly affected by outliers
+
+
+
+
+
+
+
 

@@ -239,6 +239,278 @@ A potential problem with using the range as a measure of spread - is is very
 strongly affected by outliers
 
 
+Quartiles and interquartile ranges
+
+while quartile / quarter means 4, quartiles are the box/plots inbetween the
+median and 25 / median and 75
+
+Q1 - the value splitting the distribution such that 25% of the data is below that
+line and 75% above 
+Q2 - " " " such that 50% is below and 50% (median)
+Q3 - " " " such that 75% of the data is below that
+line and 25% above
+```{r}
+# quartiles for the jobs data
+jobs %>%
+  group_by(position) %>%
+  summarise(
+    Q1 = quantile(salary, 0.25),
+    Q2 = quantile(salary, 0.5),
+    Q3 = quantile(salary, 0.75)
+  )
+```
+
+```{r}
+# quartiles on the vis - code from david
+iqr <- jobs %>% 
+  group_by(position) %>% 
+  summarise(
+    Q1 = quantile(salary, 0.25),
+    Q2 = quantile(salary, 0.5),
+    Q3 = quantile(salary, 0.75)
+  ) %>% 
+  pivot_longer(Q1:Q3, names_to = "fencepost", values_to = "value")
+
+jobs %>% 
+  ggplot() +
+  geom_histogram(aes(x = salary), col = "white", bins = 25) +
+  geom_vline(xintercept = iqr$value, linetype = "dashed", colour = "red") +
+  facet_wrap(~position)
+```
+
+## The interquartile range
+
+the range between fence posts q3 and q1
+
+```{r}
+jobs %>%
+  group_by(position) %>%
+  summarise(
+    Q1 = quantile(salary, 0.25),
+    Q2 = quantile(salary, 0.5),
+    Q3 = quantile(salary, 0.75),
+    IQR = Q3 - Q1,
+    # r also has an ICR function:
+    IQR_fun = IQR(salary)
+  )
+```
+
+
+# The five figure summary
+
+min, Q1, Q2, Q3, max
+
+```{r}
+# you can get this by using the summary functino
+summary(jobs$salary)
+```
+
+We wanted accounting and management to be grouped
+
+
+```{r}
+library(skimr)
+```
+
+`skim()` is a more sophisticated summary
+
+```{r}
+jobs %>%
+  select(-x) %>%
+  group_by(position) %>%
+  skim()
+```
+
+## Box plots
+
+An excellent statistical diagnostic tool
+
+They can have many names; box plots, hinge plots, box and whisker plot, tukey plots
+
+
+```{r}
+jobs %>%
+  ggplot() +
+  aes(x = salary, y = position) +
+  stat_boxplot(geom = "errorbar", width = 0.5) +
+  geom_boxplot()
+  
+```
+
+whiskers are typically positioned 1.5 IQRs above and below Q1 and Q3 respectively.
+any points that lie outside of these are typically defined as outliers.
+
+## Skew in boxplots 
+
+What does skew look like in a box plot?
+
+
+```{r}
+heavily_rskewed <- read_csv("heavily_right_skewed.csv")
+```
+
+```{r}
+heavily_rskewed %>%
+  ggplot() +
+  geom_boxplot(aes(x = x))
+```
+
+
+```{r}
+heavily_rskewed %>%
+  ggplot() +
+  geom_histogram(aes(x = x), colour = "white", bins = 30)
+```
+
+task
+```{r}
+jobs %>%
+  group_by(position) %>%
+  summarise(skewness = skewness(salary, type = 1))
+
+positive = right skew
+'0.5' - '1' = moderate
+
+```
+
+- aside
+removing outliers from the data (potentially dangerous)
+- get where Q1 and Q3 are
+- get IQ range
+- calculate distance to the whisker(1.5*IQR)
+- filter values above Q3 + 1.5IQR and below Q1 - 1.5IQR
+
+
+
+## Variance
+
+- a single measure of spread
+how far each value is from the mean
+
+How to calculate variance step by step
+1. get the difference between each value and mean squared
+2. sum them
+3. divide by the total number of values - 1
+
+In R - use the var function
+
+```{r}
+jobs %>%
+  group_by(position) %>%
+  summarise(variance = var(salary))
+```
+
+this is dollars squared, which doesn't really mean a lot to me
+
+## Standard Deviation
+
+- a more interpretable single measure spread of the data
+
+to go from variance to SD, all we do is take the srqt
+
+```{r}
+jobs %>%
+  group_by(position) %>%
+  summarise(st_dev = sqrt(var(salary)),
+            sd = sd(salary))
+  
+```
+
+so... if you come and work for TyrellCorp in Account, you can expect to earn 34,115 +/- 2,400
+In management, you can expect to earn 51000 +/- 11,000
+
+
+# Common distributions
+
+## discrete vscontinuous variables
+
+- all categorical variables are discrete (e.g strings)
+
+- numerical variables can be discrete or continuous
+- discrete are:
+- continuous are: 
+
+Probability mass function
+For discrete variables:
+- bars / each prob must add up to 1 together
+- each bar individually must not be over 1
+
+For continuous variables:
+- probability density;
+  considering an area of the line/area, and then a subset of that
+  
+  ??
+  
+## Discrete uniform distribution
+- there is equal probability for each outcome
+
+
+## Cumulative distribution function
+
+```{r}
+dice <- tibble(
+    x = 1:6,
+    f_x = replicate(6, 1/6)
+  ) %>%
+  mutate(F_x = cumsum(f_x))
+
+dice %>%
+  ggplot(aes(x = x, y = F_x)) +
+  geom_step() +
+  xlab("number rolled on die") + ylab("probability") +
+  scale_x_continuous(breaks = 1:6) +
+  scale_y_continuous(breaks = seq(0, 1, 0.1)) +
+  ylim(0, 1) 
+```
+
+
+## Continuous distribution
+something about cumulative density?
+- return to notes, something about functions in r?
+d(something) etc
+
+## Normal distribution
+
+
+```{r}
+three_norms <- tibble(
+  x =  seq(0, 20, 0.1),
+  f1_x = dnorm(x = x, mean = 10, sd = 1), 
+  f2_x = dnorm(x = x, mean = 10, sd = 2),
+  f3_x = dnorm(x = x, mean = 10, sd = 3)
+)
+three_norms %>%
+  ggplot() +
+  geom_line(aes(x = x, y = f2_x), col = "black")
+
+
+three_norms %>%
+  ggplot() +
+  geom_line(aes(x = x, y = f1_x), col = "black") +
+  geom_line(aes(x = x, y = f2_x), col = "red") +
+  geom_line(aes(x = x, y = f3_x), col = "blue")
+```
+
+Although the tails do not hit 0, they do not reach 0 (the probability of getting that value becomes increasingly small)
+
+## " p "
+- qbinom and CDF are opposite functions / correspond to each other
+
+## Standard normal, aka a z transform / z distribution
+
+## Standard normal distribution
+- has the mean set to 0 (standardised), and has the SD set to 1
+
+
+```{r}
+z = seq(from = -4, to = 4, by = 0.01)
+f_z = dnorm(x = z)
+# calculates the density of the distribution
+```
+
+
+
+
 
 
 

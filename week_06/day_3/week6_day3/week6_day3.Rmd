@@ -172,5 +172,310 @@ rep_sample_200 %>%
   summarise(prop = n() / nrow(rep_sample_200))
 ```
 
+LUNCH
+
+Lesson 2
+
+Descriptive / Inferential statistics
+
+Lesson 3
+
+Bootstrapping / confidence intervals
+
+# Confidence intervals
+
+- understanding what confidence intervals are
+CI's are a tool that allow us to describe how confident we are about a measurement
+
+
+```{r}
+telco <- read_csv("telecomms_churn.csv") %>%
+  clean_names()
+```
+
+earlier today, we made a sample of 200 rows of a population (the dataset),
+and then calculated the mean of that sample
+
+```{r}
+sample_200 <- telco %>%
+  rep_sample_n(size = 200, reps = 1)
+
+summary_sample_200 <- sample_200 %>%
+  ungroup() %>%
+  summarise(
+    mean_monthly_tenure = mean(tenure),
+    mean_monthly_charges = mean(monthly_charges),
+    prop_churn = mean(churn == "Yes")
+  )
+```
+
+In this case we KNOW the true population value for the mean tenure
+
+```{r}
+telco %>%
+  summarise(
+    mean_monthly_tenure = mean(tenure),
+    mean_monthly_charges = mean(monthly_charges),
+    prop_churn = mean(churn == "Yes")
+  )
+```
+
+The only reason we know this is because we have the data for the population
+
+What can we do if we don't know the true value ( we usually won't)
+
+# Confidence intervals
+
+lower bound - upper boud
+a range where we can say with a degree of confidence the true exists
+
+Let us say for example:
+From our 200 obs sample, the point est of mean tenure is 33.805, with a
+95% confidence interval of [30-34].
+
+a 95% confidence level is typically set
+
+The CI formula:
+= (sample mean +/- sample SD) / sqrt (sample size)
+
+What this actually means:
+For a 95% confidence interval, if we took 100 samples, calculating point estimates
+(mean tenure) and confidence intervals for each, we would expect 95 of the 
+determined confidence intervals to contain the true value of the mean of the population
+paramter
+
+Key takeaway:
+- CI range of values around a point estimate
+- CI are proportional to the standard error
+- Typically larger sample size = narrower confidence level
+- A larger CI corresponds to a larger set of values 
+
+# Bootstrapping (sample magic)
+
+In practice, we often only have one (or a few) samples to work with
+bootstrapping allows us to use computational power to generate sampling distributions
+from just one sample
+
+Tries to replicate collecting new samples (without actually doing so),
+and follows the central limit theorem, so over time it becomes normally
+distributed
+
+How? In the sampling function, you can set resampling function to = true
+So bootstrapping samples the sample with replacement
+
+Bootstrapping is one of our solutions to have a limited sample / one sample
+
+# starting point
+
+
+```{r}
+sample_200 <- read_csv("telecomms_churn_200_sample.csv") %>%
+  clean_names()
+```
+
+point estimate is mean tenure
+```{r}
+bootstrapping_resample <- sample_200 %>%
+  # 5000 times
+  rep_sample_n(size = 200, reps = 5000, replace = TRUE) %>%
+  summarise(
+    mean_tenure = mean(tenure)
+  )
+  
+```
+
+task
+```{r}
+bootstrapping_resample %>%
+  ggplot() +
+  geom_histogram(aes(x = mean_tenure))
+
+bootstrapping_resample %>%
+  summarise(standard_error = sd(mean_tenure))
+
+```
+
+this exercise was just to verify that bootstrapping could produce similar
+results to taking multiple samples
+
+Important notes:
+- the size of each generated sample is the same as the sample size
+- SE 1/sqrt (sample size)
+- CI 1/sqrt (sample size)
+Bootstrapping is just computer based accuracy metric, not creating fictitious data
+
+
+# Confidence intervals from the bootstrap distribution
+
+```{r}
+ci_95 <- bootstrapping_resample %>%
+  summarise(
+    mean = mean(mean_tenure),
+    lower_bound = quantile(mean_tenure, probs = 0.025),
+    upper_bound = quantile(mean_tenure, probs = 0.975)
+  )
+
+ci_95
+```
+point estimate of 32.6 mean tenure, 95% CI of 29.2 to 36
+
+
+task - change it to 99%
+```{r}
+ci_99 <- bootstrapping_resample %>%
+  summarise(
+    mean = mean(mean_tenure),
+    lower_bound = quantile(mean_tenure, probs = 0.01),
+    upper_bound = quantile(mean_tenure, probs = 0.99)
+  )
+
+ci_99
+```
+
+confidence interval gets wider for a higer degree of a confidence level
+
+# Infer workflow - Specify!, generate!, calculate!
+
+Using the infer package, which is more tidyverse-y
+1. derive the bootstrap distribution
+2. get confidence interval
+3. visualise our CI
+4. get our point estimate
+
+
+## 1. derive the bootstrap distribution
+Specify - our variable of interest
+generate -our sampling distribution
+calculate - our statistic of interest
+
+To re-do what we did above in infer langauge:
+
+```{r}
+infer_resample <- sample_200 %>%
+  specify(response = tenure) %>%
+  generate(reps = 5000, type = "bootstrap") %>%
+  calculate(stat = "mean")
+```
+
+## 2. get confidence interval
+
+let's do 95% CI again
+
+```{r}
+infer_ci_95 <- infer_resample %>%
+  get_ci(level = 0.95, type = "percentile")
+
+infer_ci_95
+```
+remember - this will be a new sampling distribution
+
+## 3 visualise our distribution and our confidence interval
+infer makes this easy with visualise() function and shade_confidence_interval()
+```{r}
+infer_resample %>%
+  # similar to ggplot, + from hereon
+  visualise(bins = 30) +
+  shade_confidence_interval(endpoints = infer_ci_95)
+  
+```
+
+## 4. get our point estimate
+```{r}
+mean_infer <- infer_resample %>%
+  summarise(mean = mean(stat))
+
+mean_infer
+```
+
+```{r}
+sample_three <- read_csv("telecomms_churn_300_sample.csv")
+```
+
+1. derive
+```{r}
+infer_sample_three <- sample_three %>%
+  specify(response = tenure) %>%
+  generate(reps = 5000, type = "bootstrap") %>%
+  calculate(stat = "mean")
+  
+infer_sample_three
+```
+
+2. CI
+```{r}
+infer_ci_3_95 <- infer_sample_three %>%
+  get_ci(level = 0.95, type = "percentile")
+
+infer_ci_3_95
+  
+```
+
+3. visualise
+```{r}
+infer_sample_three %>%
+  visualise(bins = 30) +
+  shade_ci(endpoints = infer_ci_3_95)
+```
+
+4. point estimate
+```{r}
+mean_infer_three <- infer_sample_three %>%
+  summarise(mean = mean(stat))
+
+mean_infer_three
+```
+
+- inferring a mean
+
+# CI for a proportion
+
+The overall process is very similar
+
+```{r}
+sample_200 %>%
+  select(churn)
+```
+
+We want to find out the proportion of people that did churn (churn = yes)
+
+# Using our infer verbs
+
+```{r}
+bootstrap_resample_churn <- sample_200 %>%
+  specify(response = churn, success = "Yes") %>%
+  generate(reps = 5000, type = "bootstrap") %>%
+  calculate(stat = "prop")
+
+head(bootstrap_resample_churn)
+```
+
+get ci boundaries
+```{r}
+churn_ci_95 <- bootstrap_resample_churn %>%
+  get_ci(level = 0.95, type = "percentile")
+
+churn_ci_95
+```
+
+then we want to visualise
+```{r}
+bootstrap_resample_churn %>%
+  visualise(bins = 30) +
+  shade_ci(endpoints = churn_ci_95)
+```
+
+point estimate
+```{r}
+prop_churn_bootstrap <- bootstrap_resample_churn%>%
+  summarise(mean = mean(stat))
+
+prop_churn_bootstrap
+```
+our inference: we measure the proportion of customers who DO churn to be 0.255568
+with a 95% confidence that the true proportion is between 0.2 and 0.32
+
+
+
+
 
 

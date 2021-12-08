@@ -120,9 +120,57 @@ prop_churn_plot <- rep_sample_200 %>%
 
 standard error
 - spread of sampling distribution
-- wide spread denotes a high degree of uncertainty
+- wide standard error denotes a high degree of uncertainty
+
+Putting this all together
+
+```{r}
+library(fastGraph)
+```
+
+calculate standard error
+```{r}
+std_error <- rep_sample_200 %>%
+  summarise(
+    se_mean_monthly = sd(mean_monthly_charge),
+    se_mean_tenure = sd(mean_tenure),
+    se_prop_churn = sd(prop_churn))
+```
 
 
+```{r}
+shadeDist(
+  xshade = c(60, 70),
+  lower.tail = FALSE,
+  ddist = "dnorm",
+  parm1 = mean(rep_sample_200$mean_monthly_charge),
+  parm2 = std_error$se_mean_monthly,
+  xlab = "mean_monthly_charges"
+)
+```
+
+less visual way to calculate this
+```{r}
+rep_sample_200 %>%
+  filter(mean_monthly_charge >= 60, mean_monthly_charge <= 70) %>%
+  summarise(prop = n() / nrow(rep_sample_200))
+```
+
+task - for mean tenure instead
+```{r}
+shadeDist(
+  xshade = c(30, 35),
+  lower.tail = FALSE,
+  ddist = "dnorm",
+  parm1 = mean(rep_sample_200$mean_tenure),
+  parm2 = std_error$se_mean_tenure,
+  xlab = "mean_tenure"
+)
+
+rep_sample_200 %>%
+  filter(mean_tenure >= 30, mean_tenure <= 35) %>%
+  summarise(prop = n() / nrow(rep_sample_200))
+```
 
 
 

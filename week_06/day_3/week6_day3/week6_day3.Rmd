@@ -1,0 +1,128 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Week6 day 3
+
+Sampling distribution
+
+```{r}
+library(tidyverse)
+library(janitor)
+```
+
+```{r}
+telecomms_data <- read_csv("telecomms_churn.csv") %>%
+  clean_names()
+```
+
+```{r}
+glimpse(telecomms_data)
+```
+
+this is what we want to be able to infer from our sample
+```{r}
+summary_pop <- telecomms_data %>%
+  summarise(
+    mean_monthly_charges = mean(MonthlyCharges),
+    mean_tenure = mean(tenure),
+    prop_churn = sum(Churn == "Yes") / n()
+  )
+```
+
+```{r}
+telecomms_data %>%
+  ggplot() +
+  aes(x = monthly_charges) +
+  geom_histogram(col = "white", fill = "steel blue", alpha = 0.7)
+```
+
+
+```{r}
+telecomms_data %>%
+  ggplot() +
+  aes(x = tenure) +
+  geom_histogram(col = "white", fill = "steel blue", alpha = 0.7)
+```
+
+
+```{r}
+telecomms_data %>%
+  ggplot() +
+  aes(x = churn) +
+  geom_bar()
+```
+
+```{r}
+library(infer)
+```
+
+creating sample 
+```{r}
+sample_200 <- telecomms_data %>%
+  rep_sample_n(size = 200, reps = 1)
+```
+
+```{r}
+groups(sample_200)
+```
+
+same calc for sample
+```{r}
+summary_sample <- sample_200 %>%
+  ungroup() %>%
+  summarise(mean_monthly_charge = mean(monthly_charges),
+            mean_tenture = mean(tenure),
+            prop_churn = sum(churn == "Yes") / n()
+  )
+```
+- sample error
+= point est - pop parameter
+
+```{r}
+summary_sample - summary_pop
+```
+
+central limit theorem
+implies that even when a model is not normally distributed, because a normal
+distribution is created, probabilistic and statistical models that apply to normal
+distributions can also apply to non normal distributions
+
+
+```{r}
+rep_sample_200 <- telecomms_data %>%
+  rep_sample_n(size = 200, reps = 5000) %>%
+  summarise(
+    mean_monthly_charge = mean(monthly_charges),
+            mean_tenure = mean(tenure),
+            prop_churn = sum(churn == "Yes") / n()
+  )
+```
+
+```{r}
+monthly_charges_plot <- rep_sample_200 %>%
+  ggplot(aes(x = mean_monthly_charge)) +
+  geom_histogram(col = "white", fill = "steel blue")
+```
+
+task
+```{r}
+mean_tenure_plot <- rep_sample_200 %>%
+  ggplot(aes(x = mean_tenure)) +
+  geom_histogram(col = "white", fill = "steel blue")
+
+
+prop_churn_plot <- rep_sample_200 %>%
+  ggplot(aes(x = prop_churn)) +
+  geom_bar(col = "white", fill = "steel blue")
+```
+
+standard error
+- spread of sampling distribution
+- wide spread denotes a high degree of uncertainty
+
+
+
+
+

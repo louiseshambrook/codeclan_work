@@ -1,0 +1,177 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Finishing lesson on two sample hypothesis 
+Paired / dependent sample test
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(infer)
+```
+
+```{r}
+corfu <- read_csv("corfu.csv")
+florence <- read_csv("florence.csv")
+```
+
+null hypothesis: the price of lets in florence is the same as those in corfu
+alt hypothesis: the price of lets in florence is lower than those in corfu
+
+sig level: .05
+
+```{r}
+# creating one dataframe to work with
+apart_prices <- bind_rows(florence, corfu, .id = "location") %>%
+  mutate(location = if_else(location == "1",
+                            "florence",
+                            "corfu")) %>%
+  select(-...1)
+
+```
+
+```{r}
+apart_prices %>%
+  ggplot(aes(x = location, y = price)) +
+  geom_boxplot()
+```
+
+```{r}
+null_distr <- apart_prices %>%
+  specify(price ~ location) %>%
+  hypothesise(null = "independence") %>%
+  generate(reps = 10000, type = "permute") %>%
+  calculate(stat = "diff in means",
+            order = c("florence", "corfu"))
+  
+```
+
+```{r}
+obs_stat_apart <- apart_prices %>%
+  specify(price ~ location) %>%
+  calculate(stat = "diff in means",
+            order = c("florence", "corfu"))
+```
+
+```{r}
+null_distr %>%
+  visualise() +
+  shade_pvalue(obs_stat = obs_stat_apart,
+                direction = "left")
+```
+
+```{r}
+p_value_apart <- null_distr %>%
+  get_p_value(obs_stat = obs_stat_apart,
+              direction = "left")
+
+p_value_apart
+```
+2 sample tests
+Paired aka dependent samples
+
+```{r}
+books <- read_csv("ucla_textbooks_f18.csv")
+
+```
+
+
+Is there a significant difference between the new price on campus, and an amazon?
+
+```{r}
+books_diff <- books %>%
+  mutate(diff_new = bookstore_new - amazon_new) %>%
+  filter(!is.na(diff_new))
+
+books_diff %>%
+  ggplot(aes(x = diff_new)) +
+  geom_histogram(col = "white")
+```
+
+Hypotheses:
+H0: mu(diff_new) = 0
+Ha: mu(diff_new) != 0
+
+```{r}
+null_distribution <- books_diff %>%
+  specify(response = diff_new) %>%
+  hypothesise(null = "point", mu = 0) %>%
+  generate(reps = 10000, type = "bootstrap") %>%
+  calculate(stat = "mean")
+```
+
+```{r}
+observed_stat <- books_diff %>%
+  specify(response = diff_new) %>%
+  calculate(stat = "mean")
+
+observed_stat
+```
+
+```{r}
+null_distribution %>%
+  visualise() +
+  shade_p_value(obs_stat = observed_stat,
+                direction = "both")
+```
+
+```{r}
+p_value <- null_distribution %>%
+  get_p_value(obs_stat = observed_stat,
+              direction = "both")
+p_value
+```
+
+With proportion
+two sample testing, testing difference in proportions
+
+Testing for whether the proportion of women who voted for Obama is significantly 
+differnet to those who voted for romney
+```{r}
+poll <- read_csv("election_data.csv")
+```
+
+```{r}
+ggplot(poll, aes(x = vote, fill = gender)) +
+  geom_bar(position = "fill") +
+  coord_flip()
+```
+
+
+```{r}
+obs_stat_poll <- poll %>%
+  specify(gender ~ vote,
+          success = "woman") %>%
+  calculate(stat = "diff in props",
+            order = c("obama", "romney"))
+```
+
+```{r}
+null_dist <- poll %>%
+  specify(gender ~ vote,
+          success = "woman") %>%
+  hypothesise(null = "independence") %>%
+  generate(reps = 5000, type = "permute") %>%
+  calculate(stat = "diff in props",
+            order = c("obama", "romney"))
+
+head(null_dist)
+```
+
+```{r}
+null_dist %>%
+  visualise() +
+  shade_p_value(obs_stat = obs_stat_poll,
+                direction = "both")
+```
+
+```{r}
+p_value_poll <- null_dist %>%
+  get_p_value(obs_stat = obs_stat_poll,
+              direction = "both")
+
+p_value_poll
+```
+

@@ -1,0 +1,333 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Week 6 day 4
+
+Hypothesis testing
+One sample test using a mean
+
+```{r}
+library(tidyverse)
+library(janitor)
+library(infer)
+```
+
+```{r}
+books <- read_csv("books.csv") %>%
+  clean_names()
+```
+
+```{r}
+books_tidy <- books %>%
+  filter(!is.na(average_rating)) %>%
+  rename(num_pages = number_num_pages)
+
+glimpse(books_tidy)
+```
+
+```{r}
+books_tidy %>%
+  ggplot(aes(x = average_rating)) +
+  geom_histogram(col = "white")
+```
+
+```{r}
+books_tidy %>%
+  ggplot(aes(x = average_rating)) +
+  geom_boxplot()
+```
+
+In 2016, the mean rating was 3.93. Is the 2020 data statistically different?
+
+The question is framed in terms of two competing questions:
+H0(H naught) - null hypothesis. The skeptical stance / nothing has changed.
+E.g. our null hypothesis is that the mean is the same as the as the historic mean. 
+
+The competing - Ha(alternative).
+The current mean is not the same as the historic mean.
+
+```{r}
+observed_stat <- books_tidy %>%
+  summarise(mean_rating = mean(average_rating))
+
+observed_stat
+```
+
+Generating the null sampling distribution - very similar to code for CI's 
+```{r}
+null_distribution <- books_tidy %>%
+  specify(response = average_rating) %>%
+  # extra line added for the null sampling - telling R what our null hypothesis is
+  hypothesise(null = "point", mu = 3.93) %>%
+  generate(reps = 10000, type = "bootstrap") %>%
+  calculate(stat = "mean")
+
+```
+
+
+```{r}
+null_distribution %>%
+  visualise(bins = 30)
+```
+
+Visualise observed statistic (the mean for the sample)
+```{r}
+# reminder of the observed stat
+observed_stat
+
+```
+
+
+```{r}
+null_distribution %>%
+  visualise(bins = 30) +
+  shade_p_value(obs_stat = observed_stat$mean_rating,
+                direction = "both"
+                )
+
+# visualises the area outside the mean (regardless of whether they are significant
+#, just that they are at least outside the mean / as extreme)
+```
+
+Caclulate the p value
+```{r}
+p_value <- null_distribution %>%
+  get_p_value(obs_stat = observed_stat$mean_rating,
+              direction = "both"
+              )
+p_value
+
+```
+
+There is sufficient data to reject the null hypothesis.
+
+
+# Lesson 2
+One sample test using a proportion
+
+Question:
+Does the proportion of books in the database that lack text reviews differ significantly from 7%?
+
+Null hypothesis: the pop proportion that don't have a text review = 7%
+Alt hypothesis: the pop proportion that don't have a text review =/= 7%
+
+
+```{r}
+books_prop <- books %>%
+  filter(!is.na(average_rating)) %>%
+  rename(num_pages = number_num_pages)
+
+```
+
+proportion of books with no text review
+```{r}
+observed_prop_stat <- books_prop %>%
+  group_by(text_reviews_count) %>%
+  summarise(prop = n()/nrow(books_prop)) %>%
+  filter(text_reviews_count == 0) %>%
+  pull()
+
+
+# the most common is 0 = 6.5% - this is the sample proportion
+```
+
+```{r}
+books_prop_tidy <- books_prop %>%
+  mutate(text_reviews_flag = if_else(text_reviews_count > 0,
+                                     "text_review",
+                                     "no_text_review"))
+
+books_prop_tidy
+```
+
+generate null distribution
+```{r}
+null_distribution_books_prop <- books_prop_tidy %>%
+  specify(response = text_reviews_flag, success = "no_text_review") %>%
+  hypothesise(null = "point", p = 0.07) %>%
+  generate(reps = 5000, type = "draw") %>%
+  calculate(stat = "prop")
+
+head(null_distribution_books_prop)
+```
+
+
+```{r}
+null_distribution_books_prop %>%
+  visualise(bins = 30)
+```
+
+now we will overlay the actual statistic 
+```{r}
+observed_prop_stat <- books_prop_tidy %>%
+  specify(response = text_reviews_flag,
+          success = "no_text_review",
+  ) %>%
+  calculate(stat = "prop")
+
+observed_prop_stat
+```
+
+```{r}
+null_distribution_books_prop %>%
+  visualise(bins = 30) +
+  shade_p_value(obs_stat = observed_prop_stat,
+                direction = "both")
+```
+
+```{r}
+p_value_prop <- null_distribution_books_prop %>%
+  get_p_value(obs_stat = observed_prop_stat,
+              direction = "both")
+
+p_value_prop
+```
+
+The null hypothesis can be rejected
+
+
+Task
+
+proportion of books published in french
+```{r}
+fre_prop_books <- books %>%
+  group_by(language_code) %>%
+  summarise(prop = n()/nrow(books)) %>%
+  filter(language_code == "fre")
+
+books_fre_tidy <- books %>%
+  mutate(fre_lang_flag = if_else(language_code == "fre",
+                           "fre_lang",
+                           "not_fre_lang"))
+```
+
+creating the null distribution
+```{r}
+null_distr_fre_prop <- books_fre_tidy %>%
+  specify(response = fre_lang_flag, success = "fre_lang") %>%
+  hypothesise(null = "point", p = 0.015) %>%
+  generate(reps = 5000, type = "draw") %>%
+  calculate(stat = "prop")
+```
+
+visualise
+```{r}
+null_distr_fre_prop %>%
+  visualise(bins = 30)
+```
+
+```{r}
+observed_fre_stat <- books_fre_tidy %>%
+  specify(response = fre_lang_flag,
+          success = "fre_lang") %>%
+  calculate(stat = "prop")
+
+observed_fre_stat
+```
+
+
+```{r}
+null_distr_fre_prop %>%
+  visualise(bins = 30) +
+  shade_p_value(obs_stat = observed_fre_stat,
+                direction = "left")
+```
+
+
+```{r}
+p_value_fre <- null_distr_fre_prop %>%
+  get_p_value(obs_stat = observed_fre_stat,
+              direction = "left")
+
+p_value_fre
+```
+
+# Lesson 3
+Two sample T-tests
+
+Can be paired
+Can be independent
+
+First question to ask for a two-sample test, is are the individual observations
+independent or paired?
+They are independent if: there is no connection (e.g. where there is a control 
+                          group and test group)
+They are paired if:       If there is a connection with one, and only one
+                          observation in the other sample. E.g. two sets of cohort
+                          before and after treatment
+
+
+# For independent samples
+
+In a independent case (example), we will compare the mean of two prices,
+and there is no restriction that the samples have to be the same size
+
+```{r}
+nice <- read_csv("nice.csv")
+algarve <- read_csv("algarve.csv")
+```
+
+```{r}
+apart_prices <- bind_rows(nice, algarve, .id = "location") %>%
+  mutate(location = if_else(location == "1",
+                            "nice",
+                            "algarve")) %>%
+  select(-...1)
+
+head(apart_prices)
+```
+
+```{r}
+apart_prices %>%
+  group_by(location) %>%
+  summarise(n = n())
+```
+
+```{r}
+apart_prices %>%
+  ggplot(aes(x = location, y = price)) +
+  geom_boxplot()
+```
+
+```{r}
+null_distr <- apart_prices %>%
+  specify(price ~ location) %>%
+  hypothesise(null = "independence") %>%
+  generate(reps = 1000, type = "permute") %>%
+  calculate(stat = "diff in means",
+            order = c("algarve", "nice"))
+
+head(null_distr)
+```
+
+
+```{r}
+obs_stat_apart <- apart_prices %>%
+  specify(price ~ location) %>%
+  calculate(stat = "diff in means",
+            order = c("algarve", "nice"))
+
+obs_stat_apart
+```
+
+
+```{r}
+null_distr %>%
+  visualise() +
+  shade_pvalue(obs_stat = obs_stat_apart,
+                direction = "right")
+```
+
+
+```{r}
+p_value_apart <- null_distr %>%
+  get_p_value(obs_stat = obs_stat_apart,
+              direction = "right")
+
+p_value_apart
+```
+
+
+

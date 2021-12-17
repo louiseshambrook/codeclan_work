@@ -1,0 +1,301 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+```
+
+
+Week7 day 1
+
+Dates and Times
+
+Why are they difficult?
+- formatting them in programming can be tricky
+-lots of different ways to enter them
+- tricky data format to work with
+
+
+ISO-8601 Format
+- YEAR-MONTH-DAY
+
+Format: YEAR-MONTH-DAY-HH-MM-SS
+Min digits: 4 b/c of 2000
+Clock system: 24 hours
+Time formats: 4 
+Timezone - UTC
+Combined date-times - 2021-12-13-T10:13
+
+```{r}
+library(lubridate)
+```
+
+```{r}
+my_bday <- "09-01-2021"
+my_bday
+```
+
+```{r}
+date <- dmy(my_bday)
+# transforms the string to a date
+```
+
+```{r}
+mdy("January 9th, 2021")
+```
+
+```{r}
+mdy_hms("01-09-21 10:18:26")
+```
+
+```{r}
+ymd(20190109)
+```
+
+```{r}
+netflix <- read_csv("data/netflix.csv")
+```
+
+```{r}
+netflix <- netflix %>%
+  mutate(date_added = mdy(date_added))
+```
+
+```{r}
+# extracting exact days / months from the date
+netflix <- netflix %>%
+  mutate(
+    day = day(date_added),
+    month = month(date_added, label = TRUE, abbr = FALSE),
+    year = year(date_added),
+    weekday = wday(date_added, label = TRUE, abbr = FALSE)
+  )
+
+# weekdays() and wday() is the same - weekdays() is base R and wday() is lubridate
+```
+
+```{r}
+netflix <- netflix %>%
+  mutate(made_date = make_datetime(year, month, day))
+
+head(netflix)
+```
+
+Add a time
+```{r}
+netflix <- netflix %>%
+  mutate(made_date = make_datetime(year, month, day, hour = 16, min = 59, sec = 45))
+```
+
+Calculating time spans
+
+- difftime: represents 
+- period
+- durations
+
+```{r}
+netflix <- netflix %>%
+  mutate(time_difftime = today() - date_added) %>%
+  select(time_difftime, date_added)
+```
+
+Period:
+Subsetting / breaking down periods into readable / digestable periods
+
+```{r}
+netflix <- netflix %>%
+  mutate(time_period = as.period(today() - date_added),
+         time_years = as.numeric(time_period, "years"),
+         time_hours = as.numeric(time_period, "hours"),
+         time_mins = as.numeric(time_period, "minutes"),
+         time_seconds = as.numeric(time_period, "seconds"),
+         )
+```
+When creating/reporting periods, it is important to be careful/cautious about
+leap years. Because leap years don't just appear out of nowhere, it is important
+to be aware of small changes, i.e seconds/minutes/hours, etc - each year
+is 365.25 years 
+It is really only important to watch that you get the right amount of days
+
+
+Netflix promotes new releases for 2 weeks before release
+Netflix takes shows/movies down after 4 months
+```{r}
+netflix <- netflix %>%
+  mutate(promo_date = date_added - weeks(2),
+         removal_date = date_added + months(4))
+
+netflix %>%
+  select(date_added, promo_date, removal_date)
+```
+
+
+Durations:
+Records the exact passage of time since a date
+```{r}
+netflix <- netflix %>%
+  mutate(time_duration = as.duration(today() - date_added))
+
+netflix %>%
+  select(date_added, time_difftime, time_years, time_duration)
+```
+
+
+Timezones
+```{r}
+ymd_hms("2021-12-31 11:30:22", tz = "Atlantic/Faroe")
+```
+
+
+Force_tz - add a timezone, doesn't change date/time
+with_tz - figures out what date and time would be if you were in that time zone
+```{r}
+netflix <- netflix %>%
+  mutate(date_tz1 = force_tz(date_added, tzone = "Asia/Singapore"),
+         date_tz2 = with_tz(date_added, tzone = "Asia/Singapore"))
+
+netflix %>%
+  select(date_added, date_tz1, date_tz2)
+```
+
+
+Lesson 2
+
+Timeseries
+
+Part of the PDA
+
+- continuous data over time
+- time is the primary axis
+- append rather than replace
+
+
+```{r}
+library(tsibble)
+library(tsibbledata)
+library(feasts)
+library(fable)
+```
+
+tsibble is for working with timeseries data
+feasts - features etc for statistics
+
+index_var - find the index of a tsibble
+key_vars - find the key of a tsibble
+
+You can use dplyr verbs with tsibble, but you cannot deselect / drop time as a 
+column
+
+```{r}
+# extra functions to filter dates
+vic_year <- vic_elec %>%
+   filter_index("2012-01")
+
+```
+
+```{r}
+# vic_year %>%
+#   group_by(year) %>%
+#   summarise(mean_temp = mean(Temperature))
+
+vic_year %>%
+  index_by(Time) %>%
+  summarise(mean_temp = mean(Temperature))
+
+you need to index instead of group
+```
+
+Make plots
+```{r}
+elec_date <- vic_elec %>%
+  index_by(Date) %>%
+  summarise(mean_temp = mean(Temperature))
+
+elec_date %>%
+  ggplot() +
+  aes(x = Date, y = mean_temp) +
+  geom_line()
+```
+
+```{r}
+elec_month <- vic_elec %>%
+  mutate(month = month(Date, label = T)) %>% 
+  index_by(month) %>% 
+  summarise(mean_temp = mean(Temperature)) %>% 
+  ggplot(aes(x = month, y = mean_temp)) +
+  geom_line(group = 1)
+```
+
+```{r}
+library(slider)
+```
+
+```{r}
+# calculate a rolling window
+# the . in .f corresponds to the current window in the data, i.e. each subset
+elec_rolling <- vic_elec %>% 
+  mutate(
+    temp_moving_avg = slide_dbl(
+      .x = Temperature, 
+      .f = ~ mean(., na.rm = TRUE),
+      .before = 2000,
+      .after = 2000,
+      .complete = TRUE
+    )
+  )
+
+elec_rolling
+```
+
+```{r}
+# plot the data 
+ggplot(elec_rolling) + 
+  geom_line(aes(x = Date, y = Temperature), colour = "grey") + 
+  geom_line(aes(x = Date, y = temp_moving_avg), colour = "red")
+```
+
+The slide_dbl() function makes a number of arguments available, so let’s play around with them a little!
+Try setting .before and .after to 100. How does the plot change?
+What happens if you set .complete = TRUE?
+
+
+Feasts package
+- useful for plotting
+
+
+```{r}
+index_var(tourism)
+key_vars(tourism)
+```
+
+
+```{r}
+holidays <- tourism %>%
+  filter(Purpose %in% c("Holiday","Business")) %>%
+  group_by(State) %>%
+  summarise(Trips = sum(Trips))
+
+holidays
+```
+
+```{r}
+holidays %>%
+  autoplot(Trips)
+```
+
+```{r}
+holidays %>%
+  filter(State %in% c("Queensland", "New South Wales", "Victoria")) %>%
+  gg_season(Trips)
+```
+
+
+```{r}
+holidays %>%
+  filter(State %in% c("Queensland", "New South Wales", "Victoria")) %>%
+  gg_subseries(Trips)
+```
+
+

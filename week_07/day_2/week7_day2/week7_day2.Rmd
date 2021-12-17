@@ -1,0 +1,407 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Week7 day 2 - Spatial Data / spatial analysis
+
+What do you think spatial data looks like?
+  Latitude and longitude
+  
+  
+What do you think spatial data visualisation looks like?
+  
+Spatial (geospatial data) is data about geographical locations
+
+## How is spatial data represented?
+
+
+Spatial data are special - there are meaning to the points; while encoded
+as numbers (dbl's), these numbers actually have a special meaning
+
+Spatial vectors (non-R specific)
+
+Spatial vectors encode spatial data - there are 3 main types
+
+- point (1, 4)
+- line ((1,4), (4,5))
+- polygon ((2,2), (4,2), (5,3), etc...)
+
+point; train stations, wells, etc..
+lines; roads..
+polygons; council areas, lakes
+
+## Spatial data in R
+
+Sometimes we just get given data frames with lat/long columns
+
+Another option is to load in shapefiles
+
+to do this, we use the package sf - simplefeatures
+
+```{r}
+library(sf)
+```
+
+a feature = a geometry
+
+```{r}
+north_carolina <- st_read(system.file("shape/nc.shp", package = "sf"))
+```
+
+```{r}
+library(tidyverse)
+```
+
+
+```{r}
+north_carolina %>%
+  as_tibble()
+```
+
+```{r}
+nc_geo <- st_geometry(north_carolina)
+
+nc_geo[[1]]
+```
+
+```{r}
+class(north_carolina)
+```
+it's a dataframe with geometries
+
+
+## Plotting geometries
+
+
+```{r}
+plot(north_carolina["AREA"])
+```
+
+```{r}
+# first row, "AREA" column
+plot(north_carolina[1, "AREA"])
+```
+
+Task - Have a look through some of the variables within your north_carolina dataset, and see if you can create a spatial plot using the techniques above.
+```{r}
+plot(north_carolina["FIPS"])
+```
+## ggplot and sf
+
+ggplot can plot spatial with sf, called geom_sf
+
+```{r}
+north_carolina %>%
+  ggplot() +
+  geom_sf(aes(fill = SID74), colour = "black") +
+  theme_bw()
+```
+
+Task - try plotting another feature for NC. What does it tell you? play around
+with ggplot aspects (e.g. colour)
+```{r}
+north_carolina %>%
+  ggplot() +
+  geom_sf(aes(fill = FIPS), colour = "black", show.legend = FALSE) +
+  theme_void() +
+  ylim(20, 50)
+  
+```
+
+```{r}
+library(rgeos)
+library(rnaturalearth)
+library(rnaturalearthdata)
+```
+
+Using rnaturalearth package we can import boundaries of countries at various
+levels
+
+```{r}
+world <- ne_countries(scale = "medium", returnclass = "sf")
+```
+
+```{r}
+world %>%
+  as_tibble() %>%
+  head(5)
+```
+
+So we've got the data, now we can plot it
+
+```{r}
+world %>%
+  ggplot() +
+  geom_sf() +
+  labs(x = "longitude", y = "latitude", title = "World Map")
+```
+
+We can plot actual data now: 
+
+```{r}
+world %>%
+  ggplot() +
+  geom_sf(aes(fill = pop_est)) +
+  scale_fill_viridis_c(trans = "sqrt")
+```
+
+Task: Recap your knowledge from ggplot week, and set your geom_sf aesthetic to be filled with the estimated gdp (gdp_md_est variable). Extra points if you make your map colour blind friendly!
+What does your plot tell you? What does it tell you compared to the population?
+
+```{r}
+world %>%
+  ggplot() +
+  geom_sf(aes(fill = gdp_md_est)) +
+  scale_fill_continuous(type = "viridis") +
+  theme_void()
+
+# It tells me that while China and India are greater than the rest of the world
+# in terms of population, the US is greater than the China and India in terms
+# of GDP (despite having lower population)
+```
+
+With our world data frame, we can filter for specific countries, using the 
+tidyverse
+
+```{r}
+country_italy <- world %>%
+  filter(name == "Italy")
+```
+
+```{r}
+# plot just italy
+
+country_italy %>%
+  ggplot() +
+  geom_sf() +
+  labs(x = "Longitude",
+       y = "Latitude",
+       title = "Italy")
+```
+
+
+```{r}
+country_denmark <- world %>%
+  filter(name == "Denmark")
+
+country_denmark %>%
+  ggplot() +
+  geom_sf() +
+  labs(x = "Longitude",
+       y = "Latitude",
+       title = "Danmark")
+
+country_faroes <- world %>%
+  filter(name == "Faeroe Is.")
+
+country_faroes%>%
+  ggplot() +
+  geom_sf() +
+  labs(x = "Longitude",
+       y = "Latitude",
+       title = "Færøerne")
+
+```
+
+## Zooming in on particular parts of the world
+
+- we can subset our graph by limiting the x and y range using coord_sf()
+
+```{r}
+world %>%
+  ggplot() +
+  geom_sf() +
+  coord_sf(xlim = c(-102.15, -74.12), ylim = c(7.65, 33.97), expand = FALSE)
+```
+
+Add informative labels
+
+- we need to tell ggplot where to put the label
+- therefore we need to calculate where we want to put the labels (centre of 
+each feature)
+- we need to calculate the centres (centroids)
+
+```{r}
+world %>%
+  mutate(centre = st_centroid(st_make_valid(geometry))) %>%
+  as_tibble() %>%
+  select(name, centre)
+```
+
+```{r}
+world_with_centres <- world %>%
+  mutate(centre = st_centroid(st_make_valid(geometry))) %>%
+  mutate(lat = st_coordinates(centre)[,1],
+         long = st_coordinates(centre)[,2])
+```
+
+
+```{r}
+# centre geometries
+# purely illustrative
+
+centre_geo <- world %>%
+  mutate(centre = st_centroid(st_make_valid(geometry))) %>%
+  select(centre)
+```
+
+
+```{r}
+centre_geo[[1]][[1]]
+```
+
+
+```{r}
+world_with_centres %>%
+  ggplot() +
+  geom_sf() +
+  geom_text(aes(x = lat, y = long, label = name), colour = "darkblue",
+            fontface = "bold", check_overlap = TRUE, size = 3) +
+  coord_sf(xlim = c(-102.15, -74.12), ylim = c(7.65, 33.97), expand = FALSE)
+```
+
+We can add additional information using annotate 
+
+- add one that says: Gulf of Mexico
+
+```{r}
+world_with_centres %>%
+  ggplot() +
+  geom_sf() +
+  geom_text(aes(x = lat, y = long, label = name), colour = "darkblue",
+            fontface = "bold", check_overlap = TRUE, size = 3) +
+  annotate(geom = "text", x = -90, y = 26, label = "Gulf of Mexico", size = 5,
+           fontface = "italic")+
+  coord_sf(xlim = c(-102.15, -74.12), ylim = c(7.65, 33.97), expand = FALSE) 
+```
+
+Task
+```{r}
+world_with_centres %>%
+  ggplot() +
+  geom_sf(aes(fill = income_grp)) +
+  geom_text(aes(x = lat, y = long, label = name), colour = "black",
+            fontface = "bold", check_overlap = TRUE, size = 3) +
+  annotate(geom = "text", x = -90, y = 26, label = "Gulf of Mexico", size = 3,
+           fontface = "italic")+
+  coord_sf(xlim = c(-110.15, -60.12), ylim = c(2.65, 50.97), expand = TRUE) +
+  labs(x = "Latitude",
+       y = "Longitude",
+       fill = "OECD Income group")
+```
+
+## Interactive maps with leaflet
+
+```{r}
+library(leaflet)
+```
+
+
+```{r}
+leaflet() %>%
+  addTiles() %>% #basemap
+  addMarkers(lng = 174.768, lat = -36.852, popup = "The birthplace of R")
+```
+
+That was our (maybe) first leaflet
+
+Get some spatial data from the web
+- turn it into a format R can work with
+- visualise it using leaflet
+
+```{r}
+library(jsonlite)
+```
+
+```{r}
+colorado_data_url <-
+  "https://data.colorado.gov/resource/j5pc-4t32.json?&county=BOULDER"
+```
+
+```{r}
+head(readLines(colorado_data_url))
+```
+
+jsonlite package has a lot of functions to help work with json data
+
+json is like a list of lists in R - sometimes we need to recursively sift through
+to extract the relevant data
+
+```{r}
+colorado_water <- fromJSON(colorado_data_url) %>%
+  jsonlite::flatten(recursive = TRUE)
+```
+
+```{r}
+# wrangling
+colorado_water_clean <- colorado_water %>%
+  select(-location.needs_recoding) %>%
+  mutate(across(c(starts_with("location"), amount), as.numeric)) %>%
+  filter(!is.na(location.latitude), !is.na(location.longitude))
+  
+```
+
+```{r}
+# visualise with leaflet
+
+colorado_water_clean %>%
+  leaflet() %>%
+  addTiles() %>%
+  addCircleMarkers(lng = ~location.longitude,
+                   lat = ~location.latitude)
+```
+
+- incidences of surface water in and around Boulder, Colorado
+
+```{r}
+colorado_water_clean %>%
+  leaflet() %>%
+  addTiles() %>%
+  addCircleMarkers(lng = ~location.longitude,
+                   lat = ~location.latitude,
+                   radius = ~log(amount), weight = 1)
+```
+
+## Clustering
+
+Let's have a look at what addMarkers looks like if we have lots of points
+
+```{r}
+colorado_water_clean %>%
+  leaflet() %>%
+  addTiles() %>%
+  addMarkers(lng = ~location.longitude,
+                   lat = ~location.latitude)
+```
+
+We can add clustering options
+
+```{r}
+colorado_water_clean %>%
+  leaflet() %>%
+  addTiles() %>%
+  addMarkers(lng = ~location.longitude,
+                   lat = ~location.latitude,
+             clusterOptions = markerClusterOptions())
+```
+
+## Leaflet in shiny
+
+```{r}
+whisky_df <- CodeClanData::whisky %>%
+  rename(long = Latitude,
+         lat = Longitude)
+```
+
+maybe too many?
+allow user to filter for specific regions
+only view distilleries in that region
+
+```{r}
+whisky_df %>%
+  leaflet() %>%
+  addTiles() %>%
+  addCircleMarkers(lat = ~lat, lng = ~long, popup = ~Distillery)
+```
+

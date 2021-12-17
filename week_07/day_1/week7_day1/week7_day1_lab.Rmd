@@ -1,0 +1,106 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Lab - dates and times
+
+```{r}
+library(tidyverse)
+library(lubridate)
+
+tour_defrance <- read_csv("data/tour_de_france.csv")
+```
+
+Q1. Load in the tour_de_france.csv dataset and have a look at it. What issues do you see with the dates in this?
+```{r}
+summary(tour_defrance)
+
+# There are two data columns, start_date and died. These are both of the class 
+# "character". This is a difficult format to work with in R, particularly
+# because it is not in the ISO 8601 format, and most functions will therefore
+# not be able to work with them.
+```
+
+Q2. Fix the date columns in the dataset so they are in date ISO format.
+```{r}
+tour_defrance <- tour_defrance %>%
+  mutate(start_date = mdy(start_date),
+         born = dmy(born),
+         died = mdy(died))
+```
+
+Q3. Now do a data check. Tour de France begins in June or July (usually, COVID was the exception). Create a month column which checks whether or not this is consistent and you only have these months in the start_date options. Which month is most popular for starting?
+```{r}
+tour_defrance <- tour_defrance %>%
+  mutate(start_month = month(start_date, label = TRUE, abbr = FALSE))
+
+tour_defrance %>%
+  group_by(start_month) %>%
+  summarise(most_common = sum(n()))
+
+```
+
+Q4. What day of the week is most common for the tour to start?
+```{r}
+tour_defrance <- tour_defrance %>%
+  mutate(start_wday = wday(start_date, label = TRUE, abbr = FALSE))
+
+tour_defrance %>%
+  group_by(start_wday) %>%
+  summarise(most_common = sum(n()))
+```
+
+Q5. Add a date column to your dataset that captures which date each tour finished? Hint: It lasts 23 days.
+```{r}
+tour_defrance <- tour_defrance %>%
+  mutate(time_difftime = start_date + days(23))
+```
+
+Q6. What age was each rider when they started the tour? Hint: you’ll need to calculate the time period between when the race started, and when they were born. You can then format this (recap the “periods” section in the classnotes).
+```{r}
+tour_defrance %>%
+  mutate(age = as.period(start_date - born),
+         age_years = as.numeric(age, "years"))
+
+# I have not accounted for leap years.
+```
+
+Q7. Let’s say a plane leaves Sydney Australia at 2.15pm on the 7th August 2018, and arrives at 5.40am on the 8th August 2018 in London. Create these two dates with the appropriate time zones.
+
+In which dataset?
+
+```{r}
+# 2.15pm 7/8/2018 - UTC +10
+# 5.40am on 8/8/2018 London - UTC + 1
+
+au_time <- ymd_hms("2018-08-07 14:15:00", tz = "Australia/Queensland")
+
+london_time <- ymd_hms("2018-08-08 05:40:00", tz = "Europe/London")
+# note, this should be in BST, but this does not appear to be denoted in the 
+# timezone
+
+
+```
+
+Q8. Work out how long the duration between take off and landing is.
+```{r}
+time <- au_time - london_time
+
+as.period(time)
+```
+
+Q9. Say you left London at 6.20am on the 10th August 2018, and the total flight time including stop-overs was 28 hours and 46 minutes. At what time and date would you arrive in Sydney, Australia?
+```{r}
+london_time_q9 <- ymd_hms("2018-08-10 06:20:00", tz = "Europe/London")
+
+london_time_q9 %>%
+  + hours(28) %>%
+  + minutes(46) %>%
+  with_tz(tzone = "Australia/Queensland")
+
+
+
+```
+
+

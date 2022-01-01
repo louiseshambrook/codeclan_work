@@ -1,0 +1,67 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+library(lubridate)
+ae_waiting_times <- read_csv("data/monthly_ae_waitingtimes_202110.csv")
+
+head(ae_waiting_times)
+
+activity_by_board_depr <- read_csv("data/activity by board of treatment and deprivation.csv")
+activity_by_board_depr
+
+activity_by_board_spec <- read_csv("data/activity by board of treatment and specialty.csv") 
+
+beds_by_nhs_speciality <- read_csv("data/beds_by_nhs_board_of_treatment_and_specialty.csv")
+```
+
+```{r}
+ae_waiting_with_dates <- ae_waiting_times %>%
+  select(Month, NumberOfAttendancesAggregate, NumberOfAttendancesEpisode,
+         AttendanceGreater8hrs, AttendanceGreater12hrs) %>%
+  mutate(quarter_month = ym(Month)) %>%
+  mutate(calendar_month = month(quarter_month, label = TRUE, abbr = FALSE),
+         calendar_year = year(quarter_month))
+
+ae_waiting_with_dates %>%
+  group_by(calendar_year) %>%
+  summarise(total_attendances = sum(n())) %>%
+  ggplot() +
+  geom_col(aes(x = calendar_year, y = total_attendances), fill = "blue")
+  
+```
+
+```{r}
+# beds_by_nhs_speciality %>%
+#   distinct(SpecialtyName)
+
+beds_by_nhs_speciality %>%
+  select(Quarter, PercentageOccupancy, SpecialtyName) %>%
+  filter(SpecialtyName == "Intensive Care Medicine") %>%
+  group_by(Quarter) %>%
+  summarise(mean_occ = mean(PercentageOccupancy)) %>%
+  ggplot() +
+  geom_col(aes(x = Quarter, y = mean_occ))
+
+beds_by_nhs_speciality %>%
+  select(Quarter, PercentageOccupancy, SpecialtyName) %>%
+  filter(SpecialtyName == "All Acute") %>%
+  group_by(Quarter) %>%
+  summarise(mean_occ = mean(PercentageOccupancy)) %>%
+  ggplot() +
+  geom_col(aes(x = Quarter, y = mean_occ))
+
+beds_by_nhs_speciality %>%
+  select(Quarter, PercentageOccupancy, SpecialtyName) %>%
+  filter(SpecialtyName == "Accident & Emergency") %>%
+  group_by(Quarter) %>%
+  summarise(mean_occ = mean(PercentageOccupancy)) %>%
+  ggplot() +
+  geom_col(aes(x = Quarter, y = mean_occ))
+
+
+```
+

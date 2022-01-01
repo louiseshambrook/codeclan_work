@@ -1,0 +1,74 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+loans <- read_csv("loans.csv")
+head(loans)
+```
+
+Part 1.
+Creat plot
+Write sentence
+
+Make a scatterplot with loan amount on the x-axis and interest rate, on the y-axis again.
+```{r}
+loans %>%
+  ggplot() +
+  geom_point(aes(x = loan_amnt, y = int_rate))
+
+# the graph shows that there is a correlation between loan amount and interest rate, particularly that as the loan amounts become high (30000+), so do the interest rates
+```
+Add transparency of points to the plot you just created.
+```{r}
+loans %>%
+  ggplot() +
+  geom_point(aes(x = loan_amnt, y = int_rate, alpha = I(0.1)))
+
+# this shows the same correlation, but removes a lot of the noise / overplotting
+```
+Edit the plot you created to colour the points by the grade of the loan.
+```{r}
+loans %>%
+  ggplot() +
+  geom_point(aes(x = loan_amnt, y = int_rate, colour = grade, alpha = I(0.1)))
+
+# with the colour added, it is possible to see the distribution of correlation by broken down by grade, i.e. that the lower grades tend towards the bottom (A grades), whereas the higher grades tend towards the top (G grades)
+```
+Editing the current plot, use faceting to make a separate plot for each grade.
+```{r}
+loans %>%
+  ggplot() +
+  geom_point(aes(x = loan_amnt, y = int_rate, colour = grade, alpha = I(0.1))) +
+  facet_wrap(~grade)
+
+# this makes the above point clearer, because the distribution is broken down across individual plots
+
+```
+ 
+2. Make a barplot where the height of the bars show the mean loan amount for each grade. Colour the bars by the mean interest rate in each grade.
+```{r}
+loans %>%
+  group_by(grade) %>%
+  mutate(mean_loan_amnt = mean(loan_amnt),
+         mean_int_rate = mean(int_rate)) %>%
+  ggplot() +
+  geom_col(aes(x = mean_loan_amnt, y = grade, fill = mean_int_rate)) +
+  coord_flip()
+
+```
+ 
+ 3. Explore the data. Try to create one polished graph that summarises how purpose, loan about, interest rate and grade are related. Is there one purpose that is significantly different from the others? How can you show this in your graph?
+ 
+```{r}
+loans %>%
+  ggplot() +
+  geom_point(aes(x = loan_amnt, y = int_rate, colour = grade, alpha = I(0.025))) +
+  facet_wrap(~purpose)
+
+
+```
+ 
+ 

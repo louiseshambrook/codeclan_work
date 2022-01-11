@@ -5,6 +5,7 @@ output: html_notebook
 
 ```{r}
 library(tidyverse)
+library(janitor)
 ```
 
 ```{r}
@@ -12,6 +13,8 @@ scotland_level <- read_csv("data/opendata_inc9519_scotland.csv")
 by_region <- read_csv("data/opendata_inc9519_region.csv")
 by_health_board <- read_csv("data/opendata_inc9519_hb.csv")
 label_data <- read_csv("data/geography_codes_and_labels_hb2014_01042019.csv")
+
+
 
 ```
 
@@ -52,7 +55,50 @@ So, my questions, to myself, are:
 https://publichealthscotland.scot/publications/children-and-young-people-with-
 cancer-in-scotland/children-and-young-people-with-cancer-in-scotland-21-september-2021/
 
+## 1 - What are the prevalent types in the 4 age groups of children?
 ```{r}
+by_region <- clean_names(by_region)
+
+# under 5
+by_region %>%
+  select(1:7) %>%
+  group_by(cancer_site) %>%
+  mutate(sum_type = sum(incidences_age_under5)) %>%
+  filter(sum_type != 0, cancer_site != "All cancer types") %>%
+  ggplot(aes(x = sum_type, y = cancer_site)) +
+  geom_bar(stat = "identity")
+
+# age 5 to 9 
+by_region %>%
+  select(1:6, 8) %>%
+  group_by(cancer_site) %>%
+  mutate(sum_type = sum(incidences_age5to9)) %>%
+  filter(sum_type != 0, cancer_site != "All cancer types") %>%
+  ggplot(aes(x = sum_type, y = cancer_site)) +
+  geom_bar(stat = "identity")
+
+# age 10 to 14
+by_region %>%
+  select(1:6, 9) %>%
+  group_by(cancer_site) %>%
+  mutate(sum_type = sum(incidences_age10to14)) %>%
+  filter(sum_type != 0, cancer_site != "All cancer types") %>%
+  ggplot(aes(x = sum_type, y = cancer_site)) +
+  geom_bar(stat = "identity")
+
+# age 15 to 19
+by_region %>%
+  select(1:6, 10) %>%
+  group_by(cancer_site) %>%
+  mutate(sum_type = sum(incidences_age15to19)) %>%
+  filter(sum_type != 0, cancer_site != "All cancer types") %>%
+  ggplot(aes(x = sum_type, y = cancer_site)) +
+  geom_bar(stat = "identity")
+
+```
+
+```{r}
+
 
 ```
 

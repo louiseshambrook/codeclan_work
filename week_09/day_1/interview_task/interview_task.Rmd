@@ -14,7 +14,7 @@ by_region <- read_csv("data/opendata_inc9519_region.csv")
 by_health_board <- read_csv("data/opendata_inc9519_hb.csv")
 label_data <- read_csv("data/geography_codes_and_labels_hb2014_01042019.csv")
 
-
+by_health_board <- clean_names(by_health_board)
 
 ```
 
@@ -26,45 +26,64 @@ To begin to answer / explore this
  stats from this year
  - This data goes back to 1995 
 
-Children are my interest, so that will lead my focus.
-Divide into two groups; children, and young people (this is how PHS divides them up).
-
-## Question 1 - What is the most prevalent type of cancer in each group?
-```{r}
-# by_region - filter by south east 
-# child group
-
-
-
-# by_region - filter by south east
-# young people group
-```
-
-## Question 2 - How are the demographics of each group?
+## Question 1 - What are the 5 most common / prevalent types ?
 
 ```{r}
-# by_region - how are these demographics split?
-# child group
-
-
-
-# by_region - how are these demographics split?
-# young people group
+by_health_board %>%
+  select(1:7) %>%
+  filter(hb == "S08000016", cancer_site != "All cancer types") %>%
+  group_by(cancer_site) %>%
+  summarise(sum_type = sum(incidences_all_ages)) %>%
+  arrange(desc(sum_type)) %>%
+  head(5) %>%
+  ggplot(aes(x = cancer_site, y = sum_type)) +
+  geom_col() +
+  coord_flip()
 
 ```
+Because there are a large amount of types, to present the information in a reasonable limit, it was necessary to set a limit, so this was set at 5.
+These numbers are calculated across 1995-2019, to gain a basic insight into whether there is a prevalent type, and if so, which. 
 
-## Question 3- Has the prevalence changed between 1995 and 2019?
+
+## Question 2 - How does this break down across time?
 
 ```{r}
-#by_region - child group - most prevalent 1995 / 2019
-
-
-
-#by_region - young people group - most prevalent 1995 / 2019
-
+by_health_board %>%
+  select(1:7) %>%
+  filter(hb == "S08000016", cancer_site != "All cancer types",
+         cancer_site == "Breast" | 
+         cancer_site == "Trachea, bronchus and lung" |
+          cancer_site == "Non-melanoma skin cancer" |
+          cancer_site == "Colorectal cancer" | 
+          cancer_site == "Basal cell carcinoma of the skin",
+         sex == "All"
+         ) %>%
+  ggplot(aes(x = year, y = incidences_all_ages, fill = cancer_site)) +
+  geom_col() +
+  facet_wrap(~cancer_site)
+  
+  
 ```
 
-## Question 4 - 
+## Question 3 - How does this break down across demographics? (gender)
+
+```{r}
+by_health_board %>%
+  select(1:7) %>%
+  filter(hb == "S08000016", cancer_site != "All cancer types",
+         cancer_site == "Breast" | 
+         cancer_site == "Trachea, bronchus and lung" |
+          cancer_site == "Non-melanoma skin cancer" |
+          cancer_site == "Colorectal cancer" | 
+          cancer_site == "Basal cell carcinoma of the skin",
+         sex == "Female" | sex == "Male"
+         ) %>%
+  ggplot(aes(x = year, y = incidences_all_ages, fill = sex)) +
+  geom_col()
+```
+
+## Question 4 - Statistically - are females or males diagnosed with cancer in the NHS Borders region more?
+(in this section that I looked at)
 
 ```{r}
 

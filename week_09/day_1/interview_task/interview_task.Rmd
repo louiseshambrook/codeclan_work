@@ -1,33 +1,56 @@
 ---
-title: "R Notebook"
+title: "Interview Task"
 output: html_notebook
 ---
 
+# Main task
+In order to help inform the planning for provision of cancer treatment services in NHS Borders, we would like to gain better understanding of the incidence of cancer in NHS Borders.
+
 ```{r}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+```
+
+```{r}
+# loading libraries
 library(tidyverse)
 library(janitor)
 library(infer)
 ```
 
 ```{r}
+# loading data
 scotland_level <- read_csv("data/opendata_inc9519_scotland.csv")
 by_region <- read_csv("data/opendata_inc9519_region.csv")
 by_health_board <- read_csv("data/opendata_inc9519_hb.csv")
 label_data <- read_csv("data/geography_codes_and_labels_hb2014_01042019.csv")
+```
 
+```{r}
+# initial data cleaning
 by_health_board <- clean_names(by_health_board)
 
 ```
 
+To begin to explore this, I completed exploratory plots. From these, I noticed that data went back to 1995, and became aware that I had assumed data would only be from 2021. I also completed reading on opendata.nhs.scot to explore current publications. Combined, these guided me to set 4 questions for myself to explore, which in turn can begin to inform planning. These questions are:
 
-In order to help inform the planning for provision of cancer treatment services in NHS Borders, we would like to gain better understanding of the incidence of cancer in NHS Borders.
+What are the 5 most prevalent types of cancer?
+How do these 5 types break down across time (years)?
+How do these 5 types break down across sex?
 
-To begin to answer / explore this 
- - I assumed that the data was new, i.e. that this would only include new diagnoses / 
- stats from this year
- - This data goes back to 1995 
+For all calculations and visualisations, the data has been filtered by healthboard S08000016, i.e. NHS Borders. I have also filtered out the type "All cancer types" to avoid duplicate aggregation.
 
 ## Question 1 - What are the 5 most common / prevalent types ?
+
+```{r}
+by_health_board %>%
+  select(1:7) %>%
+  filter(hb == "S08000016", cancer_site != "All cancer types") %>%
+  group_by(cancer_site) %>%
+  summarise(count_incidences = sum(incidences_all_ages)) %>%
+  arrange(desc(sum_type)) %>%
+  head(5)
+```
+This is the calculation of the 5 types with the highest incidence count.
 
 ```{r}
 by_health_board %>%
@@ -39,14 +62,18 @@ by_health_board %>%
   head(5) %>%
   ggplot(aes(x = cancer_site, y = sum_type)) +
   geom_col() +
-  coord_flip()
+  coord_flip() +
+  theme_minimal() +
+  labs(y = "Total count of incidences",
+       x = "Cancer Type",
+       title = "Frequency of the top 5 incidences of cancer")
 
 ```
-Because there are a large amount of types, to present the information in a reasonable limit, it was necessary to set a limit, so this was set at 5.
-These numbers are calculated across 1995-2019, to gain a basic insight into whether there is a prevalent type, and if so, which. 
+This is the same information, visualised.
 
+Because there are 51 types, to begin to gain an insight into the data in the time provided, it was necessary to set a limit on the types that I would look at; I set this at the top 5.
 
-## Question 2 - How does this break down across time?
+## Question 2 - What is the pattern of these types across time (i.e. 1995 - 2019)?
 
 ```{r}
 by_health_board %>%
@@ -56,15 +83,16 @@ by_health_board %>%
          cancer_site == "Trachea, bronchus and lung" |
           cancer_site == "Non-melanoma skin cancer" |
           cancer_site == "Colorectal cancer" | 
-          cancer_site == "Basal cell carcinoma of the skin",
-         sex == "All"
-         ) %>%
+          cancer_site == "Basal cell carcinoma of the skin") %>%
   ggplot(aes(x = year, y = incidences_all_ages, fill = cancer_site)) +
-  geom_col() +
-  facet_wrap(~cancer_site)
-  
-  
+  geom_col(show.legend = FALSE) +
+  facet_wrap(~cancer_site) +
+  theme_minimal() +
+  labs(y = "Total count of incidences",
+       x = "Year",
+       title = "5 highest types of cancer, spread across 1995-2019")
 ```
+In this graph, there is a visible pattern that whilst Trachea, Colorectal and Breast have remained relatively stable, Basal Cell and Non-melanoma have increased in their incidences. There is also a smaller pattern of spikes in breast cancer. 
 
 ## Question 3 - How does this break down across demographics? (gender)
 
@@ -77,87 +105,34 @@ by_health_board %>%
           cancer_site == "Non-melanoma skin cancer" |
           cancer_site == "Colorectal cancer" | 
           cancer_site == "Basal cell carcinoma of the skin",
-         sex == "Female" | sex == "Male"
+         sex != "All"
          ) %>%
   ggplot(aes(x = year, y = incidences_all_ages, fill = sex)) +
-  geom_col(position = "dodge")
+  geom_col(position = "dodge") +
+  facet_wrap(~cancer_site) +
+  theme_minimal() +
+  labs(y = "Total count of incidences",
+       x = "Year",
+       title = "5 highest types of cancer, spread across 1995-2019, by sex")
 ```
+This graph breaks down the same data as the previous graph, with the additional layer of breaking down by biological sex.
 
-# The question / hypothesis I'm asking is - is the difference between male and female diagnoses statistically significant? This is 194. 
+Whilst it may confirm an assumption that females are predominant in the type "Breast", this breakdown highlights a distinction in the previous pattern discussed. In the type "Non-melanoma skin cancer", it is evidenced that Males are increasingly receiving this diagnosis.
 
-```{r}
-total_sum_by_sex <- by_health_board %>%
-  select(1:7) %>%
-  filter(hb == "S08000016", cancer_site != "All cancer types",
-         sex == "Female" | sex == "Male")
+### Summary
 
-by_health_board %>%
-  select(1:7) %>%
-  filter(hb == "S08000016", cancer_site != "All cancer types",
-         sex == "Female" | sex == "Male") %>%
-  group_by(sex) %>%
-  summarise(total_sum = sum(incidences_all_ages))
-
-# null hypothesis - π1−π2=0 / total_sum_female-total_sum_male = 0
-# alternative hypothesis - total_sum_female-total_sum_male != 0
-# significance level - 0.05
-
-```
-
-## Question 4 - Statistically - given that one of the 5 most prevalent types is related to biological sex, is there a statistical correlation between sex and cancer diagnosis?
-
-```{r}
-# calculating null distribution
-null_dist_sex <- total_sum_by_sex %>%
-  specify(incidences_all_ages ~ sex) %>%
-  hypothesise(null = "independence") %>%
-  generate(reps = 5000, type = "permute") %>%
-  calculate(stat = "diff in means",
-            order = c("Female", "Male"))
-
-obs_stat_sex <- by_health_board %>%
-  select(1:7) %>%
-  filter(hb == "S08000016", cancer_site != "All cancer types",
-         sex == "Female" | sex == "Male") %>%
-  specify(incidences_all_ages ~ sex) %>%
-  calculate(stat = "diff in means",
-            order = c("Female", "Male"))
-  
-null_dist_sex %>%
-  visualise() +
-  shade_pvalue(obs_stat = obs_stat_sex,
-                direction = "left")
-
-p_value_sex <- null_dist_sex %>%
-  get_p_value(obs_stat = obs_stat_sex,
-              direction = "left")
-p_value_sex
-
-
-# the p value is 0.0928. Therefore, there is insufficient evidence for rejecting the null hypothesis. 
-
-# However - this is looking at all years, and all types. A key recommendation would be to investigate further into specific years, and targeted types.
-# Looking back on the initial graph that sparked this question, it would also bear investigating to see how proportions have changed from 1995 to 2019. 
-
-```
-In summary:
-
-- The 5 most prevalent types are:
+The 5 highest incidences of types are:
 Breast
-Trachea, bronchus and lung
+Trachea, bronchus and lung 
 Non-melanoma skin cancer
 Colorectal cancer
 Basal cell carcinoma of the skin
 
-- Since 1995 (when data collection began), for 3 of these types, these have remained pretty steady.
-However, Basal Cell and Non-melanoma have increased in diagnosis numbers. 
+- For Trachea, Colorectal, and Breast, the incidence rate across 1995-2019 has remained relatively stable. For Basal Cell and Non-melanoma, there is an increasing pattern.
 
-- Across sex, this.... ?
+- When breaking this further down across sex, there is a visible pattern of males increasing in incidence in the type "Non-melanoma".
 
-- As breast cancer is one of the 5 most diagnosed, this begs the question of whether
-biological sex is a statistically significant difference. This was examined; a 
-p-value of 0.0928 was found, meaning that there was insufficient evidence for 
-rejecting the null hypothesis. However - the sample was using all years, and all diagnosis types.
+### Further investigation recommendations
 
-- As for recommendations, it would 
+As these 5 types were only 5 out of the 51 total types possible, given the pattern uncovered regarding males and the type non-melanoma, further similar analyses should be completed to identify any similar trends. Additionally, statistical analyses should be completed on these, e.g. comparing 2015 and 2019 samples. 
 

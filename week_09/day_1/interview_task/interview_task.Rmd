@@ -27,78 +27,46 @@ To begin to answer / explore this
  - This data goes back to 1995 
 
 Children are my interest, so that will lead my focus.
+Divide into two groups; children, and young people (this is how PHS divides them up).
 
+## Question 1 - What is the most prevalent type of cancer in each group?
+```{r}
+# by_region - filter by south east 
+# child group
+
+
+
+# by_region - filter by south east
+# young people group
+```
+
+## Question 2 - How are the demographics of each group?
 
 ```{r}
-by_health_board %>%
-  ggplot(aes(x = Year, y = IncidencesAllAges)) +
-  geom_col()
+# by_region - how are these demographics split?
+# child group
+
+
+
+# by_region - how are these demographics split?
+# young people group
 
 ```
 
+## Question 3- Has the prevalence changed between 1995 and 2019?
+
 ```{r}
-by_region %>%
-  ggplot(aes(x = IncidencesAgeUnder5, y = CancerSite)) +
-  geom_col()
+#by_region - child group - most prevalent 1995 / 2019
 
-```
-This shows that children (under 5) are most commonly diagnosed with leukemia, i.e. there is a prevalent type.
 
-So, my questions, to myself, are:
 
-- What are the prevalent types (if any), in the 4 age groups of children?
-- What is the incidence of cancer among demographics in the groups?
-- Has a prevalent type changed over the last 30 or so years?
-- Are there regional variations?
-- What can be recommended / generalised? 
-- Note; reading about cancer in children and young people in Scotland:
-https://publichealthscotland.scot/publications/children-and-young-people-with-
-cancer-in-scotland/children-and-young-people-with-cancer-in-scotland-21-september-2021/
-
-## 1 - What are the prevalent types in the 4 age groups of children?
-```{r}
-by_region <- clean_names(by_region)
-
-# under 5
-by_region %>%
-  select(1:7) %>%
-  group_by(cancer_site) %>%
-  mutate(sum_type = sum(incidences_age_under5)) %>%
-  filter(sum_type != 0, cancer_site != "All cancer types") %>%
-  ggplot(aes(x = sum_type, y = cancer_site)) +
-  geom_bar(stat = "identity")
-
-# age 5 to 9 
-by_region %>%
-  select(1:6, 8) %>%
-  group_by(cancer_site) %>%
-  mutate(sum_type = sum(incidences_age5to9)) %>%
-  filter(sum_type != 0, cancer_site != "All cancer types") %>%
-  ggplot(aes(x = sum_type, y = cancer_site)) +
-  geom_bar(stat = "identity")
-
-# age 10 to 14
-by_region %>%
-  select(1:6, 9) %>%
-  group_by(cancer_site) %>%
-  mutate(sum_type = sum(incidences_age10to14)) %>%
-  filter(sum_type != 0, cancer_site != "All cancer types") %>%
-  ggplot(aes(x = sum_type, y = cancer_site)) +
-  geom_bar(stat = "identity")
-
-# age 15 to 19
-by_region %>%
-  select(1:6, 10) %>%
-  group_by(cancer_site) %>%
-  mutate(sum_type = sum(incidences_age15to19)) %>%
-  filter(sum_type != 0, cancer_site != "All cancer types") %>%
-  ggplot(aes(x = sum_type, y = cancer_site)) +
-  geom_bar(stat = "identity")
+#by_region - young people group - most prevalent 1995 / 2019
 
 ```
 
-```{r}
+## Question 4 - 
 
+```{r}
 
 ```
 

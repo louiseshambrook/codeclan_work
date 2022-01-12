@@ -6,6 +6,7 @@ output: html_notebook
 ```{r}
 library(tidyverse)
 library(janitor)
+library(infer)
 ```
 
 ```{r}
@@ -79,13 +80,84 @@ by_health_board %>%
          sex == "Female" | sex == "Male"
          ) %>%
   ggplot(aes(x = year, y = incidences_all_ages, fill = sex)) +
-  geom_col()
+  geom_col(position = "dodge")
 ```
 
-## Question 4 - Statistically - are females or males diagnosed with cancer in the NHS Borders region more?
-(in this section that I looked at)
+# The question / hypothesis I'm asking is - is the difference between male and female diagnoses statistically significant? This is 194. 
 
 ```{r}
+total_sum_by_sex <- by_health_board %>%
+  select(1:7) %>%
+  filter(hb == "S08000016", cancer_site != "All cancer types",
+         sex == "Female" | sex == "Male")
+
+by_health_board %>%
+  select(1:7) %>%
+  filter(hb == "S08000016", cancer_site != "All cancer types",
+         sex == "Female" | sex == "Male") %>%
+  group_by(sex) %>%
+  summarise(total_sum = sum(incidences_all_ages))
+
+# null hypothesis - π1−π2=0 / total_sum_female-total_sum_male = 0
+# alternative hypothesis - total_sum_female-total_sum_male != 0
+# significance level - 0.05
 
 ```
+
+## Question 4 - Statistically - given that one of the 5 most prevalent types is related to biological sex, is there a statistical correlation between sex and cancer diagnosis?
+
+```{r}
+# calculating null distribution
+null_dist_sex <- total_sum_by_sex %>%
+  specify(incidences_all_ages ~ sex) %>%
+  hypothesise(null = "independence") %>%
+  generate(reps = 5000, type = "permute") %>%
+  calculate(stat = "diff in means",
+            order = c("Female", "Male"))
+
+obs_stat_sex <- by_health_board %>%
+  select(1:7) %>%
+  filter(hb == "S08000016", cancer_site != "All cancer types",
+         sex == "Female" | sex == "Male") %>%
+  specify(incidences_all_ages ~ sex) %>%
+  calculate(stat = "diff in means",
+            order = c("Female", "Male"))
+  
+null_dist_sex %>%
+  visualise() +
+  shade_pvalue(obs_stat = obs_stat_sex,
+                direction = "left")
+
+p_value_sex <- null_dist_sex %>%
+  get_p_value(obs_stat = obs_stat_sex,
+              direction = "left")
+p_value_sex
+
+
+# the p value is 0.0928. Therefore, there is insufficient evidence for rejecting the null hypothesis. 
+
+# However - this is looking at all years, and all types. A key recommendation would be to investigate further into specific years, and targeted types.
+# Looking back on the initial graph that sparked this question, it would also bear investigating to see how proportions have changed from 1995 to 2019. 
+
+```
+In summary:
+
+- The 5 most prevalent types are:
+Breast
+Trachea, bronchus and lung
+Non-melanoma skin cancer
+Colorectal cancer
+Basal cell carcinoma of the skin
+
+- Since 1995 (when data collection began), for 3 of these types, these have remained pretty steady.
+However, Basal Cell and Non-melanoma have increased in diagnosis numbers. 
+
+- Across sex, this.... ?
+
+- As breast cancer is one of the 5 most diagnosed, this begs the question of whether
+biological sex is a statistically significant difference. This was examined; a 
+p-value of 0.0928 was found, meaning that there was insufficient evidence for 
+rejecting the null hypothesis. However - the sample was using all years, and all diagnosis types.
+
+- As for recommendations, it would 
 

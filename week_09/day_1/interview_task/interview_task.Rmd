@@ -36,6 +36,7 @@ To begin to explore this, I completed exploratory plots. From these, I noticed t
 What are the 5 most prevalent types of cancer?
 How do these 5 types break down across time (years)?
 How do these 5 types break down across sex?
+How does the type "squamous cell" break down across age?
 
 For all calculations and visualisations, the data has been filtered by healthboard S08000016, i.e. NHS Borders. I have also filtered out the type "All cancer types" to avoid duplicate aggregation.
 
@@ -44,10 +45,11 @@ For all calculations and visualisations, the data has been filtered by healthboa
 ```{r}
 by_health_board %>%
   select(1:7) %>%
-  filter(hb == "S08000016", cancer_site != "All cancer types") %>%
+  filter(hb == "S08000016", cancer_site != "All cancer types",
+         cancer_site != "Non-melanoma skin cancer") %>%
   group_by(cancer_site) %>%
   summarise(count_incidences = sum(incidences_all_ages)) %>%
-  arrange(desc(sum_type)) %>%
+  arrange(desc(count_incidences)) %>%
   head(5)
 ```
 This is the calculation of the 5 types with the highest incidence count.
@@ -55,7 +57,8 @@ This is the calculation of the 5 types with the highest incidence count.
 ```{r}
 by_health_board %>%
   select(1:7) %>%
-  filter(hb == "S08000016", cancer_site != "All cancer types") %>%
+  filter(hb == "S08000016", cancer_site != "All cancer types",
+         cancer_site != "Non-melanoma skin cancer") %>%
   group_by(cancer_site) %>%
   summarise(sum_type = sum(incidences_all_ages)) %>%
   arrange(desc(sum_type)) %>%
@@ -81,7 +84,7 @@ by_health_board %>%
   filter(hb == "S08000016", cancer_site != "All cancer types",
          cancer_site == "Breast" | 
          cancer_site == "Trachea, bronchus and lung" |
-          cancer_site == "Non-melanoma skin cancer" |
+          cancer_site == "Squamous cell carcinoma of the skin" |
           cancer_site == "Colorectal cancer" | 
           cancer_site == "Basal cell carcinoma of the skin") %>%
   ggplot(aes(x = year, y = incidences_all_ages, fill = cancer_site)) +
@@ -92,7 +95,7 @@ by_health_board %>%
        x = "Year",
        title = "5 highest types of cancer, spread across 1995-2019")
 ```
-In this graph, there is a visible pattern that whilst Trachea, Colorectal and Breast have remained relatively stable, Basal Cell and Non-melanoma have increased in their incidences. There is also a smaller pattern of spikes in breast cancer. 
+In this graph, there is a visible pattern that whilst Trachea, Colorectal and Breast have remained relatively stable, Basal Cell has increased in in incidences. There is also a smaller pattern of spikes in breast cancer. 
 
 ## Question 3 - How does this break down across demographics? (gender)
 
@@ -102,7 +105,7 @@ by_health_board %>%
   filter(hb == "S08000016", cancer_site != "All cancer types",
          cancer_site == "Breast" | 
          cancer_site == "Trachea, bronchus and lung" |
-          cancer_site == "Non-melanoma skin cancer" |
+          cancer_site == "Squamous cell carcinoma of the skin" |
           cancer_site == "Colorectal cancer" | 
           cancer_site == "Basal cell carcinoma of the skin",
          sex != "All"
@@ -115,24 +118,52 @@ by_health_board %>%
        x = "Year",
        title = "5 highest types of cancer, spread across 1995-2019, by sex")
 ```
+
 This graph breaks down the same data as the previous graph, with the additional layer of breaking down by biological sex.
 
-Whilst it may confirm an assumption that females are predominant in the type "Breast", this breakdown highlights a distinction in the previous pattern discussed. In the type "Non-melanoma skin cancer", it is evidenced that Males are increasingly receiving this diagnosis.
+Whilst it may confirm an assumption that females are predominant in the type "Breast", this breakdown highlights a distinction in the previous pattern discussed. In the type "Squamous cell", there is a suggestion evidenced that Males are increasingly receiving this diagnosis (the same pattern is suggested in the type "Basal cell"). To explore this further, statistical analyses should be completed. 
+
+## Question 4 - How does this break down across age?
+
+```{r}
+by_region <- clean_names(by_region)
+
+by_region %>%
+  filter(region == "South East of Scotland",
+         cancer_site != "All cancer types",
+          cancer_site == "Squamous cell carcinoma of the skin", sex == "Male", year == 2019) %>%
+  pivot_longer(7:25, cols = starts_with("incidences_age"), names_to = "age_column", values_to = "age") %>%
+  ggplot(aes(x = age_column, y = age)) +
+  geom_col() +
+  coord_flip() +
+  theme_minimal() +
+  labs(y = "Squamous cell carcinoma incidences",
+       x = "Age",
+       title = "Squamous cell carcinoma by age")
+  
+```
+Digging further into this question, of who is being diagnosed with this type (Squamous cell carcinoma) - I explored the data which is broken down by region. Whilst this does not look at NHS Borders exclusively, it does include South East Scotland, which includes NHS Borders. This was to explore the demographics further of who being diagnosed with this type, as this data was not readily available in the original dataset. From the above graph, it can be seen that in 2019 (which is filtered by "Male"), it is predominantly individuals in the age groups 75 to 79, and 80 to 84 who are being diagnosed with this type. In turn, this can inform planning. 
 
 ### Summary
 
 The 5 highest incidences of types are:
 Breast
 Trachea, bronchus and lung 
-Non-melanoma skin cancer
+Squamous cell carcinoma
 Colorectal cancer
 Basal cell carcinoma of the skin
 
-- For Trachea, Colorectal, and Breast, the incidence rate across 1995-2019 has remained relatively stable. For Basal Cell and Non-melanoma, there is an increasing pattern.
+- For Trachea, Colorectal, and Breast, the incidence rate across 1995-2019 has remained relatively stable. For Basal Cell and Squamous cell carcinoma, there is an increasing pattern.
 
-- When breaking this further down across sex, there is a visible pattern of males increasing in incidence in the type "Non-melanoma".
+- When breaking this further down across sex, there is a visible pattern of males increasing in incidence in the type Squamous cell.
+
+- When exporing the data by region, it is seen that it is predominantly males between 75 and 79 who are diagnosed with this type of cancer.
 
 ### Further investigation recommendations
 
-As these 5 types were only 5 out of the 51 total types possible, given the pattern uncovered regarding males and the type non-melanoma, further similar analyses should be completed to identify any similar trends. Additionally, statistical analyses should be completed on these, e.g. comparing 2015 and 2019 samples. 
+As these 5 types were only 5 out of the 51 total types possible, given the pattern uncovered regarding males and the type non-melanoma, further similar analyses should be completed to identify any similar trends. Additionally, statistical analyses should be completed on these, e.g. comparing 2015 and 2019 samples.
+
+### Planning recommendations
+
+As it has been shown that there is a type of cancer which is increasingly being diagnosed in males in the age group 75 to 79, this should be factored into planning on a strategic level. This can for example include ensuring to invite individuals to annual check ups, and to check against risk factors, to ensure that individuals at risk are invited sooner / more frequently.
 

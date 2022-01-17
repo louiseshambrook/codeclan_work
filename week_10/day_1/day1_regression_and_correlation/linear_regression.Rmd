@@ -1,0 +1,68 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Week 10 - day 1
+
+Correlations
+
+positive correlation - y increases, as x increases
+
+Negative correlation - y decreases as x increases
+
+Strong/weak correlation - measured by correlation coeffecient ( -1 / +1)
+When r = 1, then there is a linear correlation (?)
+
+cor()
+
+Task
+
+Change the noise and gradient values 
+```{r}
+library(tidyverse)
+
+noisy_bivariate <- function(noise = 1, gradient = 1){
+  x <- runif(n = 200, min = 0, max = 10)
+  y <- gradient * x + 10
+  y_scatter <- noise * 4 * rnorm(n = 200)
+  y <- y + y_scatter
+  data = tibble(x, y)
+
+  r <- round(cor(x, y), 4)
+  title <- paste(
+    "noise = ", noise,
+    ", gradient = ", gradient,
+    ", r = ", r
+  )
+  
+  data %>%
+    ggplot(aes(x = x, y = y)) +
+    geom_point() +
+    xlim(0, 10) +
+    ylim(min(c(min(y), 0)), max(c(max(y), 10))) +
+    ggtitle(title)
+  
+}
+noisy_bivariate(noise = 0.5, gradient = 0)
+```
+
+Covariance
+
+
+cov()
+
+
+**
+
+Strength of correlation
+
+As written out by one author (JD Evans)
+
+0 - none
+0.01 - 0.19 - very weak
+0.2 - 0.39 - weak
+0.4 - 0.59 - moderate
+0.6 - 0.79 - strong
+
+

@@ -5,7 +5,9 @@ output: html_notebook
 
 Week 10 - day 1
 
-Correlations
+What is linear regression? A linear way of modelling the relationship between two variables, which can be used to predict / forecast models
+
+## Correlations
 
 positive correlation - y increases, as x increases
 
@@ -21,6 +23,7 @@ Task
 Change the noise and gradient values 
 ```{r}
 library(tidyverse)
+library(janitor)
 
 noisy_bivariate <- function(noise = 1, gradient = 1){
   x <- runif(n = 200, min = 0, max = 10)
@@ -64,5 +67,335 @@ As written out by one author (JD Evans)
 0.2 - 0.39 - weak
 0.4 - 0.59 - moderate
 0.6 - 0.79 - strong
+
+
+To calculate correlation:
+cor()
+
+Task
+
+Use anscombe dataset to calculate correlation coeffecients
+```{r}
+cor(anscombe$x1, anscombe$y1)
+cor(anscombe$x2, anscombe$y2)
+cor(anscombe$x3, anscombe$y3)
+cor(anscombe$x4, anscombe$y4)
+
+# they're all about .8 because they all have outliers / data that doesn't fall into an expected pattern
+```
+
+Task - 2 mins See if you can suggest any confounding variable(s) for the following associations:
+“1. Sleeping with shoes on is strongly correlated with waking up with a headache. Therefore, sleeping with shoes on causes headaches.”
+
+“2. Atmospheric CO2 level and obesity levels have both increased sharply since the 1950s. Therefore, atmospheric CO2 causes obesity.”
+
+“3. The more bacon someone eats, the higher their blood pressure. Therefore bacon causes hypertension.”
+
+Task - find any correlations / plots with strong / weak correlations
+```{r}
+
+tibble_states <- clean_names(as_tibble(state.x77))
+
+cor(tibble_states$illiteracy, tibble_states$murder)
+
+pairs() 
+# plots everything at once
+
+psych::pairs_panels()
+
+```
+
+## Lines (2nd lesson)
+
+Independent variable - x
+
+y - is a function of x (so therefore, y is dependent, and x is independent)
+
+predictor vs response
+explanatory vs outcome
+
+formula: y = a*x + b
+(intercept formula)
+
+a = gradient
+b = intercept
+
+gradient = slope
+intercept = 
+
+```{r}
+line <- function(x, a, b) {
+  a * x + b
+}
+
+data <- tibble(x = seq(-5, 5, 0.1),
+               y = line(x, a = 2, b = -1))
+
+data %>%
+  ggplot(aes(x, y)) +
+  geom_line(col = "red") +
+  geom_vline(xintercept = 0) +
+  geom_hline(yintercept = 0)
+```
+Task
+
+Play around plotting two or three different lines.
+Try a line with a=0 and positive b.
+You can use mutate() to overwrite y in data from above
+Can we use our line() function to plot a perfectly vertical line?
+
+```{r}
+
+```
+
+```{r}
+noisy_line <- read_csv("data/noisy_line.csv")
+
+noisy_line_plot <- noisy_line %>%
+  ggplot(aes(x, y)) +
+  geom_point()
+
+noisy_line_plot
+
+```
+
+putting in the centroid (centre point of the graph / the mean of the means)
+```{r}
+centroid <- noisy_line %>%
+  summarise(x = mean(x),
+            y = mean(y))
+centroid
+
+noisy_line_plot <- noisy_line_plot +
+  geom_point(x = centroid$x, y = centroid$y, colour = "blue", size = 5)
+noisy_line_plot
+```
+
+Now we add the intercept, so that we have a line / multiple points to add a line
+
+To calculate this:
+y - a*x = b
+```{r}
+get_intercept <- function(slope, centroid_x, centroid_y) {
+  centroid_y - slope * centroid_x
+}
+
+slope <- 2.2
+
+noisy_line_plot +
+  geom_abline(slope = slope, intercept = get_intercept(slope, centroid$x, centroid$y))
+
+```
+
+When we talk about modelling, we talk about that line (the line through the middle of the graph),
+and this allows us to generalise and talk about the graph (and predict!)
+
+**
+
+LUNCH BREAK
+
+**
+
+## Linear regression
+
+lm()
+
+```{r}
+sample_data <- tibble(
+  height = c(176, 164, 181, 168, 195, 185, 166, 180, 188, 174),
+  weight = c(82, 65, 85, 76, 90, 92, 68, 83, 94, 74 )
+)
+
+sample_data %>%
+  ggplot(aes(weight, height)) +
+  geom_point()
+```
+
+y = b0 + b1 * x
+
+b0 = intercept
+b1 = slope
+
+making a plot for sample_data
+```{r}
+
+line <- function (x, b0, b1) {
+  b0 + x * b1
+}
+
+sample_data <- sample_data %>%
+  mutate(fit_height = line(weight, b0 = 95, b1 = 1))
+
+sample_data %>%
+  ggplot(aes(weight, height)) +
+  geom_point() +
+  geom_point(aes(y = fit_height), shape = 1) +
+  geom_abline(slope = 1, intercept = 95, colour = "red") +
+  geom_segment(aes(xend = weight, yend = fit_height))
+
+# the lines added in by the segment geom, are also called residuals
+```
+
+```{r}
+sample_data <- sample_data %>% 
+  mutate(residuals = height - fit_height)
+
+# calculating the residuals and adding them to a column
+
+sample_data %>%
+  summarise(sum_residual = sum(residuals))
+
+# the point of this line, was to minimise the residuals. when they have been calculated, if you then sum them you may then end up with 0 (because they may cancel each other out), so it's better to find the square root
+
+sample_data <- sample_data %>%
+  mutate(sq_residuals = residuals^2)
+
+sample_data %>%
+  summarise(sum_sq_residual = sum(sq_residuals))
+```
+
+Making a linear model
+```{r}
+# this is a formula (lm requires a formula to be input)
+# ~ weight
+
+new_model <- lm(height ~ weight, sample_data)
+
+# height is a function of weight
+```
+
+```{r}
+predict_at <- data.frame(weight = 78)
+
+predict(new_model, newdata = predict_at)
+```
+
+```{r}
+library(modelr)
+library(tidyverse)
+
+sample_data <- sample_data %>%
+  # select(fit_height, residuals, sq_residuals) %>%
+  add_predictions(new_model) %>%
+  add_residuals(new_model)
+
+sample_data %>%
+  ggplot(aes(x = weight)) +
+  geom_point(aes(y = height)) +
+  geom_line(aes(y = pred, colour = "red"))
+```
+
+```{r}
+# sidestep - how to calculate linear regression:
+x_dev <- sample$weight - mean(sample$weight)
+y_dev <- sample$height - mean(sample$height)
+
+top <- sum(x_dev * y_dev) / 9
+bottom <- sum(x_dev^2 / 9)
+model
+
+top / bottom
+
+cov(sample$weight, sample$height) /
+var(sample$weight)
+```
+
+
+## Interpreting Linear Regressions
+
+```{r}
+sample_data_again <- tibble(
+  height = c(176, 164, 181, 168, 195, 185, 166, 180, 188, 174),
+  weight = c(82, 65, 85, 76, 90, 92, 68, 83, 94, 74 )
+)
+
+model_again <- lm(height ~ weight, data = sample_data_again)
+summary(model_again)
+
+summary(model_again)
+boxplot(resid(model_again))
+
+```
+
+```{r}
+library(broom)
+
+summary(model_again)
+
+tidy_output <- janitor::clean_names(tidy(model_again))
+glance_output <- janitor::clean_names(glance(model_again))
+```
+
+Using glance, you get:
+
+r_squared
+is the proportion of the variation that can be explained by variation in the predictor(s)
+
+
+```{r}
+# regression diagnostics
+
+library(ggfortify)
+
+autoplot(model_again)
+```
+
+Task
+```{r}
+distribution_1 <- read_csv("data/distribution_1.csv")
+distribution_2 <- read_csv("data/distribution_2.csv")
+
+model_distribution_1 <- lm(y ~ x, distribution_1)
+model_distribution_2 <- lm(y ~ x, distribution_2)
+
+autoplot(model_distribution_1)
+# 1 - should be randomly scattered around 0, which they're not
+# 2 - should be close to the line and not in a corkscrew, which they're not
+# 3 - should be in a band close to the x axis, which they're not
+
+autoplot(model_distribution_2)
+# 2 - should be close to the line and not in a corkscrew, which they're not
+# 3 - should be in a band close to the x axis, which they're not
+
+distribution_1 <- distribution_1 %>%
+  add_predictions(model_distribution_1)
+
+distribution_1 %>%
+  ggplot(aes(x = x)) +
+  geom_point(aes(y = y)) +
+  geom_line(aes(y = pred), col = "red")
+
+distribution_2 <- distribution_2 %>%
+  add_predictions(model_distribution_2)
+
+distribution_2 %>%
+  ggplot(aes(x = x)) +
+  geom_point(aes(y = y)) +
+  geom_line(aes(y = pred), col = "red")
+
+```
+
+
+```{r}
+library(infer)
+
+bootstrap_dist_slope <- distribution_2 %>%
+  specify(formula = y ~ x) %>%
+  generate(reps = 10000, type = "bootstrap") %>%
+  calculate(stat = "slope")
+
+slope_ci95 <- bootstrap_dist_slope %>%
+  get_ci(level = .95, type = "percentile")
+slope_ci95
+
+bootstrap_dist_slope %>%
+  visualise(bins = 30) +
+  shade_ci(endpoints = slope_ci95)
+```
+
+
+
+
+
 
 

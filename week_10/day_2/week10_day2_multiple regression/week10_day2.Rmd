@@ -1,0 +1,289 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Day 2
+
+# Supervised and Unsupervised Learning
+
+# Variable Engineering
+
+
+
+```{r}
+library(tidyverse)
+library(fastDummies)
+
+grades <- read_csv("data/grades.csv")
+
+grades
+```
+
+# Missing values
+
+```{r}
+summary(grades)
+```
+
+Replace the NA values in our dataset by imputing the mean value of the appropriate columns. Refer to the summary above to see which columns need work.
+
+```{r}
+# replacing NA values
+
+grades <- grades %>%
+  group_by(subject) %>%
+  mutate(across(where(is.numeric), ~ coalesce(.x, mean(.x, na.rm = TRUE))))
+```
+
+Creating dummy variables
+Can be ordered and non-ordered
+
+```{r}
+grades %>%
+  distinct(subject)
+```
+
+
+```{r}
+grades_subject_dummy <- grades %>%
+  mutate(subject_engl = ifelse(subject == "english", 1, 0))
+
+head(grades_subject_dummy)
+```
+
+The idea of dummy variables, is that the model can't accept text, so you create individual binary variables for each variable to mark the variable (e.g. english yes/no)
+
+```{r}
+grades_subject_dummy <- grades_subject_dummy %>%
+  mutate(subject_phys = ifelse(subject == "physics", 1, 0)) %>%
+  mutate(subject_maths = ifelse(subject == "maths", 1, 0)) %>%
+  mutate(subject_fren = ifelse(subject == "french", 1, 0)) %>%
+  mutate(subject_bio = ifelse(subject == "biology", 1, 0))
+
+head(grades_subject_dummy)
+```
+
+```{r}
+grades_subject_dummy <- grades_subject_dummy %>%
+  ungroup() %>%
+  select(-subject)
+```
+
+Dummy variable trap
+Always have as few variables as possible
+We have created one variable for each, but we can identify the last variable by default
+
+```{r}
+# using fastDummies to create variables
+
+grades_subject_dummy2 <- grades %>%
+  fastDummies::dummy_cols(select_columns = "subject", remove_first_dummy = TRUE, remove_selected_columns = TRUE) 
+
+head(grades_subject_dummy2)
+
+# this is an engineered dataset to be put into a model
+```
+
+It may be necessary to scale values, to ensure they are on a common scale (e.g. if a value is input as 5kg and one is 5000g, they're the same, but a model will output them differently)
+
+```{r}
+# scaling values
+
+assignment_mean <- mean(grades$assignment)
+assignment_sd <- sd(grades$assignment)
+
+assignment_mean
+assignment_sd
+
+grades_scaled <- grades %>%
+  mutate(assignment_scaled = (assignment - assignment_mean) / assignment_sd)
+
+grades_scaled
+```
+
+```{r}
+grades %>% 
+  ggplot(aes(x = assignment)) +
+  geom_density() +
+  geom_vline(xintercept = mean(grades$assignment), size = 1, colour = "red") +
+  labs(title = "Raw data")
+
+# plotting the original, raw, data
+
+grades_scaled %>% 
+  ggplot(aes(x = assignment_scaled)) +
+  geom_density() +
+  geom_vline(xintercept = mean(grades_scaled$assignment_scaled), size = 1, colour = "red") +
+  labs(title = "Raw data")
+
+# plotting the scaled data
+```
+
+BREAK
+
+# Multiple Linear Regression
+
+As a reminder / sum, simple regression is using one variable to predict another.
+Multiple regression is using multiple variables to predict another variable
+
+```{r}
+library(mosaicData)
+library(tidyverse)
+library(janitor)
+```
+
+```{r}
+# data to be used
+
+RailTrail
+```
+
+data needs cleaning
+
+```{r}
+railtrail_clean <- RailTrail %>%
+  clean_names() %>%
+  mutate(across(spring:fall, as.logical)) 
+
+head(railtrail_clean)
+```
+
+```{r}
+railtrail_trim <- railtrail_clean %>%
+  select(-c("hightemp", "lowtemp", "fall", "day_type"))
+
+head(railtrail_trim)
+```
+
+```{r}
+# alias can be used to find dependencies in a model
+
+alias(lm(volume ~ . , data = railtrail_clean))
+```
+
+
+```{r}
+library(GGally)
+
+ggpairs(railtrail_trim)
+```
+
+Making a model
+
+```{r}
+library(ggfortify)
+
+model <- lm(volume ~ avgtemp, data = railtrail_trim)
+autoplot(model)
+```
+Not the best, but we'll keep going
+
+```{r}
+summary(model)
+```
+Task:
+Check the regression assumptions. How well does this simple model perform in predicting volume?
+[Hint - remember, we can check the regression assumptions by plotting the model object]
+What does the R-value tell us?
+
+R-squared - is 18%
+variation is 18%
+So not very well!! (the higher the better; it can only account for 18%)
+
+
+Add in another variable
+```{r}
+model2 <- lm(volume ~ avgtemp + weekday, data = railtrail_trim)
+
+summary(model2)
+autoplot(model2)
+```
+
+There are apprx 70 fewer users on the trail each weekday as compared with the weekend (with avg_temp held constant)
+
+```{r}
+library(mosaic)
+
+plotModel(model2)
+```
+
+Task
+Adding summer as a categorical predictor
+```{r}
+
+
+model3 <- lm(volume ~ avgtemp + weekday + summer, data = railtrail_trim)
+
+summary(model3)
+
+plotModel(model3)
+
+```
+P value is 0.6714
+
+
+# Interactions
+```{r}
+railtrail_trim %>%
+  ggplot(aes(x = avgtemp, y = volume, color = weekday)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+
+# the lines are demonstrating that the variable weekday are having an interaction
+# avg_temp / volume (the lines are skewed, even though they are logical)
+
+```
+
+```{r}
+model4 <- lm(volume ~ avgtemp + weekday + avgtemp:weekday , data = railtrail_trim)
+
+plotModel(model4)
+```
+Examine summary
+```{r}
+summary(model4)
+```
+
+```{r}
+model5 <- lm(volume ~ avgtemp + weekday + cloudcover, data = railtrail_trim)
+
+summary(model5)
+```
+Interpretation is that:
+For every 1 fahr increase (1 unit), there are 5.2 more users 
+
+For categorical, on average weekend users is 48 less
+
+Check this in notes (re-read)
+
+Task
+Add precip (daily precipitation in inches) into the regression model. Perform diagnostics, and if you find that precip is a significant predictor, interpret its fitted coefficient.
+```{r}
+model6 <- lm(volume ~ avgtemp + weekday + cloudcover + precip, data = railtrail_trim)
+
+summary(model6)
+```
+
+# Interactions of continuous predictors
+predictors = variable (it's the same thing)
+
+```{r}
+model7 <- lm(volume ~ avgtemp + cloudcover + weekday + precip + avgtemp:precip, data = railtrail_trim)
+summary(model7)
+
+```
+
+```{r}
+# a way of checking for interaction / relationship between variables prior to putting in a model
+
+coplot(volume ~ avgtemp | precip,
+       rows = 1,
+       panel = function(x, y, ...){
+         points(x, y)
+         abline(lm(y ~ x), col = "blue")
+       },
+       data = railtrail_trim)
+```
+
+

@@ -1,0 +1,366 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Week 10 - Day 3
+
+## Manual Model Building
+
+Explanatory model - this is what we explored yesterday; checking for statistical significance, and adding to the model
+Continue adding variables until you've built the model. You can explain it and you know how your model is able to predict
+
+Predictive model - black box models; strong predictive power, but low statistical evidence
+
+Systematic approach to model building, but it is not an exact science; it is equally an art, and therefore domain knowledge is important.
+
+
+```{r}
+library(tidyverse)
+library(car)
+library(modelr)
+library(GGally)
+```
+
+```{r}
+Prestige
+```
+
+Getting rid of the census variable
+
+```{r}
+prestige_trim <- Prestige %>%
+  select(-census) %>%
+  drop_na()
+```
+
+checking for missing values (which are then dropped up above)
+```{r}
+summary(prestige_trim)
+```
+
+Choosing first predictor
+```{r}
+# prestige will be first predictor
+
+prestige_trim %>%
+  ggpairs(aes(color = type, alpha = 0.5))
+
+# from these plots, it looks like education, income, and type
+```
+
+Looking at education first
+```{r}
+mod1a <- lm(prestige ~ education, data = prestige_trim)
+
+mod1a
+```
+Interpretation of this:
+
+Prestige = -10.841 + 5.388 * education
+
+Which means... 
+-10.841 is where the line intercepets the y-axis. And then it increases every.....
+
+```{r}
+summary(mod1a)
+```
+
+Diagnostic plot
+```{r}
+par(mfrow = c(2, 2))
+
+plot(mod1a)
+```
+
+Task
+```{r}
+mod1b <- lm(prestige ~ type, data = prestige_trim)
+
+mod1b
+
+summary(mod1b)
+
+par(mfrow = c(2, 2))
+
+plot(mod1b)
+# the plots look odd because the variable is categorical - this would change if there was a continuous variable in
+
+```
+
+Adding a second predictor into the plot (using the residuals)
+```{r}
+prestige_remain_resid <- prestige_trim %>%
+  add_residuals(mod1a) %>%
+  select(-c("prestige", "education"))
+
+prestige_remain_resid %>%
+  ggpairs(aes(color = type, alpha = 0.5))
+```
+
+Second model development; adding in residual or income
+
+```{r}
+mod2a <- lm(prestige ~ education + income, data = prestige_trim)
+
+summary(mod2a)
+```
+
+```{r}
+mod2b <- lm(prestige ~ education + type, data = prestige_trim)
+
+summary(mod2b)
+```
+The p-value for type is high; for one dummy variable it is abov 0.05, and for one, below.
+To check whether it is as a whole above or below, we can use the function anova.
+
+
+```{r}
+anova(mod1a, mod2b)
+```
+This shows that it IS statistically significant, so it could be used. 
+However, we noted that income was a better predictor, so we will proceed with this path.
+
+
+```{r}
+prestige_remain_resid <- prestige_trim %>%
+  add_residuals(mod2a) %>%
+  select(-c("prestige", "education", "income"))
+
+prestige_remain_resid %>%
+  ggpairs(aes(colour = type, alpha = 0.5))
+```
+
+There is still some variation in type, so we wil use this for our third predictor.
+
+```{r}
+mod3a <- lm(prestige ~ education + income + type, data = prestige_trim)
+
+summary(mod3a)
+```
+While the two type variables are not significant, there is one which is hidden, so it is
+important to run the anova anways
+
+```{r}
+anova(mod2a, mod3a)
+```
+
+** BREAK **
+
+Interactions
+
+You can only look at interactions if the variable is in the model.
+
+```{r}
+prestige_resid <- prestige_trim %>%
+  add_residuals(mod3a) %>%
+  select(-prestige)
+```
+
+Examining interactions
+
+Education, and income - both are continuous
+
+```{r}
+coplot(resid ~ income | education, data = prestige_resid, columns = 6)
+```
+
+Adding some regression lines
+
+```{r}
+coplot(resid ~ income | education,
+       panel = function(x,y, ...){
+         points(x,y)
+         abline(lm(y ~ x), col = "blue")
+       },
+       data = prestige_resid,
+       columns = 6)
+```
+This shows how the trend changes; as education increases, so does income (and the correlation begins to go downwards)
+
+
+Looking at education and type
+
+```{r}
+prestige_resid %>%
+  ggplot() +
+  aes(x = education, y = resid, color = type) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+Income and type
+```{r}
+prestige_resid %>%
+  ggplot() +
+  aes(x = income, y = resid, color = type) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE)
+```
+
+Task
+Test all 3 interactions in your model seperately, and choose the best.
+
+```{r}
+# education and income
+
+mod4a <- lm(prestige ~ education + income + type + education:income, data = prestige_trim)
+
+summary(mod4a)
+
+# not terrible, but not great
+
+par(mfrow = c(2, 2))
+
+plot(mod4a)
+```
+
+```{r}
+# education and type
+
+mod4b <- lm(prestige ~ education + income + type + education:type, data = prestige_trim)
+
+summary(mod4b)
+
+# roughly the same as the other one
+
+par(mfrow = c(2, 2))
+
+plot(mod4b)
+```
+
+```{r}
+# education and type
+
+mod4c <- lm(prestige ~ education + income + type + income:type, data = prestige_trim)
+
+summary(mod4c)
+
+# higher tha the other two - one of them is stat sig too
+
+par(mfrow = c(2, 2))
+
+plot(mod4c)
+
+anova(mod3a, mod4c)
+```
+
+Imagine a question is set by manager, who asks what has the most impact / where should
+we focus our efforts? This is how to determine this.
+Relative importance analysis
+
+lmg - lindemann, merenda and gold method
+
+```{r}
+library(relaimpo)
+
+calc.relimp(mod4c, type = "lmg", rela = T)
+```
+The variable with the highest metric is type (even though we only added it / found out about it 3rd) - it has 40%. 
+So this would provide a good argument for a business to give good weight to this metric
+
+```{r}
+# another way to answer the same question, using the beta coeffecient
+library(lm.beta)
+
+mod4c_beta <- lm.beta(mod4c)
+summary(mod4c_beta)
+```
+
+** LUNCH BREAK **
+
+## Dimensionality Reduction
+
+The curse of dimensionality
+
+the more variables you add, the more difficult you make your model / challenges your model faces
+
+Ways to tackle this problem
+
+Variable reduction
+- we've already done this, by selecting the relevant / best variables
+
+Dimensionality reduction
+- reducing variables into components, e.g. 40% of one, 40% of another, and 20% of a 3rd variable
+
+variable reduction - there are 3 ways to do this:
+- filter. assessing the variable by some determinate, and filtering out if they don't meet it
+- wrapper. checking for correlation, checking residual, and then deciding. Forward selection is the method used in the first lesson (starting with nothing, and then adding in)
+- embedded. 
+
+Dimensionality Reduction
+
+Principal Component Analysis
+
+Because it uses a matrix, you have to do variable engineering first (you can't use categorical variables with this)
+
+Principal Compenent Analysis Task
+```{r}
+cars_data <- mtcars
+```
+
+cleaning dataset
+```{r}
+cars_data <- cars_data %>%
+  dplyr::select(-c("vs", "am"))
+```
+
+creating the PCA
+```{r}
+cars_pca <- prcomp(cars_data, center = TRUE, scale. = TRUE)
+  
+
+summary(cars_pca)
+```
+
+```{r}
+library(factoextra)
+
+fviz_eig(cars_pca)
+
+```
+
+
+```{r}
+fviz_pca_ind(cars_pca,
+             repel = TRUE)
+```
+
+
+```{r}
+fviz_pca_var(cars_pca,
+             col.var = "contrib",
+             # Color by contributions to the PC
+             gradient.cols = c("#00AFBB", "#E7B800", "#FC4E07"),
+             repel = TRUE     # Avoid text overlapping
+             )
+```
+
+Creating a plot which is a mix of the two previous plots
+```{r}
+fviz_pca_biplot(cars_pca,
+                repel = TRUE,
+                col.var = "#00008b",
+                col.ind = "#d3d3d3")
+```
+
+
+```{r}
+unscaled_pca <- prcomp(cars_data, center = TRUE, scale. = FALSE)
+summary(unscaled_pca)
+
+
+# looking at the 1st PCA, it appears that 92% of our data is explained by the PCA. 
+# this doesn't appear quite right, so looking at the original dataset, it is clear that
+# disp and hp are on a different scale to drat, wt, etc - therefore the variance will
+# be thrown off.
+```
+
+```{r}
+mtcars
+```
+
+
+
+
+

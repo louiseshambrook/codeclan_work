@@ -349,6 +349,7 @@ fviz_pca_biplot(cars_pca,
 unscaled_pca <- prcomp(cars_data, center = TRUE, scale. = FALSE)
 summary(unscaled_pca)
 
+mtcars
 
 # looking at the 1st PCA, it appears that 92% of our data is explained by the PCA. 
 # this doesn't appear quite right, so looking at the original dataset, it is clear that
@@ -356,8 +357,61 @@ summary(unscaled_pca)
 # be thrown off.
 ```
 
+
 ```{r}
-mtcars
+n_data <- nrow(cars_data)
+
+test_index <- sample(1:n_data, size = n_data * 0.2)
+
+test <- slice(cars_data, test_index)
+train <- slice(cars_data, -test_index)
+
+cars_train_pca <- prcomp(train, center = T, scale. = T, rank. = 4)
+summary(cars_train_pca)
+
+# you can use the rank argument in prcomp to remove PCA's and therefore eliminate variables (as is intended with PCAs)
+
+```
+
+
+```{r}
+cars_predict <- predict(cars_train_pca,
+                        newdata = test)
+```
+
+```{r}
+p <- fviz_pca_biplot(cars_train_pca,
+                     repel = T,
+                     col.var = "#00008b",
+                     col.ind = "#d3d3d3")
+
+fviz_add(p, cars_predict,
+         col.var = "#00008b",
+          col.ind = "#d3d3d3"
+         )
+```
+
+Task - Spotify Data
+
+```{r}
+music <- read_csv("data/data_w_genres.csv")
+
+head(music)
+```
+
+q1 to myself - which variables / columns are relevant / irrelevant for the model?
+
+key appears irrelevant, as does mode. so does count.
+```{r}
+music_clean <- music %>%
+  filter(genres == "[]") %>%
+  mutate()
+  dplyr::select(-c("mode", "count", "genres", "key"))
+
+```
+
+```{r}
+music_pca <- prcomp(music_clean, center = TRUE, scale. = TRUE)
 ```
 
 

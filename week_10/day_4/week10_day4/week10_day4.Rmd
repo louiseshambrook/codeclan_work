@@ -1,0 +1,367 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Week 10 Day 4 
+
+Elements of model building:
+Exploratory data analysis
+Feature engineering
+Feature selection
+Model development
+Manual / automatic model building
+Manual tools: ggpairs, anova, r2, p, coplots, residual plots
+
+
+# Overfitting
+
+```{r}
+library(tidyverse)
+library(CodeClanData)
+
+savings
+```
+
+```{r}
+model_overfit <- lm(savings ~ ., data = savings)
+
+model_wellfit <- lm(savings ~ salary + age + retired, data = savings)
+
+model_underfit <- lm(savings ~ salary, data = savings)
+```
+
+```{r}
+summary(model_overfit)
+```
+
+```{r}
+summary(model_underfit)
+```
+
+
+```{r}
+summary(model_wellfit)
+```
+
+Parsimonious measure of goodness of fit
+
+A parsimonious model is one which includes as few variables as necessary
+Tools to help with this are:
+Adjusted r-squared - measured the proportion of the variation in your response variable
+Akaike information criterion (AIC) - a single number scro used to determine which of the model is most likely the best model
+Bayes Information Criterion (BIC) - Measure of goodness of fit
+
+R-squared - larger values is better
+AIC and BIC - lower values are better
+
+BIC tends to be more parsimonious. (It tends to select smaller models)
+- BIC penalises larger models when compared to AIC
+
+
+Evaluating model by these values
+```{r}
+summary(model_overfit)
+
+adj-r2 is .343 ( there is a difference between r2 and adj r2)
+```
+
+```{r}
+summary(model_overfit)$adj.r.squared
+```
+
+```{r}
+AIC(model_overfit)
+```
+
+```{r}
+BIC(model_overfit)
+```
+
+```{r}
+broom::glance(model_overfit)
+```
+
+Task:
+Find the R-squared, adjusted R-squared, AIC and BIC score for:
+The well fitted model
+The over fitted model
+The under-fitted model
+
+
+Does the results you found match with your expectations?
+
+```{r}
+broom::glance(model_underfit)
+
+AIC(model_underfit)
+
+BIC(model_underfit)
+
+summary(model_underfit)$adj.r.squared
+
+```
+
+```{r}
+broom::glance(model_wellfit)
+
+AIC(model_wellfit)
+
+BIC(model_wellfit)
+
+summary(model_wellfit)$adj.r.squared
+```
+
+## Test and training set
+
+Sits in between feature selection and model development
+
+```{r}
+set.seed(9)
+
+# count rows
+n_data <- nrow(savings)
+
+# make test index
+test_index <- sample(1:n_data, size = n_data * 0.2)
+
+# use test index to create test and training split
+
+test <- slice(savings, test_index)
+train <- slice(savings, -test_index)
+
+```
+
+
+```{r}
+model <- lm(savings ~ salary + age + retired, data = train)
+```
+
+```{r}
+library(modelr)
+```
+
+```{r}
+predictions_test <- test %>%
+  add_predictions(model) %>%
+  select(savings, pred)
+
+predictions_test
+```
+
+```{r}
+# calculate mean square errors
+mse_test <- mean((predictions_test$pred - test$savings)**2)
+mse_test
+```
+
+Calculate the mean squared error between predicted savings and actual savings in the training dataset.
+Which is higher, the error on the test or the error on the training data? Is this what you would expect?
+```{r}
+predictions_train <- train %>%
+  add_predictions(model) %>%
+  select(savings, pred)
+predictions_train
+
+mse_train <- mean((predictions_train$pred - train$savings)**2)
+mse_train
+```
+
+the mean squared error is smaller - so what does this mean? 
+It is better at predicting the data in the training set, than in the test set.
+Which makes sense, because this is the data that trained it 
+
+Test-train split is one way of evaluating a model, and K-Fold cross validation is another.
+
+# K-fold cross validation
+
+```{r}
+library(caret)
+cv_10_fold <- trainControl(method = "cv",
+                           number = 10,
+                           savePredictions = TRUE)
+
+model <- train(savings ~ salary + age + retired,
+               data = savings,
+               trControl = cv_10_fold,
+               method = "lm")
+```
+
+```{r}
+model$pred
+```
+
+```{r}
+model$resample
+```
+
+```{r}
+mean(model$resample$RMSE)
+```
+
+Task
+Find the average error and the average r-squared value across each fold, after doing a 10-fold cross validation using the model which has all the variables in it. What does this tell you? Are these values as expected?
+```{r}
+model_all_variables <- train(savings ~ .,
+               data = savings,
+               trControl = cv_10_fold,
+               method = "lm")
+
+mean(model_all_variables$resample$RMSE)
+
+
+```
+
+well-fit model - 9663.584
+over-fit model - 9789.31
+(Lloyd's numbers)
+
+well-fit, r2 - 0.340796
+over-fit, r2 - 0.3216934
+
+
+## Automated model development
+
+```{r}
+library(leaps)
+library(tidyverse)
+library(CodeClanData)
+```
+
+```{r}
+insurance
+```
+
+```{r}
+regsubsets_forward <- regsubsets(charges ~ ., data = insurance,
+                                 nvmax = 8,
+                                 method = "forward")
+```
+
+```{r}
+sum_regsubsets_forward <- summary(regsubsets_forward)
+sum_regsubsets_forward
+```
+
+```{r}
+sum_regsubsets_forward$which[4,]
+```
+
+```{r}
+plot(regsubsets_forward, scale = "adjr2")
+
+#adjr2 = adjusted r2
+```
+
+```{r}
+plot(regsubsets_forward, scale = "bic")
+```
+
+```{r}
+null_model <- lm(charges ~ 1, data = insurance)
+wellfit_model = lm(charges ~ age + bmi + children + smoker, data = insurance)
+overfit_model = lm(charges ~ ., data = insurance)
+
+BIC(wellfit_model) - BIC(null_model)
+```
+
+
+null model = lm(charges ~ l)
+wellfit model = lm(charges ~ age + bmi + children + smoker)
+
+bic(null_model) - bic(wellfit_model)
+
+```{r}
+BIC(overfit_model) - BIC(null_model)
+```
+
+
+```{r}
+plot(sum_regsubsets_forward$rsq, type = "b")
+```
+
+
+```{r}
+plot(sum_regsubsets_forward$bic, type = "b")
+```
+
+Task
+Re-run the analyses above using the backward selection and exhaustive search variable selection methods [Hint - look at the regsubsets() docs to see how to do this]
+Compare the tables (or plots, whichever you find easier) showing which predictors are included for forward selection, backward selection and exhaustive search. Do you find any differences? Use adjusted R-squared as your measure of fit.
+
+```{r}
+regsubsets_backward <- regsubsets(charges ~ ., data = insurance,
+                                 nvmax = 8,
+                                 method = "backward")
+
+```
+
+```{r}
+plot(regsubsets_backward, scale = "adjr2")
+
+plot(regsubsets_backward, scale = "bic")
+
+plot(sum_regsubsets_backward$rsq, type = "b")
+
+sum_regsubsets_backward <- summary(regsubsets_backward)
+
+plot(sum_regsubsets_backward$bic, type = "b")
+```
+
+```{r}
+regsubsets_exhaustive <- regsubsets(charges ~ ., data = insurance,
+                                 nvmax = 8,
+                                 method = "exhaustive")
+
+plot(regsubsets_exhaustive, scale = "adjr2")
+sum_regsubsets_exhaustive <- summary(regsubsets_exhaustive)
+plot(sum_regsubsets_exhaustive$rsq, type = "b")
+```
+
+
+The automatic model didn't check p values, so this is something we have to do manually
+
+```{r}
+summary(regsubsets_exhaustive)$which[6,]
+```
+
+```{r}
+mod_without_region <- lm(charges ~ age + bmi + children + smoker, data = insurance)
+
+summary(mod_without_region)
+```
+
+```{r}
+mod_with_region <- lm(charges ~ age + bmi + children + smoker + region,
+                      data = insurance)
+summary(mod_with_region)
+```
+
+```{r}
+anova(mod_with_region, mod_without_region)
+
+# p value is 0.09 for region as a whole
+```
+
+```{r}
+par(mfrow = c(2, 2))
+plot(mod_without_region)
+```
+
+This is not a good model, and because there are not many things we can change, we would have to ask for more data
+
+
+Task
+Go ahead and extract the 4
+-predictor model, and then check its significance and the diagnostic plots.
+```{r}
+mod_4_predictor <- lm(charges ~ age + bmi + smoker, data = insurance)
+
+anova(mod_4_predictor, mod_without_region)
+
+summary(mod_4_predictor)
+
+par(mfrow = c(2, 2))
+plot(mod_4_predictor)
+```
+

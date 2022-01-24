@@ -1,0 +1,25 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Logistic regression is similar to a linear regression, but the curve is constructed using the natural logarithm of the **odds** of the target variable, rather than the **probability**. 
+
+$$f(x)=\frac{L}{1+e^{-k \times (x-x_0)}} $$
+
+Where:
+
+  * `f(x)`	=	output of the function
+  * `L`	=	the curve's maximum value
+  * `e` = Euler's number (the base of the natural logarithms)
+  * `k`	=	logistic growth rate or steepness of the curve
+  * `x_0`	=	the x value of the sigmoid midpoint
+  * `x`	=	real number
+  
+  
+  
+  
+  
+  We'll mimic simple linear regression and use $b_0$ and $b_1$ so our model for the estimated probability as a function of $x$, $\widehat{\textrm{prob}}(x)$, is then:
+
+$$\widehat{\textrm{prob}}(x)=\frac{1}{1+e^{-(b_0+b_1 \times x)}} $$

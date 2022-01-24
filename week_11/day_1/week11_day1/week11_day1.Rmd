@@ -1,0 +1,31 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Week 11 Day 1
+
+Logistic Regression
+
+Binary dependent variable (0 | 1)
+
+- spam emails or not
+- married or not
+- clicked or not
+- organic avocados or conventional
+- registered user or not
+- accepted user or not
+
+
+```{r}
+library(tidyverse)
+library(janitor)
+
+mortage_data <- read_csv("data/mortgage_applications.csv") %>%
+  clean_names()
+
+head(mortage_data)
+```
+
+
+

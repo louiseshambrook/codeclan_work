@@ -21,11 +21,463 @@ Binary dependent variable (0 | 1)
 library(tidyverse)
 library(janitor)
 
-mortage_data <- read_csv("data/mortgage_applications.csv") %>%
+mortgage_data <- read_csv("data/mortgage_applications.csv") %>%
   clean_names()
 
 head(mortage_data)
 ```
+
+```{r}
+library(GGally)
+
+ggpairs(mortage_data)
+```
+
+
+```{r}
+# Let's reduce the symbol size and 'jitter' the y-values so we can see more of the data without overlap of symbols
+# geom_jitter() adds adds a small amount of random variation (vertically and/ore horizontally depending on the arguments) to the location of each point
+
+score_plot <- ggplot(mortgage_data) +
+  geom_jitter(aes(y = tu_score, x = as.integer(accepted)), shape = 1, 
+              position = position_jitter(width = 0.05)) + 
+  xlab("Accepted Status") + scale_x_continuous(breaks=seq(0, 1,1))
+
+score_plot
+```
+
+
+# Logistic function
+
+Logistic regression is estimating the LOG ODDS of an event, rather than the probability
+
+Calculating the odds (vs probability), is: 
+successes of event / potential event outcomes = odds (e.g. 4 wins / 6 failures, out of 10 games = 4:6 odds)
+probability is: (total poss) / 1-(total poss / all outcomes / ) = 4 wins / 1-(6+4) = 4/10 = 40%
+
+
+
+```{r}
+logit <- function(x){
+  return(log(x/(1-x)))
+}
+
+logit_data <- tibble(p = seq(0.001, 0.999, 0.001)) %>%
+  mutate(logit_p = logit(p))
+
+head(logit_data)
+```
+
+```{r}
+ggplot(logit_data, aes(y = p, x = logit_p)) + 
+  geom_line() + 
+  ylab("probability") + xlab("logit(p) value")
+```
+
+** BREAK **
+
+Model building time
+
+
+Build a model that predicts the probability of a loan being accepted or not, given a tu_score 
+
+1. build the logistic model
+```{r}
+mortgage_data_log_model <- glm(accepted ~ tu_score, data = mortgage_data,
+                               family = binomial(link = 'logit'))
+
+mortgage_data_log_model
+```
+B0 = intercept
+
+2. add these predictions into your dataset
+
+```{r}
+library(modelr)
+
+predict_log <- tibble(tu_score = seq(0, 710, 1)) %>%
+  add_predictions(mortgage_data_log_model, type = 'response')
+```
+
+3. Check model fits the data
+
+```{r}
+ggplot(mortgage_data) +
+  geom_jitter(aes(x = tu_score, y = as.integer(accepted)), shape = 1, position = position_jitter(h = 0.05)) +
+  geom_line(data = predict_log, aes(x = tu_score, y = pred), col = "red")
+```
+
+Task
+Use and amend the code above to predict the probability of getting a mortgage application accepted with a tu_score of 594.
+
+```{r}
+predict_log_594 <- tibble(tu_score = 594) %>%
+  add_predictions(mortgage_data_log_model, type = 'response')
+```
+This is only the probability, NOT the odds.
+
+4. Interpreting the B1 for a continuous predictor (tu_score)
+
+If the independent variables increases by 1 unit, then the estimate of the log odds of the success changes (increases or decreases) by B1 units.
+
+
+Calculate the odds of having an accepted application at tu_score = 594
+```{r}
+odds_at_594 <- tibble(tu_score = 594) %>%
+  add_predictions(mortgage_data_log_model, type = "response") %>%
+  mutate(odds = pred / (1-pred))
+
+odds_at_594
+```
+This odds ratio implies that a 1 unit increase in tu_score increases the odds of getting approved for a loan by a factor of 1.58
+
+
+
+How do these odds change if we increase the tu_score by 50 points?
+```{r}
+library(broom)
+
+b_tu_score <- tidy(mortgage_data_log_model) %>%
+  filter(term == "tu_score") %>%
+  select(estimate)
+b_tu_score
+```
+
+```{r}
+odds_factor <- exp(b_tu_score * 50)
+```
+
+Calculate the new odds of getting a loan accepted or not, based on a 50 point increase in tu_score
+
+```{r}
+odds_at_594 <- odds_at_594 %>%
+  select(odds)
+```
+
+
+```{r}
+new_odds <- odds_factor * odds_at_594
+new_odds
+```
+The old odds were 1.58, the new odds are 2.41 - so the odds have improved. To check this, we can run the calculation in the same code as before.
+
+
+```{r}
+tibble(tu_score = 644) %>%
+  add_predictions(mortgage_data_log_model, type = "response") %>%
+  mutate(odds = pred / (1-pred))
+
+```
+
+Task
+How do the odds change if the tu_score decreases by 50?
+
+```{r}
+tibble(tu_score = 544) %>%
+  add_predictions(mortgage_data_log_model, type = "response") %>%
+  mutate(odds = pred / (1-pred))
+```
+Decreases to 1.03
+
+
+** LUNCH BREAK**
+
+
+Make a new model with multiple predictors
+
+```{r}
+mortgage_multi_log_model <- glm(accepted ~ tu_score + employed + age,
+                                data = mortgage_data,
+                               family = binomial(link = 'logit'))
+
+mortgage_multi_log_model
+```
+
+```{r}
+tidy_out <- tidy(mortgage_multi_log_model)
+tidy_out
+
+```
+age is NOT stat sig = 0.8584202
+
+
+
+Final model will be: accepted ~ tu_score + employed 
+
+
+```{r}
+b_employedTRUE <- tidy(mortgage_multi_log_model) %>%
+  filter(term == "employedTRUE") %>%
+  select(estimate)
+
+exp(b_employedTRUE)
+```
+
+On average, a customer's odds of being accepted for a mortgage are 4.39 times higher if they are employed. 
+
+
+
+# Lesson 2
+# Evaluating the Performance of a model
+
+So now that we've built a model, we're going to work with the dataset to see what it's saying about our data.
+
+```{r}
+mortgage_3pred_model <- glm(accepted ~ tu_score + employed + age,
+                            data = mortgage_data,
+                            family = binomial(link = 'logit'))
+
+mortgage_data_with_3pred <- mortgage_data %>%
+  add_predictions(mortgage_3pred_model, type = "response")
+
+head(mortgage_data_with_3pred)
+```
+
+**Threshold probability** - Cut off for whether a value gets classed as true or false, that depends on a certain prob level
+
+Set the threshold to 0.6
+```{r}
+threshold <- 0.6
+
+mortgage_data_with_3pred <- mortgage_data_with_3pred %>%
+  mutate(pred_thresh_0.6 = pred > threshold)
+
+mortgage_data_with_3pred
+```
+
+Count how many times our classifier/model is correct 
+
+```{r}
+conf_table <- mortgage_data_with_3pred %>%
+  tabyl(accepted, pred_thresh_0.6)
+
+conf_table
+
+# the row is predicted values
+# the column is actual values
+```
+
+
+Task
+```{r}
+mortgage_data_with_3pred
+
+
+
+```
+
+
+# Accuracy score
+
+What is the accuracy of a classifier?
+
+(total positives + total negatives) / total outcomes
+
+679+179 = 858
+
+679+179+49+193 = 1000
+
+858 / 1000
+
+
+
+
+it is 85% (roughly)
+
+
+Task
+The weakness of accuracy appears mainly when it is applied to unbalanced datasets.
+Imagine getting a mortgage is really easy, and we have a sample dataset with 900 ‘accepted’ and 100 ‘declined’ applications. This dataset is unbalanced: the ratio of outcomes isn’t approximately 1:1. Also imagine we apply a classifier with a threshold probability of zero, an ‘always accept’ classifier.
+What will the accuracy of this classifier be?
+What is the problem?
+
+There is no classifier / predictive power - the model is only being lucky in predicting the outcome.
+
+# Rates
+
+Performance measures of the classifier/model.
+
+ > True positive rate = NTP / NTP + NFN
+ TPR: the number of positive cases that are correctly identified/classified. This is sometimes called the **sensitivity**.
+ 
+ 
+ > True negative rate = NTN / NTN + NFP
+ TNR: the number of negative cases that are correctly idenfied/classified. Sometimes called the **specificity**.
+ 
+ 
+ > False positive rate = NFP / NFP + NTN
+ FPR: False alarm rate - negative cases that are incorrectly identified as positive. Also known as **type I error**
+ 
+ 
+ > False negative rate = NFN / NFN + NTP
+ FNR: Incorrectly identifies a case as negative when it's positive :( :( :( **type II error**
+
+
+values from confusion matrix
+```{r}
+NTP <- 179
+NTN <- 679
+NFP <- 49
+NFN <- 93
+
+TPR <- NTP / (NTP + NFN)
+TNR <- NTN / (NTN + NFP)
+FPR <- NFP / (NFP + NTN)
+FNR <- NFN / (NFN + NTP)
+
+TPR
+TNR
+
+FPR
+FNR
+```
+
+** BREAK **
+
+# Last lesson
+
+# ROC Curves, AUC, Gini coefficients, and cross validation
+
+```{r}
+summary(mortgage_3pred_model)
+```
+
+# ROC curves
+
+ROC is receiver operator characteristic
+
+```{r}
+library(pROC)
+
+roc_obj_3pred <- mortgage_data_with_3pred %>%
+  roc(response = accepted, predictor = pred)
+
+
+```
+
+```{r}
+ggroc(data = roc_obj_3pred, legacy.axes = TRUE) +
+  coord_fixed() +
+  ylab("sensitivity (TPR)") +
+  xlab("1-specificity (FPR)")
+```
+
+```{r}
+classifier_data <- tibble(
+  threshold = roc_obj_3pred$thresholds,
+  sensitivity = roc_obj_3pred$sensitivities,
+  specificity = roc_obj_3pred$specificities
+)
+
+head(classifier_data)
+```
+
+Task
+
+OK, let’s fit another classifier and add its curve to the ROC plot from earlier!
+
+- Fit a single predictor logistic regression model to the mortgage_data. We recommend tu_score as the predictor. Save the model as mortgage_1pred_model
+- Add the predicted probabilities from this model to mortgage_data, and save the resulting data as mortgage_data_with_1pred
+- Use this data to generate an an object from roc(), save the object as roc_obj_1pred
+- Pass your old roc_obj_3pred and new roc_obj_1pred into ggroc() [Hint check the ggroc() docs to see how to pass in multiple roc objects].
+- Given these ROC curves, which classifier is better?
+- If you have time, try another single predictor, i.e. age or employed
+
+
+```{r}
+mortgage_1pred_model <- glm(accepted ~ tu_score,
+                                data = mortgage_data,
+                               family = binomial(link = 'logit'))
+mortgage_1pred_model
+
+
+mortgage_data_with_1pred <- mortgage_data %>%
+  add_predictions(mortgage_1pred_model, type = "response")
+
+roc_obj_1pred <- mortgage_data_with_1pred %>%
+  roc(response = accepted, predictor = pred)  
+
+roc_curve <- ggroc(data = list(pred3 = roc_obj_3pred, pred1 = roc_obj_1pred), legacy.axes = TRUE) +
+  coord_fixed() +
+  ylab("sensitivity (TPR)") +
+  xlab("1-specificity (FPR)")
+```
+ROC gives us a convenient way to compare performance of classifiers visually
+
+
+AUC value - gives us a singular number ot measure effectivesness of a classifier
+AUC - Area Under the Curve
+
+
+```{r}
+auc(roc_obj_3pred)
+```
+
+```{r}
+auc(roc_obj_1pred)
+```
+
+If the line is closer to the top left, it's taking up more of the area and therefore bigger is better
+
+
+Gini Coefficient: normalises AUC to that a random classifier has 0 and a perfect classifier has 1
+
+GINI = 2 * AUC -1
+
+It can range from -1 to 1 (but you usually see from 0 to 1)
+
+
+```{r}
+gini1 <- 2* 0.866 - 1
+```
+
+```{r}
+gini3 <- 2 * 0.881 - 1
+```
+
+
+# Cross Validation
+
+```{r}
+library(caret)
+```
+
+```{r}
+mortgage_data <- mortgage_data %>%
+  mutate(employed = as_factor(if_else(employed, "t", "f")),
+         accepted = as_factor(if_else(accepted, "t", "f")),
+         employed = relevel(employed, ref = "f"),
+         accepted = relevel(accepted, ref = "f")) 
+```
+
+
+```{r}
+train_control <- trainControl(method = "repeatedcv",
+                              number = 5,
+                              repeats = 100,
+                              savePredictions = TRUE,
+                              classProbs = TRUE,
+                              summaryFunction = twoClassSummary)
+
+```
+
+```{r}
+model <- train(accepted ~ tu_score + employed + age,
+               data = mortgage_data,
+               trControl = train_control,
+               method = "glm",
+               family = binomial(link = "logit"))
+```
+
+```{r}
+summary(model)
+```
+
+```{r}
+model$results
+```
+
+
 
 
 

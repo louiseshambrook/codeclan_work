@@ -1,0 +1,37 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Week 11 day 2
+
+Logistic regression lab
+
+# MVP
+
+You’re given sample data for the customers of a telecomms company, and asked to use the data to build a classifier to predict which customers are likely to ‘churn’ (i.e. decline to renew their service contract and move to another supplier) over the next 12 months. Your clients intend to use your classifier to send targeted offers to customers likely to churn.
+
+The sample data given in file telecomms_churn.xlsx contains a number of columns, including a Churn column stating whether each customer churned during the previous 12 months.
+
+# 1.
+Read in the telecomms_churn.xlsx dataset, do initial data tidying and then explore its contents (try the readxl ppackage). Examine the relationships between the churn variable and other possible predictor variables, looking for significant relationships.
+
+
+#2.
+Convert all character columns to factor columns (hint consider mutate_if() for this). Convert senior_citizen to a meaningful factor column as well.
+
+
+#3.
+Let’s perform logistic regression using the churn column as the binary dependent variable. Create three separate single predictor logistic regression models choosing from amongst the promising predictor columns you found in your analysis above. Try to have at least one continuous predictor, and at least one categorical predictor. Check that the coefficient of the single predictor in each model is statistically significant.
+
+
+#4.
+So far so good! Now we’ll treat the logistic regression models as potential classifiers. Plot ROC curves for each classifier (it would be nice to put these on the same axes). Obtain AUC values for each of your classifiers and say which of them is likely to be the best classifier.
+
+
+#5.
+So far we’ve used all our data for both training and testing. Let’s perform cross validation to check how representative the AUC values you calculated above will be for unseen data
+
+
+#6.
+Take the model generating the best classifier (highest AUC value) from amongst your three and interpret the fitted coefficient of the particular predictor in that model in a meaningful way. Think in terms of odds ratio, i.e. how does changing the predictor value affect the odds that a customer will churn?

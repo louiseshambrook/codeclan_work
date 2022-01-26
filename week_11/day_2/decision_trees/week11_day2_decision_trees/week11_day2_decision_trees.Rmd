@@ -1,0 +1,182 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+Week 11 Day 2
+
+Decision Trees
+
+Several types of nodes
+
+Root nodes (at the top)
+Leaf nodes (at the bottom, where there is an outcome)
+Intermediate/decision nodes
+
+There are many metrics which can be used to split data, the one generally used in R is GINI
+You can also use R2, or mean r2, or even RMSE
+
+```{r}
+library(tidyverse)
+library(rpart)
+library(rpart.plot)
+
+thrones <- read_csv("data/character_data_S01-S08.csv")
+```
+
+```{r}
+head(thrones)
+```
+
+```{r}
+clean_thrones<- thrones %>% 
+  
+# Only keep variables of interest
+  select(c(sex, religion, occupation, social_status, allegiance_last, allegiance_switched, dth_flag, featured_episode_count, prominence)) %>% 
+  
+# Convert to factor level
+    mutate(sex = factor(sex, levels = c(1, 2, 9), labels = c("Male", "Female", "Unknown")),
+    religion = factor(religion, levels = c(0, 1, 3, 4, 5, 6, 7, 9), labels = c("Great Stallion", "Lord of Light", "Faith of the Seven", "Old Gods", "Drowned God", "Many Faced God", "Other", "Unknown")),
+    occupation = factor(occupation, levels = c(1, 2, 9), labels = c("Silk-collar", "Leather-collar", "Unknown")),
+    social_status = factor(social_status, levels = c(1, 2, 9), labels = c("Highborn", "Lowborn", "Unknown")),
+    allegiance_last = factor(allegiance_last, levels = c(1, 2, 3, 4, 5, 6, 7, 8, 9), labels = c("Stark", "Targaryen", "Night's Watch", "Lannister", "Greyjoy", "Bolton", "Frey", "Other", "Unknown")),
+    allegiance_switched = factor(allegiance_switched, levels = c(1, 2, 9), labels = c("No", "Yes", "Unknown")),
+    dth_flag = factor(dth_flag, levels = c(0, 1), labels = c("Survived", "Died"))) %>%
+  
+# Remove NAs 
+ na.omit()
+```
+
+
+```{r}
+glimpse(clean_thrones)
+```
+
+FIrst step is to always create a test train split
+
+## Test train split
+```{r}
+set.seed(19)
+```
+
+```{r}
+n_data <- nrow(clean_thrones)
+test_index <- sample(1:n_data, size = n_data*0.2)
+thrones_test <- slice(clean_thrones, test_index)
+thrones_train <- slice(clean_thrones, -test_index)
+```
+
+```{r}
+thrones_test %>%
+  janitor::tabyl(dth_flag)
+```
+
+```{r}
+thrones_train %>%
+  janitor::tabyl(dth_flag)
+```
+
+## Building the decision tree
+
+```{r}
+thrones_fit <- rpart(
+  formula = dth_flag ~ .,
+  data = thrones_train,
+  method = 'class'
+)
+
+rpart.plot(thrones_fit,
+           yesno = 2,
+           fallen.leaves = TRUE,
+           faclen = 6,
+           digits = 4)
+
+# digits is the number of digits displayed at the bottomg
+# fallen.leaves is whether to display the completed nodes at the bottom of the graph
+
+# in the first node, .58 is the chance of dying, 100% is how much data has been passed through that node
+# all the probabilities are of dying
+```
+
+```{r}
+higher_0.4812 <- thrones_train %>%
+  filter(dth_flag == "Died") %>%
+  nrow()
+
+lower_0.4812 <- thrones_train %>%
+  filter(prominence < 0.4812) %>%
+  nrow()
+
+92/(184+92)
+```
+
+
+```{r}
+rpart.plot(thrones_fit,
+           yesno = 2,
+           fallen.leaves = TRUE,
+           faclen = 6,
+           digits = 4,
+           type = 4,
+           extra = 101)
+```
+
+```{r}
+rules <- rpart.rules(thrones_fit, cover = TRUE)
+```
+
+
+Using the model to create a prediction
+
+```{r}
+library(modelr)
+
+thrones_test_pred <- thrones_test %>%
+  add_predictions(thrones_fit, type = "class")
+
+thrones_test_pred %>%
+  select(pred, dth_flag, prominence, religion, allegiance_last, featured_episode_count)
+```
+
+Building a confusion matrix
+```{r}
+library(yardstick)
+
+conf_mat <- thrones_test_pred %>%
+  conf_mat(truth = dth_flag, estimate = pred)
+
+conf_mat
+```
+
+```{r}
+accuracy <- thrones_test_pred %>%
+  accuracy(truth = dth_flag, estimate = pred)
+accuracy
+```
+
+Looking at the sensitivity and specificity
+sens = TRUE positive rate
+spec = TRUE negative rate
+
+```{r}
+thrones_test_pred %>%
+  sensitivity(truth = dth_flag, estimate = pred)
+```
+
+```{r}
+thrones_test_pred %>%
+  specificity(truth = dth_flag, estimate = pred)
+```
+
+```{r}
+library(caret)
+
+confusionMatrix(thrones_test_pred$pred, thrones_test_pred$dth_flag)
+```
+
+
+
+
+
+
+
+

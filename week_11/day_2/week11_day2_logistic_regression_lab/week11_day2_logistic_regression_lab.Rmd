@@ -2,9 +2,7 @@
 title: "R Notebook"
 output: html_notebook
 ---
-
 Week 11 day 2
-
 Logistic regression lab
 
 # MVP
@@ -13,25 +11,236 @@ You’re given sample data for the customers of a telecomms company, and asked t
 
 The sample data given in file telecomms_churn.xlsx contains a number of columns, including a Churn column stating whether each customer churned during the previous 12 months.
 
+```{r}
+# loading in libraries
+library(tidyverse)
+library(GGally)
+library(janitor)
+library(modelr)
+library(broom)
+library(pROC)
+library(caret)
+library(readxl)
+```
+
 # 1.
 Read in the telecomms_churn.xlsx dataset, do initial data tidying and then explore its contents (try the readxl ppackage). Examine the relationships between the churn variable and other possible predictor variables, looking for significant relationships.
 
+```{r}
+# reading in data
+telecomms <- read_xlsx("data/telecomms_churn.xlsx")
+
+# initial overview
+head(telecomms)
+summary(telecomms)
+# the column TotalCharges has 11 NA's.
+```
+
+```{r}
+# initial data tidying
+telecomms_clean <- clean_names(telecomms)
+
+# customer_id isn't needed, so that can be dropped
+
+telecomms_clean <- telecomms_clean %>%
+  select(-customer_id)
+
+```
+
+
+```{r}
+# examining relationships
+
+# the following could be significant, I will look closer:
+# tenure, total_charge, senior citizen
+telecomms_clean %>%
+  select(c("senior_citizen", "tenure", "total_charges", "churn")) %>%
+  ggpairs()
+
+# checking the ones I didn't look at
+telecomms_clean %>%
+  select(-c("senior_citizen", "tenure", "total_charges")) %>%
+  ggpairs()
+
+```
 
 #2.
 Convert all character columns to factor columns (hint consider mutate_if() for this). Convert senior_citizen to a meaningful factor column as well.
+```{r}
+telecomms_clean <- telecomms_clean %>%
+  mutate(gender = as.factor(gender),
+         partner = as.factor(partner),
+         dependents = as.factor(dependents),
+         phone_service = as.factor(phone_service),
+         internet_service = as.factor(internet_service),
+         contract = as.factor(contract),
+         churn = as.factor(churn),
+         senior_citizen = as.factor(if_else(senior_citizen == 1, "Yes", "No")))
 
+```
 
 #3.
 Let’s perform logistic regression using the churn column as the binary dependent variable. Create three separate single predictor logistic regression models choosing from amongst the promising predictor columns you found in your analysis above. Try to have at least one continuous predictor, and at least one categorical predictor. Check that the coefficient of the single predictor in each model is statistically significant.
 
 
+```{r}
+# building the first model using tenure
+# this is a continuous predictor
+
+telecomms_model_1<- glm(churn ~ tenure,
+                        data = telecomms_clean,
+                        family = binomial(link = 'logit'))
+telecomms_model_1
+
+telecomms_1_with_pred <- telecomms_clean %>%
+  add_predictions(telecomms_model_1, type = "response")
+
+head(telecomms_1_with_pred)
+
+summary(telecomms_model_1)
+# the p value is less than 0.05, therefore stat sig
+
+tidy(telecomms_model_1) 
+# IS stat sig
+
+tidy(telecomms_model_2)
+# IS
+
+tidy(telecomms_model_3)
+# IS
+
+```
+
+
+```{r}
+# building the second model using senior_citizen (categorical)
+
+telecomms_model_2<- glm(churn ~ senior_citizen,
+                        data = telecomms_clean,
+                        family = binomial(link = 'logit'))
+telecomms_model_2
+
+telecomms_2_with_pred <- telecomms_clean %>%
+  add_predictions(telecomms_model_2, type = "response")
+
+head(telecomms_2_with_pred)
+
+summary(telecomms_model_2)
+# the p value is less than 0.05, therefore stat sig
+```
+
+```{r}
+# building the third model using total_charges (continuous)
+
+telecomms_model_3<- glm(churn ~ total_charges,
+                        data = telecomms_clean,
+                        family = binomial(link = 'logit'))
+telecomms_model_3
+
+telecomms_3_with_pred <- telecomms_clean %>%
+  add_predictions(telecomms_model_3, type = "response")
+
+head(telecomms_3_with_pred)
+
+summary(telecomms_model_3)
+# the p value is less than 0.05, therefore stat sig
+```
+
+
 #4.
 So far so good! Now we’ll treat the logistic regression models as potential classifiers. Plot ROC curves for each classifier (it would be nice to put these on the same axes). Obtain AUC values for each of your classifiers and say which of them is likely to be the best classifier.
+
+```{r}
+# calculating the 1st ROC value
+roc_1_pred <- telecomms_1_with_pred %>%
+  roc(response = churn, predictor = pred)
+
+# calculating the 2nd ROC value
+roc_2_pred <- telecomms_2_with_pred %>%
+  roc(response = churn, predictor = pred)
+
+# calculating the 3rd ROC value
+roc_3_pred <- telecomms_3_with_pred %>%
+  roc(response = churn, predictor = pred)
+```
+
+```{r}
+telecomms_1_plot <- ggroc(data = list(model_1_tenure = roc_1_pred,
+                                      model_2_senior = roc_2_pred,
+                                      model_3_total_charges = roc_3_pred),
+                          legacy.axes = TRUE) +
+  coord_fixed()
+```
+
+```{r}
+# calculating AUC values for each model
+
+auc(roc_1_pred)
+
+auc(roc_2_pred)
+
+auc(roc_3_pred)
+```
+The AUC score is lowest for model 2, highest for model 1, therefore this is likely to be the best classifier.
 
 
 #5.
 So far we’ve used all our data for both training and testing. Let’s perform cross validation to check how representative the AUC values you calculated above will be for unseen data
 
 
+```{r}
+# training the model
+train_control <- trainControl(method = "repeatedcv",
+                              number = 5,
+                              repeats = 100,
+                              savePredictions = TRUE,
+                              classProbs = TRUE,
+                              summaryFunction = twoClassSummary)
+```
+
+```{r}
+# testing model 1, with tenure 
+
+validation_model_1 <- train(churn ~ tenure,
+               data = telecomms_clean,
+               trControl = train_control,
+               method = "glm",
+               family = binomial(link = "logit"))
+
+summary(validation_model_1)
+validation_model_1$results
+```
+
+```{r}
+# testing model 2, with senior_citizen 
+
+validation_model_2 <- train(churn ~ senior_citizen,
+               data = telecomms_clean,
+               trControl = train_control,
+               method = "glm",
+               family = binomial(link = "logit"))
+summary(validation_model_2)
+validation_model_2$results
+```
+
+```{r}
+# testing model 3, with total_charges
+
+# removing na rows from the dataset, as this throws an error in cross validation
+telecomms_clean_no_na <- telecomms_clean %>%
+  filter(!is.na(total_charges))
+
+validation_model_3 <- train(churn ~ total_charges,
+               data = telecomms_clean_no_na,
+               trControl = train_control,
+               method = "glm",
+               family = binomial(link = "logit"))
+summary(validation_model_3)
+validation_model_3$results
+```
+
 #6.
 Take the model generating the best classifier (highest AUC value) from amongst your three and interpret the fitted coefficient of the particular predictor in that model in a meaningful way. Think in terms of odds ratio, i.e. how does changing the predictor value affect the odds that a customer will churn?
+
+The best predictor is model_1, tenure. The AUC value is 0.7399. 
+

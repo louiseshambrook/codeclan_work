@@ -24,13 +24,13 @@ library(janitor)
 mortgage_data <- read_csv("data/mortgage_applications.csv") %>%
   clean_names()
 
-head(mortage_data)
+head(mortgage_data)
 ```
 
 ```{r}
 library(GGally)
 
-ggpairs(mortage_data)
+ggpairs(mortgage_data)
 ```
 
 

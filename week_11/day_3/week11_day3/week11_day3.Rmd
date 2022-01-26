@@ -1,0 +1,202 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Week 11 Day 3
+
+### Lesson 1
+## Clustering
+
+Clustering is unsupervised
+
+Data can be segmented, manually - groups can be split manually into groups, e.g.
+
+age over 20 + has 4+ children, age under 20 + has <4 children
+
+This can be easy for small datasets, but can quickly become complicated
+
+This is clustering
+
+Clustering algorithims
+- connectivity models
+- hierarchical clustering
+- centroid models
+- k means clustering
+- distribution models
+- density models
+
+
+### Lesson 2
+
+## Hierarchical Clustering 
+
+When there is an inherent hierarchy in the data
+
+There are two ways to do hierarchical clustering;
+aggolomerative
+divsive
+
+They both end up in a dendrogram.
+
+```{r}
+library(tidyverse)
+library(cluster)
+library(factoextra)
+library(dendextend)
+library(corrplot)
+```
+
+```{r}
+edu_data <- read_csv("data/school_data.csv")
+```
+
+```{r}
+edu_data <- edu_data %>%
+  column_to_rownames("X1")
+```
+
+
+```{r}
+# scaling the dataframe as the state_school ranges from 0 to 30/40k, and the home_school is significantly lower
+edu_data_scale <- edu_data %>%
+  mutate_if(is.numeric, scale)
+
+edu_data_scale <- edu_data %>%
+  mutate(across(where(is.numeric), scale))
+```
+
+```{r}
+# checking that the dataframe has been normalised
+
+edu_data_scale %>%
+  pivot_longer(cols = everything(),
+               names_to = "type", 
+               values_to = "value") %>% #convert data to long format
+  group_by(type) %>%
+  summarise(mean = round(mean(value)), 
+            sd = sd(value))
+```
+
+```{r}
+# creating a correlation plot - like we did with the penguins
+
+corrplot(cor(edu_data_scale), method = "number", type = "lower")
+```
+
+Calculating the distances between variables
+```{r}
+diss_matrix <- edu_data_scale %>%
+  select(home_school) %>%
+  dist(method = "euclidean")
+
+```
+
+```{r}
+# visualising the above matrix / distance calculations
+fviz_dist(diss_matrix)
+```
+
+building the dendrogram
+```{r}
+clusters <- diss_matrix %>%
+  hclust(method = "complete")
+```
+
+Plotting the dendrogram
+```{r}
+clusters %>%
+  plot(cex = 0.5, hang = -5)
+```
+
+calculating alternative clusters
+```{r}
+alt_clusters <- diss_matrix %>%
+  hclust(method = "ward.D2")
+```
+
+```{r}
+clustering_dendrogram <- clusters %>%
+  as.dendrogram() %>%
+  dendextend::set("labels_cex", 0.5)
+
+clustering_dendrogram
+```
+
+```{r}
+alt_clustering_dendrogram <- alt_clusters %>%
+  as.dendrogram() %>%
+  dendextend::set("labels_cex", 0.6)
+
+alt_clustering_dendrogram
+```
+
+```{r}
+dend_diff(clustering_dendrogram, alt_clustering_dendrogram)
+```
+
+How many clusters do we want / can we identify for our dataset?
+```{r}
+# creating our dendrogram
+
+plot(clusters, cex = 0.6, hang = -1)
+```
+
+```{r}
+plot(clusters, cex = 0.6, hang = -1)
+rect.hclust(clusters, k = 2, border = 2:5) # this marks the significant areas / clusters and can only be run with the plot code
+# K = 2; number of clusters you want
+```
+
+```{r}
+plot(clusters, cex = 0.6, hang = -1)
+rect.hclust(clusters, k = 4, border = 2:5) 
+```
+
+```{r}
+edu_clustered_h2 <- edu_data %>%
+  mutate(school_cluster = cutree(clusters, 2))
+```
+
+Carry out cluster analysis for other variables. 
+What do you find for each variable?
+How many clusters do you choose, and why?
+What are your interpretations fromr your analysis?
+
+```{r}
+# chosen variable - private_school
+# calculating the distance between variables
+
+diss_matrix_ps <- edu_data_scale %>%
+  select(private_school) %>%
+  dist(method = "euclidean")
+
+# visualising it
+fviz_dist(diss_matrix_ps)
+
+# building the dendrogram
+dendro_ps <- diss_matrix_ps %>%
+  hclust(method = "complete")
+
+# plotting this
+dendro_ps %>%
+  plot(cex = 0.5, hang = -5)
+
+# marking significant areas of plot
+plot(dendro_ps, cex = 0.5, hang = -5)
+rect.hclust(dendro_ps, k = 6, border = 2:5)
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+

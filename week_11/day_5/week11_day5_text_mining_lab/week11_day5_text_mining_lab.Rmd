@@ -1,0 +1,114 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+Week 11 Day 5
+
+Text Mining Lab
+
+```{r}
+# loading libraries
+
+library(tidyverse)
+library(tidytext)
+library(ggwordcloud)
+library(hcandersenr)
+library(harrypotter)
+library(janeaustenr)
+library(textdata)
+devtools::install_github("bradleyboehmke/harrypotter")
+
+
+
+```
+
+In this lab we’ll be working with Harry Potter data, Jane Austen data, and data from the package hcandersenr (this has the text of Hans Christian Andersen fairy tales). We’ll also be using a dataset of movie reviews from the text2vec package. You’ll need to install and then load these packages.
+
+
+Once you have installed and loaded the package the hcandersenr package, you will have access to the data frame hcandersen_en.
+
+```{r}
+library(hcandersenr)
+hcandersen_en
+
+hcandersen_en %>%
+  distinct(book)
+```
+
+The data from text2vec that we want is movie_review.
+```{r}
+library(text2vec)
+glimpse(movie_review)
+```
+
+#1 Create a word cloud of the top words that appear in The Little Mermaid.
+
+Select only “The little mermaid” from the hcandersen_en data frame.
+```{r}
+little_mermaid <- hcandersen_en %>%
+  filter(book == "The little mermaid")
+```
+
+Unnest the tokens to count the frequency of words
+```{r}
+unnested_mermaid <- little_mermaid %>%
+  unnest_tokens(word, text)
+```
+
+Counting the frequency
+```{r}
+unnested_mermaid %>%
+  count(word) %>%
+  arrange(desc(n))
+```
+Remove stop words
+```{r}
+mermaid_cleaned <- unnested_mermaid %>%
+  anti_join(stop_words) %>%
+  count(word, sort = TRUE)
+
+```
+
+Plot the word cloud
+```{r}
+ggwordcloud(mermaid_cleaned$word, mermaid_cleaned$n)
+```
+
+Make a bar chart of the top 10 sentiment words in The Little Mermaid. Make the length of the bars depend on how often the words are said, and make the colour of the bars depend on the sentiment of the word.
+```{r}
+mermaid_cleaned %>%
+  inner_join(get_sentiments("nrc")) %>%
+  arrange(desc(n)) %>%
+  slice(1:10) %>%
+  ggplot(aes(x = word, y = n, fill = sentiment)) +
+  geom_col(position = "dodge")
+
+```
+
+Find combinations
+Find the most common bigrams in Chamber of Secrets that start with "very" followed by a sentiment word from the "bing" list
+
+```{r}
+
+
+```
+
+Use TF-IDF scores to find the 5 words most associated with the three sets of books we've looked at so far (Harry Potter, HCA, and Jane Austen)
+```{r}
+titles <- c("The little mermaid, Pride and Prejudice", "Sense and Sensibility", "Emma", "Persuasion", "Mansfield Park", "Northanger Abbey")
+books <- list(little_mermaid, prideprejudice, sensesensibility, emma, persuasion, mansfieldpark, northangerabbey)
+
+```
+
+```{r}
+all_books <- purrr::map_chr(books, paste, collapse = " ")
+
+all_books_df <- tibble(
+  book = books,
+  text = all_books) %>%
+  unnest_tokens(word, text)
+  
+all_books_df %>%  
+  
+```
+

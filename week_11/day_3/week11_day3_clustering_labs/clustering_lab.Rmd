@@ -1,0 +1,160 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Week 11 Day 3 
+
+Clustering Lab
+
+Use k-means clustering to investigate potential relationships in the dataset students_big from the CodeClanData library.
+
+#1 Part a
+We’ve been asked to create clusters of students for the answers to the ‘importance’ questions (where students rate how important they find certain topics on a scale from 0 to 1000, the higher the number the more important they think the issue is).
+
+If we are to use the mathematical methods (elbow etc.) what would your optimal value of k been? Do you think the data seems well suited to cluster?
+
+```{r}
+# reading in packages and data
+
+library(tidyverse)
+library(janitor)
+
+students_data <- CodeClanData::students_big
+```
+
+Cleaning the data
+```{r}
+clean_student_data <- students_data %>%
+  clean_names() %>%
+  select(-country, -region, -gender, -ageyears, -handed, -height, -foot_length,
+         -arm_span, -languages_spoken, -travel_to_school, -travel_time_to_school,
+         -reaction_time, -score_in_memory_game, -favourite_physical_activity) %>%
+  mutate_if(is.numeric, scale)
+```
+
+```{r}
+clustered_student_data <- kmeans(clean_student_data,
+                                 centers = 6,
+                                 nstart = 25)
+
+clustered_student_data
+```
+
+cleaning/accessing the data
+```{r}
+library(broom)
+
+tidy(clustered_student_data,
+     col.names = colnames(clean_student_data))
+augment(clustered_student_data, clean_student_data)
+```
+
+building the nested tibble to draw the elbow graph / plot
+```{r}
+max_k <- 20
+
+k_clusters_student_data <- tibble(k = 1:max_k) %>%
+  mutate(kclust = map(k, ~ kmeans(clean_student_data, .x, nstart = 25)),
+    tidied = map(kclust, tidy),
+    glanced = map(kclust, glance),
+    augmented = map(kclust, augment, clean_student_data)
+  )
+
+k_clusters_student_data
+
+```
+unnesting it, to be able to plot it 
+```{r}
+clusterings_student_data <- k_clusters_student_data %>%
+  unnest(glanced)
+```
+
+```{r}
+ggplot(clusterings_student_data, aes(x=k, y=tot.withinss)) +
+  geom_point() +
+    geom_line() +
+    scale_x_continuous(breaks = seq(1, 20, by = 1))
+```
+
+```{r}
+library(factoextra)
+
+fviz_nbclust(clean_student_data,
+             kmeans,
+             method = "silhouette",
+             nstart = 25)
+```
+
+
+```{r}
+fviz_nbclust(clean_student_data, 
+             kmeans, 
+             method = "gap_stat", 
+             nstart = 25, 
+             k.max = 10)
+```
+
+```{r}
+fviz_nbclust(clean_student_data,
+             kmeans,
+             method = "wss",
+             nstart = 25)
+```
+
+Probably 2.
+
+
+## 2 Part b
+
+We have been asked to cluster the variables which are asking about environmental questions (importance_reducing_pollution, importance_recycling_rubbish, importance_conserving_water, importance_saving_energy) into 2 clusters because the school wants to split the students into 2 groups to target with specific learning/lessons about environmental issues.
+
+
+```{r}
+clustered_student_data_1 <- kmeans(clean_student_data,
+                                 centers = 1,
+                                 nstart = 25)
+
+clustered_student_data_1
+
+clustered_student_data_2 <- kmeans(clean_student_data,
+                                 centers = 1,
+                                 nstart = 25)
+
+clustered_student_data_2
+```
+
+
+
+Once you have set up the 2 clusters visualise a combination of the variables split by the clusters (e.g. plot importance_reducing_pollution vs importance_recycling_rubbish etc.) how might you describe these 2 groups in terms of characteristics on views on environmental issues back to the school?
+
+```{r}
+library(GGally)
+
+clusterings_student_data %>% 
+  unnest(cols = c(augmented)) %>%
+  select(-iter, -betweenss, -tot.withinss, -totss, -k) %>%
+  ggcorr()
+```
+```{r}
+clusterings_student_data %>% 
+  unnest(cols = c(augmented)) %>%
+  filter(k == 2) %>%
+  ggplot(aes(x = importance_recycling_rubbish, y = importance_conserving_water, colour = .cluster)) +
+  geom_point(aes(color = .cluster))
+```
+
+
+
+
+
+```{r}
+clusterings_student_data %>% 
+  unnest(cols = c(augmented)) %>%
+  filter(k == 2) %>%
+  ggplot(aes(x = importance_recycling_rubbish, y = importance_conserving_water, colour = .cluster)) +
+  geom_point(aes(color = .cluster)) +
+  facet_wrap(~ .cluster)
+```
+
+

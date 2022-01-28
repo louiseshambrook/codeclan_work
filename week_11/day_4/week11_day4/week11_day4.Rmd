@@ -1,0 +1,400 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+Week 11 Day 4
+
+Text Analysis
+
+```{r}
+library(tidyverse)
+library(tidytext)
+```
+
+```{r}
+phrases <- c(
+  "here is some text",
+  "again more text",
+  "text is text"
+)
+
+example_text <- tibble(id = seq(phrases),
+                       phrase = phrases)
+
+example_text
+```
+
+```{r}
+words_df <- example_text %>%
+  unnest_tokens(word, phrase)
+```
+
+
+```{r}
+phrases <- c(
+  "Here is some text.",
+  "Again, more text!",
+  "TEXT is text?"
+)
+```
+
+```{r}
+example_text <- tibble(id = seq(phrases), phrase = phrases)
+```
+
+```{r}
+example_text %>%
+  unnest_tokens(word, phrase)
+
+# unnest has made the words lowercase, and dropped the punctuation
+# this is default behaviour for unnest
+```
+
+```{r}
+example_text %>%
+  unnest_tokens(word, phrase, to_lower = FALSE, strip_punct = FALSE)
+```
+
+Task
+```{r}
+lines <- 
+c(
+  "Whose woods these are I think I know.",
+  "His house is in the village though;", 
+  "He will not see me stopping here",
+  "To watch his woods fill up with snow."
+)
+```
+
+
+Task
+
+Create a DF, one with each word and the line number of the word
+```{r}
+lines_text <- tibble(id = seq(lines),
+                     line = lines)
+lines_text
+
+unnested_lines <- lines_text %>%
+  unnest_tokens(word, line)
+```
+
+```{r}
+unnested_lines %>%
+  count(word) %>%
+  arrange(desc(n))
+```
+
+function created ???
+```{r}
+tibble(line_no = seq(lines), line = lines) %>%
+  unnest_tokens(word, line)
+
+create_text_df <- function(text) {
+  tibble(line_no = seq(text), line = text) %>%
+    unnest_tokens(output = word, input = line)
+}
+create_text_df
+```
+
+
+
+```{r}
+library(janeaustenr)
+```
+
+
+
+```{r}
+head(prideprejudice, 20)
+```
+
+Making the prideprejudice into a df
+```{r}
+pride_book <- create_text_df(prideprejudice)
+
+```
+
+Stop word dictionary
+```{r}
+stop_words
+
+stop_words %>%
+  group_by(lexicon) %>%
+  arrange(word) %>%
+  slice(1:5)
+
+stop_words %>%
+  group_by(lexicon) %>%
+  count(word, sort = TRUE)
+
+pride_book %>%
+  anti_join(stop_words) %>%
+  count(word, sort = TRUE)
+```
+
+```{r}
+pride_book
+```
+
+Task
+do the same thing for sense and sensibility
+```{r}
+sense_book <- create_text_df(sensesensibility)
+```
+
+```{r}
+sense_book %>%
+  anti_join(stop_words) %>%
+  count(word, sort = TRUE) %>%
+  slice(1:5)
+```
+
+https://1drv.ms/u/s!ApAHmNS-ofL2kzpCQrQvIZCtFUzT?e=iUZDcf
+
+** LUNCH BREAK **
+
+Comparing word frequencies across dataframes
+
+## TF IDF
+
+term frequency - inverse document frequency
+
+```{r}
+
+library(tidytext)
+
+unnest_tokens(token = )
+```
+
+```{r}
+sentences <- c(
+  "This is a sentence about cats.",
+  "This is a sentence about dogs.",
+  "This is a sentence about alligators."
+)
+```
+
+```{r}
+sentences_df <- tibble(
+  sentence = sentences,
+  id = 1:3
+) %>%
+unnest_tokens(word, sentence)
+```
+
+```{r}
+sentences_df %>%
+  count(word, id) %>%
+  bind_tf_idf(term = word, document = id, n = n)
+
+
+```
+
+__TF__ = Term Frequency
+will be high for important words(in a doc)
+
+__DF__ = document frequency
+will be low if it is in few documents
+
+__IDF__ = Inverse Document Frequency
+1/DF
+
+__TF-IDF__ = Term Frequency - Inverse Document Frequency
+is a measure of how important a word is to a document in a collection of documents
+
+TF = log(ntimes term in document / n terms in document)
+DF = log(n of documents term appears in / n documents)
+tf-idf = TF*log(1/df)
+
+doing this across jane austens books
+```{r}
+titles <- c("Pride and Prejudice", "Sense and Sensibility", "Emma", "Persuasion", "Mansfield Park", "Northanger Abbey")
+
+books <- list(prideprejudice, sensesensibility, emma, persuasion, mansfieldpark,  northangerabbey)
+```
+
+
+```{r}
+all_books <- purrr::map_chr(books, paste, collapse = " ")
+
+```
+
+
+```{r}
+all_books_df <- tibble(
+  title = titles,
+  text = all_books
+) %>%
+  unnest_tokens(word, text)
+
+head(all_books_df)
+```
+
+```{r}
+all_books_tf_idf <- all_books_df %>%
+  count(word, title) %>%
+  bind_tf_idf(word, title, n) %>%
+  arrange(desc(tf_idf))
+  
+```
+
+```{r}
+all_books_tf_idf %>%
+  group_by(title) %>%
+  slice_max(tf_idf)
+```
+
+## Lesson 3
+
+N-grams
+
+bigrams = words of two (e.g. "the who", "may the", "the queen")
+
+trigrams = words of three (e.g. "may the force")
+
+
+```{r}
+phrases <- c(
+  "here is some text",
+  "again more text",
+  "text is text"
+)
+
+phrases_df <- tibble(
+  phrase = phrases,
+  id     = 1:3
+) 
+
+
+phrases_df %>%
+  unnest_tokens(bigram, phrase, token = "ngrams", n = 2)
+```
+
+For the book P&P, find the top bigrams and trigrams
+
+```{r}
+book_df <- tibble(
+  id = 1:length(prideprejudice),
+  text = prideprejudice
+)
+
+book_df %>%
+  unnest_tokens(bigram, text, token = "ngrams", n = 2) %>%
+  count(bigram, sort = TRUE)
+```
+
+```{r}
+book_df %>%
+  unnest_tokens(trigram, text, token = "ngrams", n = 3) %>%
+  count(trigram, sort = TRUE)
+```
+
+```{r}
+book_df %>%
+  unnest_tokens(character, text, token = "characters") %>%
+  count(character, sort = TRUE)
+```
+
+```{r}
+book_df %>%
+  unnest_tokens(bigram, text, token = "ngrams", n = 2) %>%
+  count(bigram, sort = TRUE) %>%
+  separate(bigram, c("word1", "word2"), sep = " ") %>%
+  anti_join(stop_words, by = c("word1" = "word")) %>%
+  anti_join(stop_words, by = c("word2" = "word")) %>%
+  unite(bigram, word1, word2, remove = FALSE, sep = " ")
+```
+
+Main functions to remember from this
+
+bind_tf_idf()
+unnest_tokens(df, bigram, phrase, token = "ngrams", n = 2)
+
+
+## Sentiment analysis
+
+
+sentiment dictionaries
+```{r}
+library(textdata)
+
+sentiments
+
+get_sentiments("bing")
+
+get_sentiments("loughran") %>%
+  count(sentiment)
+
+get_sentiments("nrc") %>%
+  count(sentiment)
+  
+```
+
+```{r}
+book_pride <- tibble(
+    text = prideprejudice,
+    # treat each row as sentence
+    sentence = 1:length(prideprejudice)
+  ) %>%
+  unnest_tokens(word, text) %>%
+  anti_join(stop_words)
+```
+
+```{r}
+book_pride %>%
+  left_join(get_sentiments("bing"))
+```
+
+```{r}
+book_sentiments <- book_pride %>%
+  inner_join(get_sentiments("bing"))
+```
+
+```{r}
+book_pride %>%
+  inner_join(get_sentiments("loughran"))
+```
+
+```{r}
+book_sentiments <- book_pride %>%
+  inner_join(get_sentiments("bing"))
+```
+```{r}
+book_sentiments %>%
+  filter(sentiment == "positive") %>%
+  count(word, sort = TRUE)
+```
+
+```{r}
+book_sentiments %>%
+  filter(sentiment == "negative") %>%
+  count(word, sort = TRUE)
+```
+
+```{r}
+book_sentiments <- book_pride %>%
+  inner_join(get_sentiments("afinn"))
+
+sentence_sentiments <- book_sentiments %>%
+  group_by(sentence) %>%
+  summarise(
+    mean_sentiment = mean(value)
+  )
+
+sentence_sentiments
+```
+
+```{r}
+ggplot(sentence_sentiments, aes(sentence, mean_sentiment)) +
+  geom_point(alpha = 0.1) +
+  geom_smooth()
+```
+
+
+
+
+
+
+
